@@ -6,7 +6,7 @@ Welcome to the most complete A* algorithm learning resource available! This proj
 
 ## 🎯 Quick Start
 
-1. **[Open the Interactive Demo](demo.html)** - Start experimenting immediately
+1. **[Open the Interactive Demo](https://jimmyu2foru18.github.io/A-Pathfinding-Algorithm/)** - Start experimenting immediately
 2. **[Read Graph Theory Basics](01-graph-theory-basics.md)** - Understand the foundation
 3. **[Explore the Complete Implementation](07-complete-implementation.md)** - See production-ready code
 4. **[Try the Step-by-Step Guide](10-demo-guide.md)** - Learn through guided practice
