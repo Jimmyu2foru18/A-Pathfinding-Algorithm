@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A* Algorithm Interactive Visualizer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 0;
+            min-height: 80vh;
+        }
+
+        .visualization-area {
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .controls-panel {
+            background: #f8f9fa;
+            border-left: 1px solid #e9ecef;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .grid-container {
+            border: 2px solid #34495e;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            background: white;
+        }
+
+        #gridCanvas {
+            display: block;
+            cursor: crosshair;
+        }
+
+        .control-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .control-section h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 5px;
+        }
+
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(149, 165, 166, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .speed-control {
+            margin: 15px 0;
+        }
+
+        .speed-control label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .speed-control input {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .legend {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #2c3e50;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+            border: 1px solid #bdc3c7;
+        }
+
+        .stats {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+
+        .stats h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 13px;
+        }
+
+        .instructions {
+            background: #e8f4f8;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .instructions h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .instructions ul {
+            margin-left: 20px;
+            color: #34495e;
+        }
+
+        .instructions li {
+            margin-bottom: 5px;
+            font-size: 13px;
+        }
+
+        .algorithm-info {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+
+        .algorithm-info h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .algorithm-info p {
+            font-size: 13px;
+            color: #856404;
+            line-height: 1.4;
+        }
+
+        @media (max-width: 1200px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls-panel {
+                border-left: none;
+                border-top: 1px solid #e9ecef;
+            }
+        }
+
+        .heuristic-selector {
+            margin: 15px 0;
+        }
+
+        .heuristic-selector select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            background: white;
+        }
+
+        .step-info {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .step-info h4 {
+            color: #495057;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>A* Algorithm Interactive Visualizer</h1>
+            <p>Explore the most popular pathfinding algorithm with real-time visualization</p>
+        </div>
+        
+        <div class="main-content">
+            <div class="visualization-area">
+                <div class="grid-container">
+                    <canvas id="gridCanvas" width="800" height="600"></canvas>
+                </div>
+            </div>
+            
+            <div class="controls-panel">
+                <div class="instructions">
+                    <h4>🎯 How to Use</h4>
+                    <ul>
+                        <li><strong>Left Click:</strong> Set start/end points or add obstacles</li>
+                        <li><strong>Right Click:</strong> Remove obstacles</li>
+                        <li><strong>Drag:</strong> Paint multiple obstacles</li>
+                        <li><strong>Space:</strong> Start/pause algorithm</li>
+                        <li><strong>R:</strong> Reset grid</li>
+                    </ul>
+                </div>
+                
+                <div class="control-section">
+                    <h3>🎮 Controls</h3>
+                    <div class="button-group">
+                        <button id="startBtn" class="btn btn-primary">Start A* Search</button>
+                        <button id="pauseBtn" class="btn btn-secondary" disabled>Pause</button>
+                        <button id="resetBtn" class="btn btn-danger">Reset Grid</button>
+                        <button id="clearPathBtn" class="btn btn-secondary">Clear Path Only</button>
+                        <button id="generateMazeBtn" class="btn btn-secondary">Generate Maze</button>
+                    </div>
+                    
+                    <div class="speed-control">
+                        <label for="speedSlider">Animation Speed:</label>
+                        <input type="range" id="speedSlider" min="1" max="100" value="50">
+                        <span id="speedValue">50ms</span>
+                    </div>
+                    
+                    <div class="heuristic-selector">
+                        <label for="heuristicSelect">Heuristic Function:</label>
+                        <select id="heuristicSelect">
+                            <option value="manhattan">Manhattan Distance</option>
+                            <option value="euclidean">Euclidean Distance</option>
+                            <option value="diagonal">Diagonal Distance</option>
+                            <option value="dijkstra">Dijkstra (h=0)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="control-section">
+                    <h3>🎨 Legend</h3>
+                    <div class="legend">
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #2ecc71;"></div>
+                            <span>Start</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #e74c3c;"></div>
+                            <span>End</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #34495e;"></div>
+                            <span>Obstacle</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #3498db;"></div>
+                            <span>Open Set</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #9b59b6;"></div>
+                            <span>Closed Set</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #f1c40f;"></div>
+                            <span>Path</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="control-section">
+                    <h3>📊 Statistics</h3>
+                    <div class="stats">
+                        <div class="stat-item">
+                            <span>Nodes Explored:</span>
+                            <span id="nodesExplored">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>Path Length:</span>
+                            <span id="pathLength">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>Execution Time:</span>
+                            <span id="executionTime">0ms</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>Algorithm Status:</span>
+                            <span id="algorithmStatus">Ready</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="algorithm-info">
+                    <h4>💡 Algorithm Insight</h4>
+                    <p id="algorithmDescription">
+                        A* uses f(n) = g(n) + h(n) where g(n) is the actual cost from start to n, 
+                        and h(n) is the heuristic estimate from n to goal. Click Start to begin!
+                    </p>
+                </div>
+                
+                <div class="step-info">
+                    <h4>🔍 Current Step</h4>
+                    <p id="stepDescription">Click on the grid to set start and end points, then click Start to begin the A* search.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="visualization.js"></script>
+</body>
+</html>
