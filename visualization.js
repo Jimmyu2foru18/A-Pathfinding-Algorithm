@@ -5,6 +5,9 @@
 
 class AStarVisualizer {
     constructor() {
+        this.MOBILE_BREAKPOINT = 768;
+        this.RESIZE_DEBOUNCE_MS = 120;
+
         this.canvas = document.getElementById('gridCanvas');
         if (!this.canvas) {
             throw new Error('Canvas element #gridCanvas not found');
@@ -111,7 +114,7 @@ class AStarVisualizer {
         const container = this.canvas.parentElement;
         if (!container) return false;
 
-        const isMobile = window.innerWidth <= 768;
+        const isMobile = window.innerWidth <= this.MOBILE_BREAKPOINT;
         const nextCellSize = isMobile ? 16 : 20;
         const maxWidth = Math.min(container.clientWidth || 800, 900);
         const maxHeight = Math.min(Math.max(window.innerHeight - 260, 320), 650);
@@ -144,7 +147,7 @@ class AStarVisualizer {
                 this.draw();
             }
             this.resizeDebounceId = null;
-        }, 120);
+        }, this.RESIZE_DEBOUNCE_MS);
     }
 
     getEventGridPosition(clientX, clientY) {
