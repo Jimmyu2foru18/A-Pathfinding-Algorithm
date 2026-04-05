@@ -7,6 +7,8 @@ class AStarVisualizer {
     constructor() {
         this.canvas = document.getElementById('gridCanvas');
         this.ctx = this.canvas.getContext('2d');
+        this.baseCanvasWidth = this.canvas.width;
+        this.baseCanvasHeight = this.canvas.height;
         this.cellSize = 20;
         this.cols = Math.floor(this.canvas.width / this.cellSize);
         this.rows = Math.floor(this.canvas.height / this.cellSize);
@@ -41,6 +43,8 @@ class AStarVisualizer {
         
         this.initializeGrid();
         this.setupEventListeners();
+        this.resizeCanvasToFitContainer();
+        this.updateAlgorithmDescription();
         this.draw();
     }
     
@@ -60,6 +64,14 @@ class AStarVisualizer {
         this.canvas.addEventListener('mousemove', (e) => this.handleMouseMove(e));
         this.canvas.addEventListener('mouseup', () => this.handleMouseUp());
         this.canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+        window.addEventListener('mouseup', () => this.handleMouseUp());
+        
+        // Touch events for mobile
+        this.canvas.addEventListener('touchstart', (e) => this.handleTouchStart(e), { passive: false });
+        this.canvas.addEventListener('touchmove', (e) => this.handleTouchMove(e), { passive: false });
+        this.canvas.addEventListener('touchend', () => this.handleMouseUp());
+        this.canvas.addEventListener('touchcancel', () => this.handleMouseUp());
+        window.addEventListener('resize', () => this.resizeCanvasToFitContainer());
         
         // Button events
         document.getElementById('startBtn').addEventListener('click', () => this.startSearch());
@@ -73,6 +85,10 @@ class AStarVisualizer {
         speedSlider.addEventListener('input', (e) => {
             this.animationSpeed = 101 - parseInt(e.target.value);
             document.getElementById('speedValue').textContent = this.animationSpeed + 'ms';
+        });
+
+        document.getElementById('heuristicSelect').addEventListener('change', () => {
+            this.updateAlgorithmDescription();
         });
         
         // Keyboard events
@@ -95,8 +111,10 @@ class AStarVisualizer {
     
     getMousePos(e) {
         const rect = this.canvas.getBoundingClientRect();
-        const x = Math.floor((e.clientX - rect.left) / this.cellSize);
-        const y = Math.floor((e.clientY - rect.top) / this.cellSize);
+        const scaleX = this.canvas.width / rect.width;
+        const scaleY = this.canvas.height / rect.height;
+        const x = Math.floor(((e.clientX - rect.left) * scaleX) / this.cellSize);
+        const y = Math.floor(((e.clientY - rect.top) * scaleY) / this.cellSize);
         return { x, y };
     }
     
@@ -133,6 +151,34 @@ class AStarVisualizer {
     
     handleMouseUp() {
         this.isMouseDown = false;
+    }
+
+    handleTouchStart(e) {
+        e.preventDefault();
+        if (!e.touches.length) return;
+        this.isMouseDown = true;
+        this.mouseButton = 0;
+        const touch = e.touches[0];
+        const pos = this.getMousePos(touch);
+        
+        if (pos.x >= 0 && pos.x < this.cols && pos.y >= 0 && pos.y < this.rows) {
+            this.handleCellClick(pos.x, pos.y, 0);
+        }
+    }
+
+    handleTouchMove(e) {
+        e.preventDefault();
+        if (!this.isMouseDown || !e.touches.length) return;
+        const touch = e.touches[0];
+        const pos = this.getMousePos(touch);
+        
+        if (pos.x >= 0 && pos.x < this.cols && pos.y >= 0 && pos.y < this.rows) {
+            const node = this.grid[pos.x][pos.y];
+            if (node !== this.startNode && node !== this.endNode) {
+                node.isObstacle = true;
+                this.draw();
+            }
+        }
     }
     
     handleCellClick(x, y, button) {
@@ -486,6 +532,41 @@ class AStarVisualizer {
     
     updateStepDescription(description) {
         document.getElementById('stepDescription').textContent = description;
+    }
+
+    updateAlgorithmDescription() {
+        const heuristicType = document.getElementById('heuristicSelect').value;
+        const descriptionElement = document.getElementById('algorithmDescription');
+        const startBtn = document.getElementById('startBtn');
+        
+        switch (heuristicType) {
+            case 'euclidean':
+                descriptionElement.textContent = 'A* with Euclidean distance uses straight-line distance as h(n). This is smooth and effective for free movement in all directions.';
+                startBtn.textContent = 'Start A* Search';
+                break;
+            case 'diagonal':
+                descriptionElement.textContent = 'A* with diagonal distance is optimized for 8-direction movement, matching the cost model used in this grid.';
+                startBtn.textContent = 'Start A* Search';
+                break;
+            case 'dijkstra':
+                descriptionElement.textContent = 'Dijkstra\'s algorithm is A* with h(n)=0. It guarantees optimal paths but explores more nodes than informed heuristics.';
+                startBtn.textContent = 'Start Dijkstra Search';
+                break;
+            case 'manhattan':
+            default:
+                descriptionElement.textContent = 'A* with Manhattan distance estimates cost using horizontal + vertical distance. It is simple and often fast on grid maps.';
+                startBtn.textContent = 'Start A* Search';
+                break;
+        }
+    }
+
+    resizeCanvasToFitContainer() {
+        const container = this.canvas.parentElement;
+        if (!container) return;
+        const availableWidth = container.clientWidth;
+        const scale = Math.min(1, availableWidth / this.baseCanvasWidth);
+        this.canvas.style.width = `${Math.floor(this.baseCanvasWidth * scale)}px`;
+        this.canvas.style.height = `${Math.floor(this.baseCanvasHeight * scale)}px`;
     }
 }
 
