@@ -112,7 +112,10 @@ class AStarVisualizer {
 
     updateCanvasSize() {
         const container = this.canvas.parentElement;
-        if (!container) return false;
+        if (!container) {
+            console.warn('Grid canvas container is missing; skipping resize update.');
+            return false;
+        }
 
         const isMobile = window.innerWidth <= this.MOBILE_BREAKPOINT;
         const nextCellSize = isMobile ? 16 : 20;
@@ -422,6 +425,7 @@ class AStarVisualizer {
             case 'euclidean':
                 return Math.sqrt(dx * dx + dy * dy);
             case 'diagonal':
+                // Octile distance: consistent with orthogonal cost=1 and diagonal cost=sqrt(2).
                 return (Math.max(dx, dy) - Math.min(dx, dy)) + Math.sqrt(2) * Math.min(dx, dy);
             case 'dijkstra':
                 return 0;
