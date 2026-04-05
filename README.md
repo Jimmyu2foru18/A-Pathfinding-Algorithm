@@ -109,6 +109,7 @@ Interactive Visualization:
 - **Compare** different heuristics
 - **Visualize** open/closed sets in real-time
 - **Experiment** with various grid configurations
+- **Use on mobile** with responsive canvas and touch interactions
 
 ## Features
 

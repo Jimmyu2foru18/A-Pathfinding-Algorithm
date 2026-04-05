@@ -6,17 +6,23 @@
 class AStarVisualizer {
     constructor() {
         this.canvas = document.getElementById('gridCanvas');
+        if (!this.canvas) {
+            throw new Error('Canvas element #gridCanvas not found');
+        }
         this.ctx = this.canvas.getContext('2d');
+        if (!this.ctx) {
+            throw new Error('Unable to get 2D context from #gridCanvas');
+        }
         this.cellSize = 20;
-        this.cols = Math.floor(this.canvas.width / this.cellSize);
-        this.rows = Math.floor(this.canvas.height / this.cellSize);
+        this.cols = 0;
+        this.rows = 0;
         
         // Grid state
         this.grid = [];
         this.startNode = null;
         this.endNode = null;
-        this.openSet = [];
-        this.closedSet = [];
+        this.openSet = new Set();
+        this.closedSet = new Set();
         this.path = [];
         
         // Animation state
@@ -37,8 +43,11 @@ class AStarVisualizer {
         // Mouse state
         this.isMouseDown = false;
         this.mouseButton = 0;
+        this.isTouchDrawing = false;
+        this.resizeDebounceId = null;
         this.currentMode = 'start'; // 'start', 'end', 'obstacle'
         
+        this.updateCanvasSize();
         this.initializeGrid();
         this.setupEventListeners();
         this.draw();
@@ -60,6 +69,9 @@ class AStarVisualizer {
         this.canvas.addEventListener('mousemove', (e) => this.handleMouseMove(e));
         this.canvas.addEventListener('mouseup', () => this.handleMouseUp());
         this.canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+        this.canvas.addEventListener('touchstart', (e) => this.handleTouchStart(e), { passive: false });
+        this.canvas.addEventListener('touchmove', (e) => this.handleTouchMove(e), { passive: false });
+        this.canvas.addEventListener('touchend', () => this.handleTouchEnd(), { passive: true });
         
         // Button events
         document.getElementById('startBtn').addEventListener('click', () => this.startSearch());
@@ -91,13 +103,59 @@ class AStarVisualizer {
                     break;
             }
         });
+
+        window.addEventListener('resize', () => this.handleResize());
+    }
+
+    updateCanvasSize() {
+        const container = this.canvas.parentElement;
+        if (!container) return false;
+
+        const isMobile = window.innerWidth <= 768;
+        const nextCellSize = isMobile ? 16 : 20;
+        const maxWidth = Math.min(container.clientWidth || 800, 900);
+        const maxHeight = Math.min(Math.max(window.innerHeight - 260, 320), 650);
+
+        const width = Math.max(nextCellSize * 10, Math.floor(maxWidth / nextCellSize) * nextCellSize);
+        const height = Math.max(nextCellSize * 10, Math.floor(maxHeight / nextCellSize) * nextCellSize);
+        const nextCols = Math.floor(width / nextCellSize);
+        const nextRows = Math.floor(height / nextCellSize);
+
+        const changed = nextCols !== this.cols || nextRows !== this.rows || nextCellSize !== this.cellSize;
+
+        this.cellSize = nextCellSize;
+        this.canvas.width = width;
+        this.canvas.height = height;
+        this.cols = nextCols;
+        this.rows = nextRows;
+
+        return changed;
+    }
+
+    handleResize() {
+        if (this.resizeDebounceId) {
+            clearTimeout(this.resizeDebounceId);
+        }
+        this.resizeDebounceId = setTimeout(() => {
+            if (this.updateCanvasSize()) {
+                this.resetGrid();
+                this.updateStepDescription('Grid resized for your screen. Set start and end points to continue.');
+            } else {
+                this.draw();
+            }
+            this.resizeDebounceId = null;
+        }, 120);
+    }
+
+    getEventGridPosition(clientX, clientY) {
+        const rect = this.canvas.getBoundingClientRect();
+        const x = Math.floor((clientX - rect.left) / this.cellSize);
+        const y = Math.floor((clientY - rect.top) / this.cellSize);
+        return { x, y };
     }
     
     getMousePos(e) {
-        const rect = this.canvas.getBoundingClientRect();
-        const x = Math.floor((e.clientX - rect.left) / this.cellSize);
-        const y = Math.floor((e.clientY - rect.top) / this.cellSize);
-        return { x, y };
+        return this.getEventGridPosition(e.clientX, e.clientY);
     }
     
     handleMouseDown(e) {
@@ -133,6 +191,35 @@ class AStarVisualizer {
     
     handleMouseUp() {
         this.isMouseDown = false;
+    }
+
+    handleTouchStart(e) {
+        e.preventDefault();
+        if (!e.touches || e.touches.length === 0) return;
+        this.isTouchDrawing = true;
+        const touch = e.touches[0];
+        const pos = this.getEventGridPosition(touch.clientX, touch.clientY);
+        if (pos.x >= 0 && pos.x < this.cols && pos.y >= 0 && pos.y < this.rows) {
+            this.handleCellClick(pos.x, pos.y, 0);
+        }
+    }
+
+    handleTouchMove(e) {
+        e.preventDefault();
+        if (!this.isTouchDrawing || !e.touches || e.touches.length === 0) return;
+        const touch = e.touches[0];
+        const pos = this.getEventGridPosition(touch.clientX, touch.clientY);
+        if (pos.x >= 0 && pos.x < this.cols && pos.y >= 0 && pos.y < this.rows) {
+            const node = this.grid[pos.x][pos.y];
+            if (node && node !== this.startNode && node !== this.endNode) {
+                node.isObstacle = true;
+                this.draw();
+            }
+        }
+    }
+
+    handleTouchEnd() {
+        this.isTouchDrawing = false;
     }
     
     handleCellClick(x, y, button) {
@@ -188,7 +275,7 @@ class AStarVisualizer {
         this.updateAlgorithmStatus('Running');
         
         // Initialize A* algorithm
-        this.openSet = [this.startNode];
+        this.openSet = new Set([this.startNode]);
         this.startNode.gCost = 0;
         this.startNode.hCost = this.heuristic(this.startNode, this.endNode);
         this.startNode.fCost = this.startNode.gCost + this.startNode.hCost;
@@ -204,29 +291,30 @@ class AStarVisualizer {
         this.updateAlgorithmStatus('Paused');
         if (this.animationId) {
             clearTimeout(this.animationId);
+            this.animationId = null;
         }
     }
     
     async animateSearch() {
         if (!this.isRunning || this.isPaused) return;
         
-        if (this.openSet.length === 0) {
+        if (this.openSet.size === 0) {
             this.finishSearch(false, 'No path found!');
             return;
         }
         
         // Find node with lowest f cost
-        let current = this.openSet[0];
-        for (let i = 1; i < this.openSet.length; i++) {
-            if (this.openSet[i].fCost < current.fCost || 
-                (this.openSet[i].fCost === current.fCost && this.openSet[i].hCost < current.hCost)) {
-                current = this.openSet[i];
+        let current = null;
+        for (const node of this.openSet) {
+            if (!current || node.fCost < current.fCost ||
+                (node.fCost === current.fCost && node.hCost < current.hCost)) {
+                current = node;
             }
         }
         
         // Remove current from open set and add to closed set
-        this.openSet = this.openSet.filter(node => node !== current);
-        this.closedSet.push(current);
+        this.openSet.delete(current);
+        this.closedSet.add(current);
         this.stats.nodesExplored++;
         
         // Check if we reached the goal
@@ -239,14 +327,14 @@ class AStarVisualizer {
         // Explore neighbors
         const neighbors = this.getNeighbors(current);
         for (const neighbor of neighbors) {
-            if (neighbor.isObstacle || this.closedSet.includes(neighbor)) {
+            if (neighbor.isObstacle || this.closedSet.has(neighbor)) {
                 continue;
             }
             
             const tentativeGCost = current.gCost + this.getDistance(current, neighbor);
             
-            if (!this.openSet.includes(neighbor)) {
-                this.openSet.push(neighbor);
+            if (!this.openSet.has(neighbor)) {
+                this.openSet.add(neighbor);
             } else if (tentativeGCost >= neighbor.gCost) {
                 continue;
             }
@@ -331,7 +419,7 @@ class AStarVisualizer {
             case 'euclidean':
                 return Math.sqrt(dx * dx + dy * dy);
             case 'diagonal':
-                return Math.max(dx, dy) + (Math.sqrt(2) - 1) * Math.min(dx, dy);
+                return (Math.max(dx, dy) - Math.min(dx, dy)) + Math.sqrt(2) * Math.min(dx, dy);
             case 'dijkstra':
                 return 0;
             default:
@@ -344,6 +432,7 @@ class AStarVisualizer {
         this.isPaused = false;
         if (this.animationId) {
             clearTimeout(this.animationId);
+            this.animationId = null;
         }
         
         this.initializeGrid();
@@ -367,8 +456,8 @@ class AStarVisualizer {
     }
     
     resetSearch() {
-        this.openSet = [];
-        this.closedSet = [];
+        this.openSet = new Set();
+        this.closedSet = new Set();
         this.path = [];
         
         // Reset all node states except obstacles and start/end
@@ -420,9 +509,9 @@ class AStarVisualizer {
                     color = '#e74c3c'; // Red for end
                 } else if (this.path.includes(node)) {
                     color = '#f1c40f'; // Yellow for path
-                } else if (this.closedSet.includes(node)) {
+                } else if (this.closedSet.has(node)) {
                     color = '#9b59b6'; // Purple for closed set
-                } else if (this.openSet.includes(node)) {
+                } else if (this.openSet.has(node)) {
                     color = '#3498db'; // Blue for open set
                 }
                 
@@ -436,7 +525,7 @@ class AStarVisualizer {
                 this.ctx.strokeRect(x, y, this.cellSize, this.cellSize);
                 
                 // Draw f, g, h costs for debugging (small text)
-                if (this.isRunning && (this.openSet.includes(node) || this.closedSet.includes(node))) {
+                if (this.isRunning && (this.openSet.has(node) || this.closedSet.has(node))) {
                     this.ctx.fillStyle = '#2c3e50';
                     this.ctx.font = '8px Arial';
                     this.ctx.textAlign = 'center';

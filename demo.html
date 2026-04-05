@@ -71,11 +71,16 @@
             border-radius: 8px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.1);
             background: white;
+            width: 100%;
+            max-width: 900px;
         }
 
         #gridCanvas {
             display: block;
             cursor: crosshair;
+            width: 100%;
+            max-width: 100%;
+            touch-action: none;
         }
 
         .control-section {
@@ -259,6 +264,39 @@
             }
         }
 
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .header {
+                padding: 20px 15px;
+            }
+
+            .header h1 {
+                font-size: 1.7em;
+            }
+
+            .visualization-area,
+            .controls-panel {
+                padding: 15px;
+            }
+
+            .control-section,
+            .instructions {
+                padding: 14px;
+            }
+
+            .btn {
+                padding: 12px;
+                font-size: 13px;
+            }
+
+            .legend {
+                grid-template-columns: 1fr;
+            }
+        }
+
         .heuristic-selector {
             margin: 15px 0;
         }
@@ -308,6 +346,7 @@
                         <li><strong>Left Click:</strong> Set start/end points or add obstacles</li>
                         <li><strong>Right Click:</strong> Remove obstacles</li>
                         <li><strong>Drag:</strong> Paint multiple obstacles</li>
+                        <li><strong>Touch:</strong> Tap to place points and drag to paint obstacles</li>
                         <li><strong>Space:</strong> Start/pause algorithm</li>
                         <li><strong>R:</strong> Reset grid</li>
                     </ul>
