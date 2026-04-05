@@ -7,6 +7,10 @@ class AStarVisualizer {
     constructor() {
         this.MOBILE_BREAKPOINT = 768;
         this.RESIZE_DEBOUNCE_MS = 120;
+        this.DEFAULT_CONTAINER_WIDTH = 800;
+        this.VIEWPORT_UI_OFFSET = 260;
+        this.MIN_CANVAS_HEIGHT = 320;
+        this.MAX_CANVAS_HEIGHT = 650;
 
         this.canvas = document.getElementById('gridCanvas');
         if (!this.canvas) {
@@ -119,8 +123,11 @@ class AStarVisualizer {
 
         const isMobile = window.innerWidth <= this.MOBILE_BREAKPOINT;
         const nextCellSize = isMobile ? 16 : 20;
-        const maxWidth = Math.min(container.clientWidth || 800, 900);
-        const maxHeight = Math.min(Math.max(window.innerHeight - 260, 320), 650);
+        const maxWidth = Math.min(container.clientWidth || this.DEFAULT_CONTAINER_WIDTH, 900);
+        const maxHeight = Math.min(
+            Math.max(window.innerHeight - this.VIEWPORT_UI_OFFSET, this.MIN_CANVAS_HEIGHT),
+            this.MAX_CANVAS_HEIGHT
+        );
 
         const width = Math.max(nextCellSize * 10, Math.floor(maxWidth / nextCellSize) * nextCellSize);
         const height = Math.max(nextCellSize * 10, Math.floor(maxHeight / nextCellSize) * nextCellSize);
@@ -425,7 +432,8 @@ class AStarVisualizer {
             case 'euclidean':
                 return Math.sqrt(dx * dx + dy * dy);
             case 'diagonal':
-                // Octile distance: consistent with orthogonal cost=1 and diagonal cost=sqrt(2).
+                // Octile/diagonal heuristic (Chebyshev distance with diagonal cost adjustment):
+                // consistent with orthogonal cost=1 and diagonal cost=sqrt(2).
                 return (Math.max(dx, dy) - Math.min(dx, dy)) + Math.sqrt(2) * Math.min(dx, dy);
             case 'dijkstra':
                 return 0;
