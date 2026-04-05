@@ -432,7 +432,7 @@ class AStarVisualizer {
             case 'euclidean':
                 return Math.sqrt(dx * dx + dy * dy);
             case 'diagonal':
-                // Octile/diagonal heuristic (Chebyshev distance with diagonal cost adjustment):
+                // Octile/diagonal heuristic:
                 // consistent with orthogonal cost=1 and diagonal cost=sqrt(2).
                 return (Math.max(dx, dy) - Math.min(dx, dy)) + Math.sqrt(2) * Math.min(dx, dy);
             case 'dijkstra':
