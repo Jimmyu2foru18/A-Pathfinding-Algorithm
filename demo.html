@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A* Algorithm Interactive Visualizer</title>
+    <link rel="stylesheet" href="shared.css">
+    <style>
+        /* Incorporate existing specialized styles */
+        .visualization-area { padding: 30px; display: flex; flex-direction: column; align-items: center; }
+        .controls-panel { background: #f8f9fa; border-left: 1px solid #e9ecef; padding: 30px; overflow-y: auto; }
+        .grid-container { border: 2px solid #34495e; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); background: white; }
+        #gridCanvas { display: block; cursor: crosshair; }
+        .control-section { margin-bottom: 25px; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .btn { padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; text-transform: uppercase; }
+        /* ... (rest of the specific styles) ... */
+    </style>
+</head>
+<body>
+    <nav class="nav-bar">
+        <span>Mastering A*</span>
+        <div>
+            <a href="index.html">Home</a>
+            <a href="demo.html">Visualizer</a>
+        </div>
+    </nav>
+    
+    <div class="main-content" style="display: grid; grid-template-columns: 1fr 350px;">
+        <div class="visualization-area">
+            <div class="grid-container">
+                <canvas id="gridCanvas" width="800" height="600"></canvas>
+            </div>
+        </div>
+        
+        <div class="controls-panel">
+            <!-- ... (Controls, Legend, Stats, etc.) ... -->
+        </div>
+    </div>
+    
+    <script src="visualization.js"></script>
+</body>
+</html>

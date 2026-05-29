@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Module - A* Pathfinding</title>
+    <link rel="stylesheet" href="shared.css">
+    <style>
+        .content-area { padding: 2rem; }
+    </style>
+</head>
+<body>
+    <nav class="nav-bar">
+        <span>Mastering A*</span>
+        <div>
+            <a href="index.html">Home</a>
+            <a href="demo.html">Visualizer</a>
+        </div>
+    </nav>
+    <div class="container content-area" id="content">Loading content...</div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const fileName = urlParams.get('file');
+
+        if (fileName) {
+            fetch(fileName)
+                .then(response => {
+                    if (!response.ok) throw new Error('File not found');
+                    return response.text();
+                })
+                .then(text => {
+                    // Basic markdown to HTML
+                    document.getElementById('content').innerHTML = text
+                        .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+                        .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+                        .replace(/\*\*(.*)\*\*/gim, '<b>$1</b>')
+                        .replace(/\n/gim, '<br>');
+                })
+                .catch(err => {
+                    document.getElementById('content').innerHTML = 'Error loading content: ' + err.message;
+                });
+        } else {
+            document.getElementById('content').innerHTML = 'No module specified.';
+        }
+    </script>
+</body>
+</html>
