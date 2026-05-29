@@ -19,16 +19,16 @@
         
         <section>
             <h2>The Two Essential Data Structures</h2>
-            <p>Efficient management of nodes is critical for the performance of the A* algorithm.</p>
+            <p>Efficient management of nodes is critical for the performance of the A* algorithm. A* is fundamentally defined by its ability to intelligently prune the search space, and the data structures used to maintain the "frontier" and the "explored" areas determine whether the algorithm runs in milliseconds or seconds.</p>
             <ul>
-                <li><strong>Open Set (Frontier):</strong> A collection of nodes that have been discovered but not yet explored. This needs to support efficient extraction of the node with the minimum <code>f</code> value. A <strong>Priority Queue</strong> (Min-Heap) is the recommended implementation.</li>
-                <li><strong>Closed Set (Explored):</strong> A collection of nodes that have already been evaluated. This needs to support fast membership checking to avoid re-evaluating nodes. A <strong>Hash Set</strong> is the recommended implementation.</li>
+                <li><strong>Open Set (Frontier):</strong> This is the collection of nodes that have been discovered but not yet fully explored. A* continuously selects the node in the Open Set with the minimum <code>f</code> value to expand next. Because this extraction and the insertion of new nodes occur millions of times in large problems, this <strong>must</strong> support efficient operations. A <strong>Priority Queue</strong> (specifically, a Binary Min-Heap) is the gold-standard implementation, offering <code>O(log n)</code> insertion and extraction.</li>
+                <li><strong>Closed Set (Explored):</strong> This collection stores nodes that have already been evaluated and finalized. When exploring neighbors, A* must check if a neighbor is already in the Closed Set to avoid redundant work and cycles. Because this check happens constantly, it must be extremely fast. A <strong>Hash Set</strong> (offering <code>O(1)</code> average time complexity for lookups) is the recommended implementation.</li>
             </ul>
         </section>
 
         <section>
-            <h2>Performance Impact</h2>
-            <p>Choosing the wrong data structures can significantly slow down A* as the graph size increases. A simple array for the Open Set can turn a fast algorithm into a sluggish one, whereas a Binary Heap ensures consistent performance.</p>
+            <h2>Performance Impact: The Hidden Bottleneck</h2>
+            <p>Choosing the wrong data structures can turn A* from a high-performance pathfinding tool into a sluggish process that freezes the UI or game loop as the map size increases.</p>
             <table border="1" style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
                 <thead>
                     <tr style="background: #f4f4f4;">
@@ -43,6 +43,15 @@
                     <tr><td>1000×1000</td><td>Unusable</td><td>Fast</td></tr>
                 </tbody>
             </table>
+            <p>Using a simple array for the Open Set forces an <code>O(N)</code> scan to find the minimum <code>f</code> value every time we want to expand a node, where N is the number of nodes in the open set. As the search expands, N grows, making the algorithm perform <code>O(N²)</code> total operations, which is unacceptable for serious applications.</p>
+        </section>
+
+        <section>
+            <h2>Advanced Set Management Concepts</h2>
+            <h3>Memory-Efficient Node States</h3>
+            <p>For very large graphs, storing full node objects in the Open/Closed sets can consume massive amounts of RAM. Many high-performance implementations use a simple bit-array or a single integer per grid cell to track node status (e.g., 0 = Unvisited, 1 = Open, 2 = Closed) and store costs separately.</p>
+            <h3>Handling Re-visits</h3>
+            <p>In some graph types (like those with non-consistent heuristics), a node might be found again via a <em>shorter</em> path even after it was placed in the Closed Set. Standard A* ignores these re-visits if the heuristic is consistent. If the heuristic is <em>not</em> consistent, you must allow nodes in the Closed Set to be moved back to the Open Set if a better path is found, which adds significant complexity to set management.</p>
         </section>
     
     <div class="nav-links">

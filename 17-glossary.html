@@ -15,23 +15,54 @@
     </header>
     
     <main class="container">
-        <h1>Glossary</h1>
+        <h1>Pathfinding Glossary</h1>
+        <p>This glossary provides concise definitions of key terminology encountered in the study of pathfinding and graph search algorithms.</p>
         
         <dl>
             <dt><strong>A* Algorithm</strong></dt>
-            <dd>A graph traversal and pathfinding algorithm that efficiently finds the shortest path by using a heuristic.</dd>
+            <dd>A graph traversal and pathsearch algorithm used extensively in AI, robotics, and mapping. It finds the shortest path from a start node to a goal node by minimizing <code>f(n) = g(n) + h(n)</code>, effectively balancing actual cost incurred and estimated cost remaining.</dd>
             
             <dt><strong>Admissible Heuristic</strong></dt>
-            <dd>A heuristic that never overestimates the true cost to the goal, ensuring optimality.</dd>
+            <dd>A crucial property of heuristics for A*. A heuristic is admissible if it never overestimates the true minimum cost from node <em>n</em> to the goal. Admissibility is a requirement for A* to guarantee the optimality (the shortest path) of its solution.</dd>
             
-            <dt><strong>Open Set (Frontier)</strong></dt>
-            <dd>A priority queue of nodes discovered but not yet evaluated.</dd>
+            <dt><strong>Branching Factor</strong></dt>
+            <dd>In a graph or tree, the number of edges emanating from a node. In pathfinding on grids, the branching factor is typically 4 or 8 depending on allowed movement (cardinal only vs. cardinal + diagonal).</dd>
+            
+            <dt><strong>Chebyshev Distance</strong></dt>
+            <dd>A heuristic metric for 8-directional grids where diagonal movement cost is equal to cardinal movement cost. It is defined as <code>max(|x1 - x2|, |y1 - y2|)</code>.</dd>
             
             <dt><strong>Closed Set (Explored)</strong></dt>
-            <dd>A set of nodes that have already been evaluated.</dd>
+            <dd>A data structure (typically a Hash Set) holding nodes that have already been fully evaluated. Checking against this set prevents the algorithm from re-processing nodes, which avoids infinite loops and cycles.</dd>
+            
+            <dt><strong>Completeness</strong></dt>
+            <dd>A property of a search algorithm. An algorithm is complete if it is guaranteed to find a solution if one exists.</dd>
+            
+            <dt><strong>Consistent (Monotonic) Heuristic</strong></dt>
+            <dd>A stronger condition than admissibility. A heuristic is consistent if for every node <em>n</em> and every neighbor <em>m</em> of <em>n</em>, <code>h(n) ≤ cost(n, m) + h(m)</code>. A consistent heuristic ensures that once A* reaches a node, it has found the optimal path to it.</dd>
+            
+            <dt><strong>Euclidean Distance</strong></dt>
+            <dd>The "straight-line" distance between two points in Euclidean space. Formula: <code>√[(x1 - x2)² + (y1 - y2)²]</code>. Often used as a heuristic in any-angle pathfinding.</dd>
+            
+            <dt><strong>Graph</strong></dt>
+            <dd>A mathematical abstraction consisting of a set of vertices (nodes) and edges (connections). Graphs model environments in pathfinding applications.</dd>
+            
+            <dt><strong>Heuristic (h)</strong></dt>
+            <dd>An "educated guess" used to guide search algorithms toward the goal. A good heuristic significantly narrows the search space compared to blind search algorithms.</dd>
             
             <dt><strong>Manhattan Distance</strong></dt>
-            <dd>A distance metric for 4-directional grids: |x1 - x2| + |y1 - y2|.</dd>
+            <dd>A distance metric for 4-directional grid-based pathfinding where diagonal movement is disallowed. It represents the sum of the absolute differences of the coordinates: <code>|x1 - x2| + |y1 - y2|</code>.</dd>
+            
+            <dt><strong>Node (Vertex)</strong></dt>
+            <dd>An individual point or location within the graph environment. In grid-based pathfinding, a node typically represents a single grid cell.</dd>
+            
+            <dt><strong>Open Set (Frontier)</strong></dt>
+            <dd>A data structure (typically a Priority Queue or Min-Heap) containing nodes that have been discovered (neighbors of expanded nodes) but not yet evaluated. The node with the lowest <code>f(n)</code> is extracted from the frontier to be expanded next.</dd>
+            
+            <dt><strong>Optimality</strong></dt>
+            <dd>A property of a search algorithm. An algorithm is optimal if it is guaranteed to return the lowest-cost solution when multiple solutions exist.</dd>
+            
+            <dt><strong>Priority Queue (Min-Heap)</strong></dt>
+            <dd>The ideal data structure for the Open Set. It allows efficient insertion of new nodes and fast extraction of the node with the minimum <code>f(n)</code> value (<code>O(log n)</code> operations).</dd>
         </dl>
     
     <div class="nav-links">

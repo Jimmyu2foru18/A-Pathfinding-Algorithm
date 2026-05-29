@@ -15,21 +15,39 @@
     </header>
     
     <main class="container">
-        <h1>Testing and Validation</h1>
+        <h1>Testing and Validation Framework</h1>
         
         <section>
-            <h2>Testing Strategy</h2>
-            <p>To ensure the A* algorithm is robust, we employ a multi-layered testing strategy:</p>
+            <h2>The Critical Importance of Algorithmic Validation</h2>
+            <p>Pathfinding algorithms are notoriously difficult to debug because they often fail silently—they may return a valid path that is not the shortest, take an excessively long time, or crash only under specific, rare topological edge cases. A robust, multi-layered testing strategy is the only way to guarantee correctness in production.</p>
+        </section>
+
+        <section>
+            <h2>The Multi-Layered Testing Pyramid</h2>
             <ul>
-                <li><strong>Unit Tests:</strong> Validate individual functions (e.g., heuristic calculation, neighbor generation).</li>
-                <li><strong>Integration Tests:</strong> Ensure the algorithm correctly interacts with the visualizer and grid data.</li>
-                <li><strong>Visual Validation:</strong> Manually confirm the visualizer correctly reflects algorithm states (open, closed, path, obstacle).</li>
+                <li><strong>1. Unit Testing (The Foundation):</strong> Every discrete logic component must be tested in isolation. For instance, the <code>heuristic()</code> function should be tested with inputs where the output is mathematically known (e.g., Euclidean distance between (0,0) and (3,4) must equal exactly 5). The <code>getNeighbors()</code> function should be tested for boundary conditions (e.g., nodes at the very edge of the grid, corners, and nodes surrounded by obstacles).</li>
+                <li><strong>2. Integration Testing:</strong> This validates the interaction between components. Does the algorithm correctly pause when the "Stop/Pause" button is pressed? Does the UI correctly update the stats <code>div</code> when the algorithm's state changes?</li>
+                <li><strong>3. Stress/Performance Testing:</strong> Algorithmic performance degrades non-linearly with grid size. You must stress-test with large grids to ensure the algorithm remains responsive and does not exceed memory limits.</li>
             </ul>
         </section>
 
         <section>
-            <h2>Validating Heuristics</h2>
-            <p>A critical step is validating that heuristic functions are <em>admissible</em> (never overestimate the cost). We do this by comparing results with known simple paths.</p>
+            <h2>Validation Techniques</h2>
+            <h3>Admissibility Checking</h3>
+            <p>A critical step is validating that your heuristic function is truly <strong>admissible</strong> (it never overestimates the true cost to the goal). An inadmissible heuristic will invalidate the algorithm's optimality guarantee. You can validate this by running the algorithm on a small, solvable grid and comparing the output path length against a naive Breadth-First Search, which is guaranteed to find the shortest path in unweighted graphs.</p>
+
+            <h3>Regression Testing with Known Maps</h3>
+            <p>Create a suite of "Golden Maps"—specific grid configurations with pre-computed, known optimal paths. Every time you make an optimization to the algorithm, re-run it against these maps to ensure the generated path length still matches the golden standard. If a code change results in a longer path or different node exploration behavior than expected, your optimization has introduced a regression.</p>
+        </section>
+
+        <section>
+            <h2>Visual and User Validation</h2>
+            <p>Even with comprehensive unit tests, visual validation remains essential for pathfinding. Manually testing edge cases is key:</p>
+            <ul>
+                <li><strong>The Dead End:</strong> Can the algorithm gracefully handle a goal surrounded entirely by obstacles? (It should return "No Path").</li>
+                <li><strong>The Tunnel:</strong> A long, winding corridor that forces the algorithm to explore deeply before finding the goal.</li>
+                <li><strong>The Open Room:</strong> Validates that the algorithm doesn't explore excessively due to tie-breaking issues.</li>
+            </ul>
         </section>
     
     <div class="nav-links">

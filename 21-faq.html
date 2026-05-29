@@ -16,13 +16,23 @@
     
     <main class="container">
         <h1>Frequently Asked Questions</h1>
+        <p>Answers to common hurdles encountered when learning, implementing, and optimizing the A* pathfinding algorithm.</p>
         
         <dl>
-            <dt><strong>Q: Is A* always optimal?</strong></dt>
-            <dd>A* is optimal if the heuristic is <em>admissible</em> (never overestimates the cost).</dd>
+            <dt><strong>Q: Is A* always guaranteed to find the shortest path?</strong></dt>
+            <dd>A* is guaranteed to be optimal—meaning it will find the lowest-cost path—if and only if two conditions are met: the heuristic <code>h(n)</code> is <strong>admissible</strong> (it never overestimates the true cost to the goal) and the graph is static. If your heuristic overestimates the cost, A* may return a suboptimal path.</dd>
+            
+            <dt><strong>Q: What should I do if my A* implementation is slow?</strong></dt>
+            <dd>Slow performance is almost always caused by inefficient data structures or an overly large search space. First, ensure you are using a <strong>Binary Min-Heap</strong> for the Open Set—using an array is a common bottleneck. Second, review your heuristic; ensure it's admissible, consistent, and correctly matched to your movement constraints (e.g., Manhattan for 4-way, Octile for 8-way). Finally, consider algorithmic optimizations like Jump Point Search for uniform grids.</dd>
+            
+            <dt><strong>Q: My A* implementation returns a path that looks "jagged". How do I fix this?</strong></dt>
+            <dd>This is a common issue with grid-based A*. Because the algorithm only considers nodes in discrete grid cells, the resulting path is constrained to grid axes or diagonals. You can resolve this with a <strong>Path Smoothing</strong> post-processing step. Iterate through the generated path and remove any intermediate nodes that are redundant; if you have a direct "line of sight" between <code>path[i]</code> and <code>path[i+2]</code>, you can safely remove <code>path[i+1]</code>.</dd>
+            
+            <dt><strong>Q: How do I handle dynamic obstacles (e.g., doors, moving units)?</strong></dt>
+            <dd>Standard A* assumes the graph is static. For environments where obstacles change, you must re-calculate the path. A naive approach is to re-run A* from scratch whenever the graph changes. For better performance, look into <strong>Incremental A*</strong> algorithms like <strong>D* Lite</strong>, which update the search tree based only on the changed edges rather than re-calculating the entire path.</dd>
             
             <dt><strong>Q: What happens if A* finds no path?</strong></dt>
-            <dd>If the Open Set becomes empty and the goal hasn't been reached, no path exists.</dd>
+            <dd>If the <code>openSet</code> becomes empty and you have not reached the goal, it is mathematically certain that no valid path exists between the start and goal nodes given the current obstacle configuration. Your code must explicitly handle this case (e.g., by returning <code>null</code> or a specific "unreachable" status code) to avoid runtime errors during path reconstruction.</dd>
         </dl>
     
     <div class="nav-links">

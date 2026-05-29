@@ -15,31 +15,44 @@
     </header>
     
     <main class="container">
-        <h1>Contributing Guide</h1>
+        <h1>Contributing to Mastering A*</h1>
         
         <section>
-            <h2>Welcome Contributors!</h2>
-            <p>Thank you for your interest in contributing to this repository! We welcome bug fixes, documentation improvements, new features, and research insights.</p>
+            <h2>Welcome to the Community!</h2>
+            <p>Thank you for your interest in helping improve this project! Whether you're fixing a subtle bug, optimizing a performance bottleneck, improving the documentation, or introducing new research insights, your contributions are invaluable to the community. This project aims to be not just a code repository, but a central, community-maintained educational resource for pathfinding enthusiasts of all levels.</p>
         </section>
 
         <section>
-            <h2>How to Contribute</h2>
+            <h2>Contribution Guidelines and Workflow</h2>
+            <p>To ensure maintainability and high code quality, we follow a structured contribution workflow. Please adhere to the following steps for all non-trivial changes:</p>
             <ol>
-                <li><strong>Fork and Clone:</strong> Create your own fork and clone the repository locally.</li>
-                <li><strong>Create a Branch:</strong> Work on your changes in a dedicated branch.</li>
-                <li><strong>Develop:</strong> Implement your changes, following our code standards.</li>
-                <li><strong>Test:</strong> Ensure all changes are thoroughly tested.</li>
-                <li><strong>Submit a Pull Request:</strong> Open a PR with a clear description of your changes.</li>
+                <li><strong>Open an Issue First:</strong> Before starting significant work, please open an issue to discuss your proposed changes. This helps avoid duplicate work and ensures the feature aligns with the project’s pedagogical goals.</li>
+                <li><strong>Fork and Clone:</strong> Fork the repository to your own GitHub account and clone it locally: <code>git clone https://github.com/your-username/A-Pathfinding-Algorithm</code>.</li>
+                <li><strong>Dedicated Branching:</strong> Create a new branch with a descriptive name, such as <code>fix/performance-bottleneck</code> or <code>feat/add-octile-heuristic</code>.</li>
+                <li><strong>Implementation:</strong> Implement your changes. Please prioritize readability and documentation over clever, obfuscated code.</li>
+                <li><strong>Testing:</strong> Any new functionality or algorithmic change <em>must</em> be accompanied by updated unit or integration tests. We run automated tests on every PR; your code must pass them to be considered.</li>
+                <li><strong>Pull Request (PR):</strong> When ready, open a Pull Request. Provide a concise but detailed explanation of your changes, including any performance benchmarks if you are introducing an optimization.</li>
             </ol>
         </section>
 
         <section>
-            <h2>Code Standards</h2>
-            <p>Please adhere to our style guidelines to maintain project consistency:</p>
+            <h2>Code and Style Standards</h2>
+            <p>Consistency is key to project longevity. To maintain clean, maintainable code, please follow these guidelines:</p>
             <ul>
-                <li>Use descriptive camelCase for functions and variables.</li>
-                <li>Document all public functions with JSDoc.</li>
-                <li>Keep functions focused and modular.</li>
+                <li><strong>Descriptive Naming:</strong> Use <code>camelCase</code> for all functions and variables. Names should be self-documenting; <code>pathfinder.findPath()</code> is preferred over <code>pf.calc()</code>.</li>
+                <li><strong>Modular Design:</strong> Keep functions focused. A function should ideally do one thing and do it well. Large, monolithic functions should be decomposed into smaller, testable sub-functions.</li>
+                <li><strong>Comprehensive JSDoc:</strong> All public methods, class properties, and utility functions MUST be documented with JSDoc, detailing parameters, return types, and any assumptions (e.g., "The grid must be non-empty and 2D").</li>
+                <li><strong>Performance Consciousness:</strong> If you are optimizing core search logic, please benchmark your changes. Any performance claim must be supported by numbers (e.g., "This change reduces node exploration by 15% on large mazes").</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Ways You Can Help</h2>
+            <p>Beyond code, you can contribute in many ways:</p>
+            <ul>
+                <li><strong>Educational Content:</strong> Propose improvements to the learning modules, clarify confusing concepts, or suggest new modules.</li>
+                <li><strong>Visualizer Features:</strong> Suggest or implement new interactive features for the demo visualizer (e.g., importing custom maps, new visualization styles).</li>
+                <li><strong>Issue Reporting:</strong> Found a bug or inconsistent behavior? Please provide a detailed issue report, ideally with a reproduction script or a screenshot/recording if it's a visualization bug.</li>
             </ul>
         </section>
     

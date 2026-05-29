@@ -15,25 +15,37 @@
     </header>
     
     <main class="container">
-        <h1>Optimization Techniques</h1>
+        <h1>Optimization Techniques for A*</h1>
         
         <section>
-            <h2>Performance Bottlenecks</h2>
-            <p>For large environments or real-time applications, basic A* can be improved using several advanced techniques.</p>
+            <h2>Understanding Performance Bottlenecks</h2>
+            <p>While the basic A* algorithm is efficient, it can quickly hit performance limitations in scenarios involving massive environments (e.g., open-world games), tight real-time constraints (e.g., 60 FPS game loops), or high-frequency updates in dynamic environments (e.g., logistics robotics). Bottlenecks usually stem from:</p>
+            <ul>
+                <li><strong>Memory Pressure:</strong> Creating millions of node objects can trigger heavy Garbage Collection (GC) pauses in managed languages like JavaScript, C#, or Java.</li>
+                <li><strong>Search Space Explosion:</strong> In large, open areas, A* expands radially, exploring a massive number of nodes that are irrelevant to the shortest path.</li>
+                <li><strong>Queue Overhead:</strong> Inefficient insertion, deletion, or sorting operations in the Open Set (Frontier) consume the majority of the algorithm's CPU time.</li>
+            </ul>
         </section>
         
         <section>
-            <h2>Key Optimizations</h2>
+            <h2>Advanced Optimization Strategies</h2>
+            
+            <h3>1. Memory-Efficient Design: Node Pooling</h3>
+            <p>Instead of instantiating new Node objects during the search (which causes GC), use a <strong>Node Pool</strong>. Pre-allocate a large array of nodes at application startup and simply reset their states (<code>gCost</code>, <code>fCost</code>, <code>parent</code>, etc.) for each search. This technique effectively eliminates object creation overhead during pathfinding.</p>
+            
+            <h3>2. Advanced Algorithmic Improvements</h3>
             <ul>
-                <li><strong>Memory Management:</strong> Use Node Pooling to pre-allocate objects and reduce garbage collection pressure.</li>
-                <li><strong>Data Structures:</strong> A Binary Heap is essential for O(log n) Open Set operations. For extremely large grids, Fibonacci Heaps or Hierarchical A* may be required.</li>
-                <li><strong>Algorithmic Improvements:</strong>
-                    <ul>
-                        <li><strong>Jump Point Search (JPS):</strong> Drastically speeds up search on uniform-cost grids by "jumping" over unnecessary nodes.</li>
-                        <li><strong>Bidirectional A*:</strong> Searches from both start and goal simultaneously to reduce the search area.</li>
-                    </ul>
-                </li>
+                <li><strong>Jump Point Search (JPS):</strong> JPS is a massive optimization for uniform-cost grids. Instead of exploring every neighbor node, JPS identifies "jump points"—nodes where the path might change (e.g., obstacle corners)—and skips over all intermediate, straight-line nodes. It can result in speedups of up to 100x on open maps.</li>
+                <li><strong>Bidirectional A*:</strong> This approach runs two simultaneous searches: one from the Start to the Goal, and one from the Goal to the Start. When the two search frontiers meet, the path is complete. This drastically reduces the number of nodes explored in large areas, as the search area is roughly the square of the radius of the meeting point, rather than the square of the distance between Start and Goal.</li>
             </ul>
+
+            <h3>3. Data Structure Refinement</h3>
+            <p>For the Open Set, a <strong>Binary Min-Heap</strong> is essential to ensure <code>O(log n)</code> insertion and extraction. If performance is still insufficient, look into <strong>D-ary Heaps</strong>, which often have better cache locality and faster insertion times than standard binary heaps, or <strong>Hierarchical A* (HPA*)</strong>, which divides the map into smaller regions to compute paths at multiple levels of abstraction.</p>
+        </section>
+
+        <section>
+            <h2>Practical Implementation: Dynamic Environments</h2>
+            <p>Basic A* assumes a static environment. In dynamic worlds (e.g., doors closing, new obstacles appearing), A* is often too slow to re-run from scratch. Advanced variants like <strong>D* Lite</strong> or <strong>Incremental A*</strong> are designed for this. They retain information from the previous search and only update the affected portions of the graph, making re-pathing orders of magnitude faster than full re-calculation.</p>
         </section>
     
     <div class="nav-links">

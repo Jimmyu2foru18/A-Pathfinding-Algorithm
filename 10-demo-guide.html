@@ -15,21 +15,33 @@
     </header>
     
     <main class="container">
-        <h1>Interactive Demo Guide</h1>
+        <h1>Interactive A* Visualizer Guide</h1>
         
         <section>
-            <h2>How to Use the Visualizer</h2>
-            <p>The interactive demo allows you to experiment with A* in real-time.</p>
+            <h2>Purpose of the Visualizer</h2>
+            <p>The interactive visualizer is designed to demystify the A* algorithm by providing a real-time, step-by-step look at how the algorithm traverses the grid. Understanding pathfinding is often difficult because the algorithm's state changes thousands of times per second. By visualizing the <code>openSet</code> (frontier) and <code>closedSet</code> (visited nodes), you can observe the algorithm's "thought process" as it decides where to expand next based on its heuristic.</p>
+        </section>
+
+        <section>
+            <h2>Core Features & Controls</h2>
+            <p>Mastering the tool allows for efficient experimentation with pathfinding dynamics:</p>
             <ul>
-                <li><strong>Start/Goal:</strong> Right-click to set start/goal.</li>
-                <li><strong>Obstacles:</strong> Left-click or drag to create walls.</li>
-                <li><strong>Execution:</strong> Use the "Start Algorithm" button to begin.</li>
+                <li><strong>Defining the Environment:</strong> Use your mouse to draw complex maze layouts. Left-click/drag creates obstacles, while right-click sets the start and goal positions. Clear and reset buttons are available to quickly change configurations.</li>
+                <li><strong>Algorithm Execution:</strong> Use the "Start Algorithm" button to begin the search. You can pause or stop the search mid-way to inspect the current <code>openSet</code> and <code>closedSet</code>, which helps in understanding which nodes were considered but discarded.</li>
+                <li><strong>Heuristic Manipulation:</strong> The configuration panel allows you to switch between <em>Manhattan</em>, <em>Euclidean</em>, <em>Diagonal</em>, and <em>Dijkstra (No Heuristic)</em> at any time.</li>
+                <li><strong>Animation Control:</strong> Use the speed slider to adjust the visualization pace. Slowing it down is essential for visualizing precisely how the node with the lowest <code>f(n)</code> is chosen at each step.</li>
             </ul>
         </section>
         
         <section>
             <h2>Experimentation Scenarios</h2>
-            <p>Try testing different heuristics to see how they change the exploration pattern (the orange/yellow cells). Notice how Manhattan, Euclidean, and Dijkstra produce vastly different search areas.</p>
+            <p>To truly understand A*, I recommend performing the following experiments:</p>
+            <ol>
+                <li><strong>The Room Scenario:</strong> Draw a large empty room with a narrow door. Observe how A* focuses intensely on the door area as the best path.</li>
+                <li><strong>Heuristic Comparison:</strong> Create an identical obstacle layout, then compare how different heuristics search the same map. Observe how <em>Manhattan</em> creates a more "box-like" search area on a grid, while <em>Euclidean</em> creates a smoother, more "circular" expansion pattern.</li>
+                <li><strong>Dijkstra vs. A*:</strong> Set a Start and Goal in an open area. Run Dijkstra first, then run A*. Notice how Dijkstra explores uniformly in all directions (as it has no goal-directed heuristic), while A* focuses its search energy aggressively toward the goal, finding the path with a fraction of the nodes explored.</li>
+                <li><strong>The Trap:</strong> Place obstacles to create a "trap" (e.g., a U-shaped wall facing away from the goal). This forces A* to fully explore the trap before it realizes it must backtrack to find the real path—a perfect visualization of the algorithm's complete pathfinding behavior.</li>
+            </ol>
         </section>
     
     <div class="nav-links">

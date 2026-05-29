@@ -19,32 +19,44 @@
         
         <section>
             <h2>The Core Formula: f(n) = g(n) + h(n)</h2>
-            <p>This formula determines the order in which A* explores the graph. Every node evaluated is given an <code>f</code> value, which represents its total estimated cost.</p>
+            <p>At every step, A* must make an informed decision: "Which node should I explore next?" This formula is the engine behind that decision, determining the exploration order. By summing the actual cost incurred so far and the estimated cost remaining, A* balances accuracy (G) with ambition (H).</p>
             <ul>
-                <li><strong>g(n):</strong> The actual cost incurred from the start node to the current node <em>n</em>.</li>
-                <li><strong>h(n):</strong> The estimated cost from node <em>n</em> to the goal node.</li>
+                <li><strong>g(n):</strong> This is the <strong>accumulated cost</strong> from the start node to the current node <em>n</em>. It represents the path we have already traveled, which is known and fixed.</li>
+                <li><strong>h(n):</strong> This is the <strong>heuristic estimate</strong>—the "educated guess"—of the cost from node <em>n</em> to the goal node.</li>
+                <li><strong>f(n):</strong> The total estimated cost of the cheapest path through node <em>n</em>.</li>
             </ul>
         </section>
 
         <section>
-            <h2>Step-by-Step Evaluation</h2>
+            <h2>The Philosophy of Evaluation</h2>
+            <p>A* is effectively a <em>Best-First Search</em>. By constantly picking the node with the lowest <code>f(n)</code> from the <code>openSet</code>, the algorithm prioritizes paths that appear promising overall. If <code>h(n)</code> is accurate and admissible, this strategy is mathematically guaranteed to find the absolute shortest path while ignoring less promising areas of the graph.</p>
+        </section>
+
+        <section>
+            <h2>Detailed Evaluation Cycle</h2>
             <ol>
-                <li><strong>Initialize:</strong> Calculate the <code>f</code> value for the start node and add it to the <code>openSet</code>.</li>
-                <li><strong>Expand:</strong> While the <code>openSet</code> is not empty:
+                <li><strong>Initialization:</strong> The start node is evaluated. Its <code>g</code> cost is 0, its <code>h</code> cost is calculated via the chosen heuristic, and its <code>f</code> value is <code>h</code> itself. It is then added to the <code>openSet</code>.</li>
+                <li><strong>Selection (The "Focus" Step):</strong> In each iteration, A* scans the <code>openSet</code> and identifies the node with the lowest <code>f(n)</code>. If multiple nodes have the same <code>f(n)</code>, a common tie-breaking strategy is to pick the node with the lowest <code>h(n)</code> (the one closest to the goal).</li>
+                <li><strong>Expansion (Node Processing):</strong> The selected node is moved from the <code>openSet</code> to the <code>closedSet</code>. It is now "visited" and finalized.</li>
+                <li><strong>Neighbor Assessment:</strong> For each unvisited neighbor <em>m</em> of the current node:
                     <ul>
-                        <li>Pick the node with the lowest <code>f</code> value (current node).</li>
-                        <li>If it is the goal node, path reconstruction begins.</li>
-                        <li>Move the current node from the <code>openSet</code> to the <code>closedSet</code>.</li>
-                    </ul>
-                </li>
-                <li><strong>Neighbor Evaluation:</strong> For each neighbor of the current node:
-                    <ul>
-                        <li>If the neighbor is in the <code>closedSet</code>, ignore it.</li>
-                        <li>Calculate a tentative <code>g</code> value.</li>
-                        <li>If this new path to the neighbor is better (lower <code>g</code>), update the neighbor's <code>g</code>, <code>h</code>, <code>f</code> values, and set its parent to the current node.</li>
+                        <li>Calculate a tentative <code>g</code> value: <code>current.g + cost(current, neighbor)</code>.</li>
+                        <li>If the neighbor is already in the <code>openSet</code> and the new tentative <code>g</code> is <em>higher</em> than the existing <code>g</code> for that node, ignore this path; it is inefficient.</li>
+                        <li>If the neighbor is new or this new path has a <em>lower</em> <code>g</code>, update the neighbor: set its parent to the current node, update its <code>g</code>, <code>h</code>, and <code>f</code> values, and add/update it in the <code>openSet</code>.</li>
                     </ul>
                 </li>
             </ol>
+        </section>
+
+        <section>
+            <h2>Step-by-Step Example</h2>
+            <p>Imagine navigating a 3x3 grid from (0,0) to (2,2) with a cost of 1 per move (no diagonal movement). Let's evaluate a node at (0,1) with a goal at (2,2).</p>
+            <ul>
+                <li><strong>g(n):</strong> We moved from (0,0) to (0,1). The cost is 1.</li>
+                <li><strong>h(n):</strong> Using Manhattan Distance: |0-2| + |1-2| = 2 + 1 = 3.</li>
+                <li><strong>f(n):</strong> 1 + 3 = <strong>4</strong>.</li>
+            </ul>
+            <p>If another node at (1,0) has <code>g=1</code>, <code>h=3</code>, its <code>f</code> is also 4. A* will pick one arbitrarily (or based on tie-breaking) to expand first.</p>
         </section>
     
     <div class="nav-links">

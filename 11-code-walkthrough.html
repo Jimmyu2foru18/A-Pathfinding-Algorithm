@@ -15,26 +15,51 @@
     </header>
     
     <main class="container">
-        <h1>Code Walkthrough</h1>
+        <h1>Comprehensive Code Walkthrough</h1>
         
         <section>
-            <h2>Project Architecture</h2>
-            <p>This repository provides a complete, interactive A* implementation. The core files are:</p>
+            <h2>Project Architecture and Design Patterns</h2>
+            <p>This implementation was built with a clear separation of concerns, ensuring that the algorithmic logic is distinct from the visual representation and the UI management. Understanding this architecture is crucial for extending the codebase or integrating it into larger applications.</p>
             <ul>
-                <li><strong><code>demo.html</code></strong>: The interactive interface for visualizing the algorithm.</li>
-                <li><strong><code>visualization.js</code></strong>: The core logic managing the grid, the A* algorithm, and the animation state.</li>
-                <li><strong><code>shared.css</code></strong>: A centralized design system ensuring consistent styling across all pages.</li>
+                <li><strong><code>demo.html</code> (View):</strong> Acts as the primary interface. It structures the visual DOM, including the canvas for rendering and the control panel for configuration.</li>
+                <li><strong><code>visualization.js</code> (Controller/Model):</strong> This is the heart of the project. It encapsulates the <code>AStarVisualizer</code> class, which manages the grid state (Model) and the algorithm lifecycle (Controller).</li>
+                <li><strong><code>shared.css</code> (Styles):</strong> Implements a centralized, component-based design system, ensuring consistent branding and layout logic across every learning module and the visualizer.</li>
             </ul>
         </section>
 
         <section>
-            <h2>Core Visualizer Logic</h2>
-            <p>The <code>AStarVisualizer</code> class in <code>visualization.js</code> orchestrates the entire process:</p>
-            <ul>
-                <li><strong>Grid State:</strong> Manages nodes, obstacles, and the open/closed sets.</li>
-                <li><strong>Algorithm Loop:</strong> Implements the core A* logic: selecting the lowest f-cost node, exploring neighbors, and updating costs.</li>
-                <li><strong>Visualization:</strong> A render loop (<code>draw</code>) updates the HTML5 canvas to show the current search progress in real-time.</li>
-            </ul>
+            <h2>Anatomy of the <code>AStarVisualizer</code> Class</h2>
+            <p>The <code>AStarVisualizer</code> class uses several sophisticated patterns to handle the complexity of real-time pathfinding visualization:</p>
+            <h3>1. State Management</h3>
+            <p>The constructor initializes several critical state trackers: the <code>grid</code> (a 2D array of Node objects), the <code>openSet</code> (currently a prioritized list), and the <code>closedSet</code> (a tracking array for visited nodes). Note that in highly optimized production environments, these might be replaced with more efficient structures like binary heaps and hash sets.</p>
+            
+            <h3>2. The Animation Lifecycle</h3>
+            <p>Unlike a traditional blocking algorithm, this A* implementation is <strong>asynchronous</strong>. By using <code>setTimeout</code> to recursively call <code>animateSearch()</code>, the algorithm avoids blocking the browser's UI thread. This is a critical pattern for any web-based visualizer; without it, the browser would hang during the search, making it impossible to see the step-by-step progress.</p>
+            
+            <h3>3. Event-Driven Controller</h3>
+            <p>The <code>setupEventListeners()</code> method follows an event-driven design pattern, delegating responsibility for user interactions (clicks, keyboard shortcuts, speed slider input) to specific handler methods. This makes the code modular: adding a new control (e.g., a "fast-forward" button) would only require adding one new event listener and one handler method.</p>
+        </section>
+        
+        <section>
+            <h2>Deep Dive: The Core Search Loop</h2>
+            <p>The <code>animateSearch()</code> method mimics the theoretical A* algorithm but is refactored to support incremental execution. Every time the function is called, it performs only <em>one</em> node expansion (the "Focus" step), updates the canvas via <code>this.draw()</code>, and schedules the next step. This design is highly educational as it perfectly maps the code to the theoretical steps taught in previous modules.</p>
+            <p><strong>Key Logic Block:</strong></p>
+            <pre style="background: #eee; padding: 10px;">
+// Find node with lowest f cost (The "Selection" step)
+let current = this.openSet[0];
+// ... find current ...
+
+// Check if we reached the goal
+if (current === this.endNode) {
+    this.reconstructPath(current);
+    this.finishSearch(true, ...);
+    return;
+}</pre>
+        </section>
+        
+        <section>
+            <h2>Extendability and Future Development</h2>
+            <p>This codebase is intentionally kept clean to serve as a pedagogical tool. However, it is architected to be easily extensible. For example, to implement a new heuristic (like Octile distance), you only need to modify the <code>heuristic()</code> method in the <code>AStarVisualizer</code> class; the rest of the algorithm remains entirely agnostic to the math behind the heuristic estimate.</p>
         </section>
     
     <div class="nav-links">

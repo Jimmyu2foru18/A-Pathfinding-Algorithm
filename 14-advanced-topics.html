@@ -15,15 +15,33 @@
     </header>
     
     <main class="container">
-        <h1>Advanced Pathfinding</h1>
+        <h1>Advanced Pathfinding Paradigms</h1>
         
         <section>
             <h2>Going Beyond Basic A*</h2>
-            <p>For large-scale, dynamic, or real-time environments, standard A* may not be sufficient. Advanced approaches include:</p>
+            <p>While A* is the cornerstone of pathfinding, real-world constraints—such as massive, procedurally generated environments, dynamic obstacles, or strict real-time response limits—often necessitate advanced algorithmic paradigms. Understanding these techniques allows you to architect solutions that scale where simple A* would fail.</p>
+        </section>
+
+        <section>
+            <h2>Architectural Paradigms for Scale</h2>
+            
+            <h3>1. Hierarchical Pathfinding (HPA*)</h3>
+            <p>In massive maps, A* suffers because it must consider too many individual nodes. HPA* solves this by creating a <strong>Hierarchical Abstraction</strong>. The map is partitioned into smaller, manageable clusters. A graph is built where nodes represent entrances between clusters, and edges represent the cost to travel between these entrances. HPA* performs the high-level pathfinding on this coarse, abstracted graph, and only performs the detailed, low-level A* within the specific clusters the path traverses. This can reduce search time from seconds to milliseconds for maps with millions of nodes.</p>
+            
+            <h3>2. Jump Point Search (JPS)</h3>
+            <p>JPS is an optimization specifically for uniform-cost grid maps. A naive A* explores every single node in every direction. JPS leverages the fact that in open areas, most nodes are redundant. By intelligently "jumping" over nodes that do not alter the path's optimal characteristics (e.g., straight lines that do not encounter obstacles), JPS drastically prunes the <code>openSet</code>. It does not change the optimality of A*, just the speed at which it explores.</p>
+            
+            <h3>3. Bidirectional A*</h3>
+            <p>For some search spaces, searching from both the Start and the Goal simultaneously is drastically faster. If A* searches a circular area with radius <em>d</em>, its complexity is proportional to <em>d²</em>. Running two searches with radius <em>d/2</em> yields a complexity proportional to <em>(d/2)² + (d/2)² = d²/2</em>. While the savings look modest on paper, the practical reduction in the number of explored nodes in open, complex maps is often massive.</p>
+        </section>
+
+        <section>
+            <h2>Dynamic and Real-Time Pathfinding</h2>
+            <p>Static A* assumes the world doesn't change. When environment state changes—such as a door closing, a new obstacle being placed, or traffic congestion shifting—a full A* recalculation is wasteful.</p>
             <ul>
-                <li><strong>Hierarchical A* (HPA*):</strong> Breaking a massive grid into smaller clusters, pathfinding between clusters first, then within clusters.</li>
-                <li><strong>Jump Point Search (JPS):</strong> An optimization for uniform-cost grids that "jumps" over nodes that do not change the path direction.</li>
-                <li><strong>Bidirectional A*:</strong> Running two concurrent searches (from start and goal) to reduce the search space significantly.</li>
+                <li><strong>D* (Dynamic A*):</strong> The foundation for dynamic pathfinding. It keeps the previous search state and intelligently propagates only the changes necessitated by new obstacles, rather than fully re-searching.</li>
+                <li><strong>D* Lite:</strong> A modern, more maintainable variant of D* that provides the same functionality with significantly cleaner implementation, widely used in autonomous robotics for reactive navigation.</li>
+                <li><strong>Anytime A*:</strong> When you must return <em>a</em> path within a fixed time budget (e.g., 5ms), but a <em>better</em> path could be found if more time were available. Anytime A* initially finds a suboptimal path very quickly, and then iteratively improves it (optimizes it) if the system has spare CPU cycles.</li>
             </ul>
         </section>
     

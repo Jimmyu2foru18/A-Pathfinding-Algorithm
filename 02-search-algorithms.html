@@ -29,6 +29,15 @@
         </section>
 
         <section>
+            <h2>Deep Dive: Algorithmic Characteristics</h2>
+            <p>Choosing the right algorithm depends on the requirements: Do you need the absolute shortest path? Is memory a constraint?</p>
+            
+            <h3>The Trade-off: BFS vs. DFS</h3>
+            <p>BFS uses significant memory to store all nodes at the current depth (frontier). In a grid with branching factor <em>b</em> and depth <em>d</em>, BFS stores <em>O(b^d)</em> nodes. This is often impractical for large maps.</p>
+            <p>DFS is memory efficient, storing only the current path and unexplored neighbors of nodes on that path <em>O(d)</em>. However, it may wander down an infinite path or return a path far from the shortest, making it unsuitable for most shortest-path problems.</p>
+        </section>
+
+        <section>
             <h3>Informed Search (Heuristic Search)</h3>
             <p>Algorithms that use domain knowledge (a heuristic) to guide the search towards the goal. Examples include Greedy Best-First Search, Dijkstra's Algorithm, and A*.</p>
             <ul>
@@ -47,6 +56,19 @@
                 <li><strong>h(n):</strong> The heuristic estimate from node <em>n</em> to the goal.</li>
                 <li><strong>f(n):</strong> The total estimated cost of the path through node <em>n</em>.</li>
             </ul>
+            <p>A* is efficient because it prioritizes nodes with lower <em>f(n)</em>. If the heuristic <em>h(n)</em> is admissible (never overestimates the cost), A* is guaranteed to find the shortest path.</p>
+        </section>
+
+        <section>
+            <h2>Step-by-Step Visualization Example</h2>
+            <p>Consider a simple 3x3 grid. A* expands nodes based on the lowest f(n) value. Below is a conceptual state table during the search:</p>
+            <table border="1" style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+                <tr style="background: #f4f4f4;"><th>Step</th><th>Open Set</th><th>Closed Set</th><th>Focus (Lowest f)</th></tr>
+                <tr><td>1</td><td>{Start}</td><td>{}</td><td>Start</td></tr>
+                <tr><td>2</td><td>{N1, N2}</td><td>{Start}</td><td>N1</td></tr>
+                <tr><td>3</td><td>{N2, N3, N4}</td><td>{Start, N1}</td><td>N2</td></tr>
+            </table>
+            <p>The <em>Open Set</em> holds candidates for exploration, while the <em>Closed Set</em> contains nodes already evaluated. A* iteratively picks the best candidate from the Open Set until the goal is reached.</p>
         </section>
 
         <section>
@@ -61,6 +83,7 @@
                 </thead>
                 <tbody>
                     <tr><td>BFS</td><td>✓</td><td>✓</td></tr>
+                    <tr><td>DFS</td><td>✗</td><td>✗</td></tr>
                     <tr><td>DFS</td><td>✗</td><td>✗</td></tr>
                     <tr><td>Greedy</td><td>✗</td><td>✗</td></tr>
                     <tr><td>Dijkstra</td><td>✓</td><td>✓</td></tr>

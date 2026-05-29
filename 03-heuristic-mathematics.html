@@ -19,29 +19,49 @@
         
         <section>
             <h2>What is a Heuristic?</h2>
-            <p>A heuristic is an <strong>educated guess</strong> about the cost to reach the goal from any given node. It is the component that makes A* "informed."</p>
-            <h3>Key Properties</h3>
+            <p>A heuristic is an <strong>educated guess</strong> about the cost to reach the goal from any given node. It is the component that makes A* "informed," effectively acting as a compass guiding the algorithm toward the target rather than blindly exploring in all directions.</p>
+            <h3>Key Properties of Heuristics</h3>
             <ul>
-                <li><strong>Admissible:</strong> h(n) ≤ h*(n) (it never overestimates the true cost). This guarantees optimality.</li>
-                <li><strong>Consistent:</strong> h(n) ≤ cost(n,n') + h(n'). This ensures the first path found to a node is the optimal one.</li>
-                <li><strong>Efficiency:</strong> It must be fast to compute (ideally O(1)).</li>
+                <li><strong>Admissible:</strong> A heuristic is admissible if <code>h(n) ≤ h*(n)</code>, where <code>h*(n)</code> is the true minimum cost to reach the goal from node <em>n</em>. Essentially, it never overestimates the true cost. This is the crucial requirement to guarantee that A* finds the optimal (shortest) path.</li>
+                <li><strong>Consistent (Monotonic):</strong> A heuristic is consistent if <code>h(n) ≤ cost(n, n') + h(n')</code> for every node <em>n</em> and its successor <em>n'</em>, with <code>h(goal) = 0</code>. This ensures that the first time A* reaches a node, it has found the shortest path to it, allowing us to avoid revisiting nodes and dramatically improving performance.</li>
+                <li><strong>Efficiency:</strong> Since the heuristic is calculated for every explored node, it must be extremely fast to compute, ideally <code>O(1)</code>.</li>
             </ul>
         </section>
 
         <section>
-            <h2>Common Heuristics</h2>
+            <h2>Common Heuristics: A Deeper Look</h2>
             
             <h3>1. Manhattan Distance (L1 Norm)</h3>
             <p><strong>Formula:</strong> <code>h(n) = |x₁ - x₂| + |y₁ - y₂|</code></p>
-            <p>Used for grids allowing only 4-directional movement (up, down, left, right).</p>
+            <p>Used specifically for grids allowing only 4-directional movement (up, down, left, right). It represents the distance traveled if you could only move along grid axes. Think of walking in a city with a grid of streets.</p>
             
             <h3>2. Euclidean Distance (L2 Norm)</h3>
             <p><strong>Formula:</strong> <code>h(n) = √[(x₁ - x₂)² + (y₁ - y₂)²]</code></p>
-            <p>Used for environments allowing any-direction movement (straight-line distance).</p>
+            <p>This is the "straight-line" distance between two points. It is best suited for environments allowing movement in any direction. However, in a grid, Euclidean distance is often <em>not</em> admissible if the actual movement is restricted to grid steps, because the true cost (grid distance) might be higher than the straight-line distance.</p>
             
             <h3>3. Chebyshev Distance</h3>
             <p><strong>Formula:</strong> <code>h(n) = max(|x₁ - x₂|, |y₁ - y₂|)</code></p>
-            <p>Used for environments allowing 8-directional movement (including diagonals) where diagonal movement costs the same as cardinal movement.</p>
+            <p>Used for environments allowing 8-directional movement (including diagonals) where diagonal movement costs the <em>same</em> as cardinal movement (e.g., in a game like Chess, where a King moves diagonally for cost 1).</p>
+            
+            <h3>4. Octile Distance</h3>
+            <p><strong>Formula:</strong> <code>h(n) = max(dx, dy) + (√2 - 1) * min(dx, dy)</code></p>
+            <p>A more accurate heuristic for 8-directional movement where diagonal movement has a cost of <code>√2</code> (approx 1.414) while cardinal movement costs 1.</p>
+        </section>
+
+        <section>
+            <h2>Worked Example: Comparing Heuristics</h2>
+            <p>Suppose you are at (0,0) and the goal is at (3,3). The cost of a cardinal step is 1. The cost of a diagonal step is √2 (≈1.414).</p>
+            <ul>
+                <li><strong>Manhattan:</strong> |0-3| + |0-3| = 3 + 3 = <strong>6</strong></li>
+                <li><strong>Euclidean:</strong> √[(0-3)² + (0-3)²] = √[9 + 9] = √18 ≈ <strong>4.24</strong></li>
+                <li><strong>Octile:</strong> max(3,3) + (1.414-1) * min(3,3) = 3 + (0.414 * 3) = 3 + 1.242 = <strong>4.242</strong></li>
+            </ul>
+            <p>Notice how different heuristics estimate the same distance differently based on allowed movement. Selecting the wrong heuristic for your movement rules will lead to suboptimal paths or inefficient searches.</p>
+        </section>
+
+        <section>
+            <h2>Tie-Breaking and Optimization</h2>
+            <p>If multiple nodes have the same <code>f(n)</code> value, A* might explore them all unnecessarily. You can force A* to prioritize nodes closer to the straight-line path by slightly increasing the heuristic estimate, effectively breaking ties in favor of a more direct route: <code>h'(n) = h(n) * (1 + p)</code>, where <code>p</code> is a very small value (e.g., 0.001). This can significantly reduce the number of explored nodes in open areas.</p>
         </section>
 
         <section>
@@ -55,7 +75,8 @@
                 </thead>
                 <tbody>
                     <tr><td>4-directional</td><td>Manhattan</td></tr>
-                    <tr><td>8-directional</td><td>Chebyshev</td></tr>
+                    <tr><td>8-directional (Diagonal cost 1)</td><td>Chebyshev</td></tr>
+                    <tr><td>8-directional (Diagonal cost 1.414)</td><td>Octile</td></tr>
                     <tr><td>Any direction</td><td>Euclidean</td></tr>
                 </tbody>
             </table>

@@ -15,16 +15,33 @@
     </header>
     
     <main class="container">
-        <h1>Research Frontiers</h1>
+        <h1>Research Frontiers in Pathfinding</h1>
         
         <section>
-            <h2>Current Areas of Study</h2>
-            <p>Pathfinding is an active research area. Modern approaches focus on adapting to massive scales and complex, changing environments.</p>
+            <h2>The Future of Algorithmic Navigation</h2>
+            <p>Pathfinding is not a "solved" problem. As environments grow exponentially in complexity—from simple 2D grids to hyper-realistic, procedurally generated 3D worlds and high-dimensional state spaces in robotics—the limitations of classical A* become apparent. Current academic research is pivoting toward hybrid approaches that combine classical search efficiency with probabilistic and data-driven methods.</p>
+        </section>
+        
+        <section>
+            <h2>Modern Research Directions</h2>
+            
+            <h3>1. Machine Learning-Enhanced Heuristics</h3>
+            <p>The performance of A* is fundamentally bound by the quality of its heuristic function <code>h(n)</code>. While manually defined heuristics like Manhattan or Euclidean distance are robust, they are often suboptimal for complex environments with intricate obstacle layouts. Research is actively exploring <strong>Deep Reinforcement Learning (DRL)</strong> to train models that learn to predict the "true" remaining cost <code>h*(n)</code> better than any human-authored heuristic could. These learned heuristics can be trained to recognize common topological patterns in specific map types, allowing the algorithm to navigate "known" environments with almost zero unnecessary exploration.</p>
+            
+            <h3>2. Reinforcement Learning (RL) and Policy-Based Navigation</h3>
+            <p>Instead of explicitly searching for a path, Reinforcement Learning treats navigation as a policy problem: "What is the best action to take in this specific state to maximize cumulative reward?" Agents learn to navigate through extensive environment interaction, receiving positive rewards for reaching the goal and negative rewards for colliding with obstacles. While RL agents often lack the strict optimality guarantees of A*, they are exceptionally robust in highly dynamic, unpredictable, or partially observable environments where a static path planning search might fail immediately.</p>
+            
+            <h3>3. Quantum-Inspired and Evolutionary Algorithms</h3>
+            <p>For high-dimensional optimization problems where classical search spaces are too vast to explore, researchers are looking at nature-inspired and quantum-inspired metaheuristics:</p>
             <ul>
-                <li><strong>Machine Learning-Enhanced Heuristics:</strong> Using neural networks to learn better heuristic estimators than standard distance formulas.</li>
-                <li><strong>Reinforcement Learning:</strong> Agents learning optimal pathfinding policies through environment interaction and reward mechanisms.</li>
-                <li><strong>Quantum-Inspired Pathfinding:</strong> Borrowing principles from quantum mechanics (superposition, interference) to optimize path searches.</li>
+                <li><strong>Genetic/Evolutionary Algorithms:</strong> These maintain a population of candidate paths, evolving them through mutation and crossover to "evolve" a near-optimal solution.</li>
+                <li><strong>Quantum-Inspired Search:</strong> These algorithms borrow concepts like superposition and constructive interference to parallelize exploration in massive search spaces, aiming to find optimal solutions much faster than traditional sequential algorithms.</li>
             </ul>
+        </section>
+
+        <section>
+            <h2>Bridging the Gap: The Hybrid Future</h2>
+            <p>The most promising research currently lies in <strong>Hybrid Planning</strong>. This paradigm uses a fast, low-fidelity heuristic (like Manhattan distance) for initial pathfinding, followed by a learning-based optimizer to refine the path for real-time constraints, and finally a local reactive planner to handle dynamic obstacles not captured in the original graph. This layered approach mimics how autonomous vehicles navigate: a global planner (A*) sets the route, while local, sensor-driven controllers manage immediate obstacle avoidance.</p>
         </section>
     
     <div class="nav-links">

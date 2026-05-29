@@ -15,15 +15,40 @@
     </header>
     
     <main class="container">
-        <h1>Learning Checklist</h1>
+        <h1>Mastery Checklist</h1>
+        <p>Use this checklist to track your progress through the "Mastering A*" course. Pathfinding mastery requires understanding both the theory and the practical engineering hurdles involved in implementation.</p>
+        
         <form>
+            <h3>Phase 1: Theoretical Foundations</h3>
             <ul>
-                <li><input type="checkbox"> Understand Graph Theory</li>
-                <li><input type="checkbox"> Compare Search Algorithms</li>
-                <li><input type="checkbox"> Master Heuristics</li>
-                <li><input type="checkbox"> Implement A* Node Evaluation</li>
-                <li><input type="checkbox"> Manage Open/Closed Sets</li>
-                <li><input type="checkbox"> Reconstruct Paths</li>
+                <li><input type="checkbox"> Can define nodes, edges, weights, and directed vs. undirected graphs.</li>
+                <li><input type="checkbox"> Understand the trade-offs between informed and uninformed search (BFS/DFS vs. Dijkstra/A*).</li>
+                <li><input type="checkbox"> Can explain why admissibility is required for optimal pathfinding.</li>
+                <li><input type="checkbox"> Can differentiate between Manhattan, Euclidean, Chebyshev, and Octile distance metrics.</li>
+            </ul>
+
+            <h3>Phase 2: Algorithmic Implementation</h3>
+            <ul>
+                <li><input type="checkbox"> Can manually trace an A* search iteration, including <code>f, g, h</code> cost calculation.</li>
+                <li><input type="checkbox"> Understand the importance of using Priority Queues (Min-Heaps) for the Open Set.</li>
+                <li><input type="checkbox"> Can implement a robust path reconstruction loop from goal to start.</li>
+                <li><input type="checkbox"> Can identify why a Hash Set is the standard data structure for the Closed Set.</li>
+            </ul>
+
+            <h3>Phase 3: Production Engineering & Optimization</h3>
+            <ul>
+                <li><input type="checkbox"> Can list at least three performance bottlenecks in naive A* implementations.</li>
+                <li><input type="checkbox"> Understand how Node Pooling and data locality improve performance.</li>
+                <li><input type="checkbox"> Can explain the advantages and specific use cases for Hierarchical A* (HPA*) and Jump Point Search (JPS).</li>
+                <li><input type="checkbox"> Understand the necessity of defensive programming and time-slicing for real-time applications.</li>
+            </ul>
+
+            <h3>Phase 4: Validation & Advanced Concepts</h3>
+            <ul>
+                <li><input type="checkbox"> Can design a multi-layered testing strategy (unit, integration, stress).</li>
+                <li><input type="checkbox"> Can explain the difference between admissible and consistent heuristics.</li>
+                <li><input type="checkbox"> Understand the principles behind dynamic pathfinding algorithms like D* Lite.</li>
+                <li><input type="checkbox"> Are aware of modern research areas like ML-enhanced heuristics and RL-based navigation.</li>
             </ul>
         </form>
     

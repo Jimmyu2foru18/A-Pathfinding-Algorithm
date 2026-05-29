@@ -29,6 +29,42 @@
         </section>
 
         <section>
+            <h2>Deep Dive: Graph Representations</h2>
+            <p>While graphs are conceptually simple, how we represent them in memory matters significantly for performance. Two common ways to represent a graph are the <strong>Adjacency Matrix</strong> and the <strong>Adjacency List</strong>.</p>
+            
+            <h3>Adjacency Matrix</h3>
+            <p>An adjacency matrix is a 2D array of size V x V, where V is the number of vertices. If there is an edge from vertex i to vertex j, the matrix[i][j] is set to 1 (or the weight of the edge). Otherwise, it is 0.</p>
+            <p><strong>Pros:</strong> Quick lookup (O(1)) to check if an edge exists between two nodes.</p>
+            <p><strong>Cons:</strong> Uses O(V²) space, which is inefficient for sparse graphs where most nodes have few connections.</p>
+            
+            <h3>Adjacency List</h3>
+            <p>An adjacency list represents the graph as an array of lists. Each index in the array represents a vertex, and the list at that index contains all vertices connected to it.</p>
+            <p><strong>Pros:</strong> More space-efficient (O(V + E)) for sparse graphs.</p>
+            <p><strong>Cons:</strong> Slower to check if a specific edge exists (O(degree of V)).</p>
+        </section>
+
+        <section>
+            <h2>Types of Graphs</h2>
+            <p>Graphs are categorized based on their connectivity and properties:</p>
+            <ul>
+                <li><strong>Directed vs. Undirected:</strong> In a directed graph, edges have a direction (one-way movement). In an undirected graph, edges are bidirectional.</li>
+                <li><strong>Weighted vs. Unweighted:</strong> Edges in weighted graphs have associated costs (e.g., travel time, fuel usage). Unweighted graphs treat all connections equally.</li>
+                <li><strong>Cyclic vs. Acyclic:</strong> A cyclic graph contains at least one cycle (path that starts and ends at the same node). Directed Acyclic Graphs (DAGs) are crucial for tasks like scheduling or dependency analysis.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Real-World Example: Navigational Complexity</h2>
+            <p>Imagine navigating a city map. The city is a graph:</p>
+            <ul>
+                <li>Nodes = Intersections.</li>
+                <li>Edges = Streets connecting them.</li>
+                <li>Weights = Traffic-dependent time to travel that street.</li>
+            </ul>
+            <p>An algorithm must navigate this efficiently. If you only move in one direction (one-way streets), the graph is <strong>directed</strong>. If traffic changes (e.g., peak hour), the <strong>weights</strong> of the edges change dynamically. This makes pathfinding in a real city much more complex than simple grid movement.</p>
+        </section>
+
+        <section>
             <h2>Grid-Based Graphs</h2>
             <p>For most pathfinding applications, we use a grid-based representation. This maps the environment into discrete cells, where each cell is a node.</p>
             <p>Visualizing a simple grid:</p>
