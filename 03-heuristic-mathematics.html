@@ -3,188 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="shared.css">
-    <title>03 Heuristic Mathematics</title>
+    <title>Heuristic Mathematics | Mastering A*</title>
 </head>
 <body>
-    <nav class="nav-bar">
+    <header class="nav-bar">
         <span>Mastering A*</span>
-        <div>
+        <nav>
             <a href="index.html">Home</a>
             <a href="demo.html">Visualizer</a>
-        </div>
-    </nav>
-    <div class="container">
+        </nav>
+    </header>
+    
+    <main class="container">
         <h1>Heuristic Mathematics</h1>
-<br>
-<h2>What is a Heuristic?</h2>
-<p>A heuristic is an <b>educated guess</b> about the cost to reach the goal from any given node.</p>
-<br>
-<h3>Key Properties</h3>
-<p>1. <b>Admissible</b>: h(n) ≤ h*(n) (never overestimate)</p>
-<p>2. <b>Consistent</b>: h(n) ≤ c(n,n') + h(n') (triangle inequality)</p>
-<p>3. <b>Fast to compute</b>: O(1) time complexity</p>
-<br>
-<h2>Common Heuristics</h2>
-<br>
-<h3>1. Manhattan Distance (L1 Norm)</h3>
-<b>Formula</b>: `h(n) = |x₁ - x₂| + |y₁ - y₂|`
-<br>
-<pre>
-<p>Example: From (1,1) to (4,3)</p>
-<p>h = |4-1| + |3-1| = 3 + 2 = 5</p>
-<br>
-<p>┌─┬─┬─┬─┬─┐</p>
-<p>│ │ │ │G│ │  G = Goal (4,3)</p>
-<p>├─┼─┼─┼─┼─┤</p>
-<p>│ │ │2│1│ │  Numbers = Manhattan distance</p>
-<p>├─┼─┼─┼─┼─┤</p>
-<p>│ │S│3│2│1│  S = Start (1,1)</p>
-<p>├─┼─┼─┼─┼─┤</p>
-<p>│ │4│3│2│1│</p>
-<p>└─┴─┴─┴─┴─┘</p>
-<p></pre></p>
-<br>
-<b>Best for</b>: 4-directional movement (no diagonal)
-<br>
-<h3>2. Euclidean Distance (L2 Norm)</h3>
-<b>Formula</b>: `h(n) = √[(x₁ - x₂)² + (y₁ - y₂)²]`
-<br>
-<pre>
-<p>Example: From (1,1) to (4,3)</p>
-<p>h = √[(4-1)² + (3-1)²] = √[9 + 4] = √13 ≈ 3.6</p>
-<br>
-<p>┌─┬─┬─┬─┬─┐</p>
-<p>│ │ │ │G│ │  G = Goal (4,3)</p>
-<p>├─┼─┼─┼─┼─┤</p>
-<p>│ │ │2.2│1│ │  Numbers = Euclidean distance</p>
-<p>├─┼─┼─┼─┼─┤</p>
-<p>│ │S│2.8│2│1│  S = Start (1,1)</p>
-<p>├─┼─┼─┼─┼─┤</p>
-<p>│ │3.6│3.2│2.2│1│</p>
-<p>└─┴─┴─┴─┴─┘</p>
-<p></pre></p>
-<br>
-<b>Best for</b>: Any-direction movement
-<br>
-<h3>3. Chebyshev Distance (L∞ Norm)</h3>
-<b>Formula</b>: `h(n) = max(|x₁ - x₂|, |y₁ - y₂|)`
-<br>
-<pre>
-<p>Example: From (1,1) to (4,3)</p>
-<p>h = max(|4-1|, |3-1|) = max(3, 2) = 3</p>
-<br>
-<p>┌─┬─┬─┬─┬─┐</p>
-<p>│ │ │ │G│ │  G = Goal (4,3)</p>
-<p>├─┼─┼─┼─┼─┤</p>
-<p>│ │ │2│1│ │  Numbers = Chebyshev distance</p>
-<p>├─┼─┼─┼─┼─┤</p>
-<p>│ │S│2│2│1│  S = Start (1,1)</p>
-<p>├─┼─┼─┼─┼─┤</p>
-<p>│ │3│3│2│1│</p>
-<p>└─┴─┴─┴─┴─┘</p>
-<p></pre></p>
-<br>
-<b>Best for</b>: 8-directional movement (with diagonal)
-<br>
-<h2>Heuristic Impact on Performance</h2>
-<br>
-<h3>Perfect Heuristic (h = h*)</h3>
-<pre>
-<p>Nodes explored: Minimal (only optimal path)</p>
-<p>┌─┬─┬─┬─┬─┐</p>
-<p>│ │ │ │G│ │</p>
-<p>├─┼─┼─┼─┼─┤</p>
-<p>│ │ │ │*│ │</p>
-<p>├─┼─┼─┼─┼─┤</p>
-<p>│ │S│*│*│ │</p>
-<p>└─┴─┴─┴─┴─┘</p>
-<p></pre></p>
-<br>
-<h3>Good Heuristic (h < h*, close)</h3>
-<pre>
-<p>Nodes explored: Few</p>
-<p>┌─┬─┬─┬─┬─┐</p>
-<p>│ │ │*│G│ │</p>
-<p>├─┼─┼─┼─┼─┤</p>
-<p>│ │*│*│*│ │</p>
-<p>├─┼─┼─┼─┼─┤</p>
-<p>│ │S│*│*│ │</p>
-<p>└─┴─┴─┴─┴─┘</p>
-<p></pre></p>
-<br>
-<h3>Poor Heuristic (h << h*)</h3>
-<pre>
-<p>Nodes explored: Many (like Dijkstra)</p>
-<p>┌─┬─┬─┬─┬─┐</p>
-<p>│*│*│*│G│ │</p>
-<p>├─┼─┼─┼─┼─┤</p>
-<p>│*│*│*│*│ │</p>
-<p>├─┼─┼─┼─┼─┤</p>
-<p>│*│S│*│*│ │</p>
-<p>└─┴─┴─┴─┴─┘</p>
-<p></pre></p>
-<br>
-<h3>Inadmissible Heuristic (h > h*)</h3>
-<pre>
-<p>Result: Suboptimal path found</p>
-<p>┌─┬─┬─┬─┬─┐</p>
-<p>│ │ │ │G│ │</p>
-<p>├─┼─┼─┼─┼─┤</p>
-<p>│ │ │ │X│ │  X = Suboptimal path</p>
-<p>├─┼─┼─┼─┼─┤</p>
-<p>│ │S│X│X│X│</p>
-<p>└─┴─┴─┴─┴─┘</p>
-<p></pre></p>
-<br>
-<h2>Choosing the Right Heuristic</h2>
-<br>
-<p>| Movement Type | Best Heuristic | Reason |</p>
-<p>|---------------|----------------|--------|</p>
-<p>| 4-directional | Manhattan | Matches actual movement |</p>
-<p>| 8-directional | Chebyshev | Accounts for diagonal |</p>
-<p>| Any direction | Euclidean | True geometric distance |</p>
-<p>| Weighted edges | Custom | Domain-specific |</p>
-<br>
-<h2>Mathematical Proof: Admissibility</h2>
-<br>
-<p>For A* to be optimal, the heuristic must be admissible:</p>
-<br>
-<b>Theorem</b>: If h(n) ≤ h*(n) for all n, then A* finds optimal solution.
-<br>
-<b>Proof Sketch</b>:
-<p>1. Suppose A* returns suboptimal path with cost C</p>
-<p>2. Optimal path has cost C* < C</p>
-<p>3. Some node n on optimal path must be in open set</p>
-<p>4. f(n) = g(n) + h(n) ≤ g(n) + h*(n) = C*</p>
-<p>5. Since f(n) ≤ C* < C, node n would be expanded before suboptimal goal</p>
-<p>6. Contradiction! ∎</p>
-<br>
-<h2>Implementation Tips</h2>
-<br>
-<pre>javascript
-<p>// Manhattan distance for grid</p>
-<p>function manhattanDistance(a, b) {</p>
-<p>    return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);</p>
-<p>}</p>
-<br>
-<p>// Euclidean distance</p>
-<p>function euclideanDistance(a, b) {</p>
-<p>    const dx = a.x - b.x;</p>
-<p>    const dy = a.y - b.y;</p>
-<p>    return Math.sqrt(dx * dx + dy * dy);</p>
-<p>}</p>
-<br>
-<p>// Chebyshev distance</p>
-<p>function chebyshevDistance(a, b) {</p>
-<p>    return Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y));</p>
-<p>}</p>
-<p></pre></p>
-<br>
-<p>---</p>
-<b>Previous:</b> <a href="02-search-algorithms.md">Search Algorithms Comparison</a>
-<b>Next:</b> <a href="04-node-evaluation.md">Node Evaluation Process</a>
-<br>
-<b>Interactive:</b> <a href="demo.html">Test different heuristics</a>
-    </div>
+        
+        <section>
+            <h2>What is a Heuristic?</h2>
+            <p>A heuristic is an <strong>educated guess</strong> about the cost to reach the goal from any given node. It is the component that makes A* "informed."</p>
+            <h3>Key Properties</h3>
+            <ul>
+                <li><strong>Admissible:</strong> h(n) ≤ h*(n) (it never overestimates the true cost). This guarantees optimality.</li>
+                <li><strong>Consistent:</strong> h(n) ≤ cost(n,n') + h(n'). This ensures the first path found to a node is the optimal one.</li>
+                <li><strong>Efficiency:</strong> It must be fast to compute (ideally O(1)).</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Common Heuristics</h2>
+            
+            <h3>1. Manhattan Distance (L1 Norm)</h3>
+            <p><strong>Formula:</strong> <code>h(n) = |x₁ - x₂| + |y₁ - y₂|</code></p>
+            <p>Used for grids allowing only 4-directional movement (up, down, left, right).</p>
+            
+            <h3>2. Euclidean Distance (L2 Norm)</h3>
+            <p><strong>Formula:</strong> <code>h(n) = √[(x₁ - x₂)² + (y₁ - y₂)²]</code></p>
+            <p>Used for environments allowing any-direction movement (straight-line distance).</p>
+            
+            <h3>3. Chebyshev Distance</h3>
+            <p><strong>Formula:</strong> <code>h(n) = max(|x₁ - x₂|, |y₁ - y₂|)</code></p>
+            <p>Used for environments allowing 8-directional movement (including diagonals) where diagonal movement costs the same as cardinal movement.</p>
+        </section>
+
+        <section>
+            <h2>Choosing the Right Heuristic</h2>
+            <table border="1" style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+                <thead>
+                    <tr style="background: #f4f4f4;">
+                        <th>Movement Type</th>
+                        <th>Best Heuristic</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>4-directional</td><td>Manhattan</td></tr>
+                    <tr><td>8-directional</td><td>Chebyshev</td></tr>
+                    <tr><td>Any direction</td><td>Euclidean</td></tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <footer class="container" style="text-align: center; margin-top: 2rem; font-size: 0.8rem; color: #777;">
+        <p>&copy; 2026 Mastering A* Pathfinding Algorithm</p>
+    </footer>
 </body>
 </html>

@@ -3,71 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="shared.css">
-    <title>01 Graph Theory Basics</title>
+    <title>Graph Theory Basics | Mastering A*</title>
 </head>
 <body>
-    <nav class="nav-bar">
+    <header class="nav-bar">
         <span>Mastering A*</span>
-        <div>
+        <nav>
             <a href="index.html">Home</a>
             <a href="demo.html">Visualizer</a>
-        </div>
-    </nav>
-    <div class="container">
+        </nav>
+    </header>
+    
+    <main class="container">
         <h1>Graph Theory Basics</h1>
-<br>
-<h2>What is a Graph?</h2>
-<p>A graph is a mathematical structure consisting of:</p>
-<ul><li><b>Vertices (Nodes)</b>: Points in space</li>
-<li><b>Edges</b>: Connections between vertices</li>
-<li><b>Weights</b>: Optional costs for traversing edges</li>
-<br>
-<h2>Grid-Based Graphs</h2>
-<p>In pathfinding, we often use grid-based representations:</p>
-<br>
-<pre>
-<p>┌─┬─┬─┬─┐</p>
-<p>│S│ │ │ │  S = Start</p>
-<p>├─┼─┼─┼─┤</p>
-<p>│ │█│ │ │  █ = Obstacle</p>
-<p>├─┼─┼─┼─┤</p>
-<p>│ │ │ │E│  E = End</p>
-<p>└─┴─┴─┴─┘</p>
-<p></pre></p>
-<br>
-<h2>Movement Types</h2>
-<br>
-<h3>4-Directional Movement</h3>
-<pre>
-<p>    ↑</p>
-<p>  ← N →</p>
-<p>    ↓</p>
-<p></pre></p>
-<p>Cost: 1 unit per move</p>
-<br>
-<h3>8-Directional Movement</h3>
-<pre>
-<p>  ↖ ↑ ↗</p>
-<p>  ← N →</p>
-<p>  ↙ ↓ ↘</p>
-<p></pre></p>
-<p>Cost: 1 for cardinal, √2 for diagonal</p>
-<br>
-<h2>Key Properties</h2>
-<li><b>Connected</b>: Path exists between nodes</li>
-<li><b>Weighted</b>: Edges have movement costs</li>
-<li><b>Directed/Undirected</b>: Movement restrictions</li>
-<br>
-<h2>Real-World Examples</h2>
-<li>Video game maps</li>
-<li>Robot navigation grids</li>
-<li>City street networks</li>
-<li>Circuit board routing</li></ul>
-<br>
-<p>---</p>
-<b>Next:</b> <a href="02-search-algorithms.md">Search Algorithms Comparison</a>
-<br>
-<b>Interactive:</b> <a href="demo.html">Try grid creation</a>
-    </div>
+        
+        <section>
+            <h2>What is a Graph?</h2>
+            <p>At its core, a graph is a mathematical structure used to model pairwise relations between objects. In pathfinding, it is the foundation for representing the environment.</p>
+            <p>A graph consists of two primary components:</p>
+            <ul>
+                <li><strong>Vertices (Nodes):</strong> These represent distinct points or locations in space (e.g., a specific tile on a game board).</li>
+                <li><strong>Edges:</strong> These are the connections between nodes, representing the possibility of movement between them.</li>
+                <li><strong>Weights:</strong> These are numerical values assigned to edges, representing the "cost" of traveling across that specific connection.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Grid-Based Graphs</h2>
+            <p>For most pathfinding applications, we use a grid-based representation. This maps the environment into discrete cells, where each cell is a node.</p>
+            <p>Visualizing a simple grid:</p>
+            <pre style="background: #eee; padding: 10px;">
+┌─┬─┬─┬─┐
+│S│ │ │ │  S = Start
+├─┼─┼─┼─┤
+│ │█│ │ │  █ = Obstacle
+├─┼─┼─┼─┤
+│ │ │ │E│  E = End
+└─┴─┴─┴─┘</pre>
+        </section>
+
+        <section>
+            <h2>Movement Types</h2>
+            <h3>4-Directional Movement</h3>
+            <p>Allows movement only vertically and horizontally. This is often called "Manhattan" movement.</p>
+            
+            <h3>8-Directional Movement</h3>
+            <p>Allows movement vertically, horizontally, and diagonally. Diagonal movement typically has a higher cost (usually 1.414, which is the square root of 2).</p>
+        </section>
+    </main>
+
+    <footer class="container" style="text-align: center; margin-top: 2rem; font-size: 0.8rem; color: #777;">
+        <p>&copy; 2026 Mastering A* Pathfinding Algorithm</p>
+    </footer>
 </body>
 </html>

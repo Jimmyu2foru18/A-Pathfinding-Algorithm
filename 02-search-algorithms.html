@@ -3,136 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="shared.css">
-    <title>02 Search Algorithms</title>
+    <title>Search Algorithms Comparison | Mastering A*</title>
 </head>
 <body>
-    <nav class="nav-bar">
+    <header class="nav-bar">
         <span>Mastering A*</span>
-        <div>
+        <nav>
             <a href="index.html">Home</a>
             <a href="demo.html">Visualizer</a>
-        </div>
-    </nav>
-    <div class="container">
+        </nav>
+    </header>
+    
+    <main class="container">
         <h1>Search Algorithms Comparison</h1>
-<br>
-<h2>Uninformed vs Informed Search</h2>
-<br>
-<h3>Uninformed Search (Blind Search)</h3>
-<p>Algorithms that explore without knowledge of the goal location.</p>
-<br>
-<p>#### Breadth-First Search (BFS)</p>
-<pre>
-<p>Exploration Pattern:</p>
-<p>┌─┬─┬─┬─┬─┐</p>
-<p>│1│2│3│4│5│</p>
-<p>├─┼─┼─┼─┼─┤</p>
-<p>│2│3│4│5│6│</p>
-<p>├─┼─┼─┼─┼─┤</p>
-<p>│3│4│5│6│7│</p>
-<p>└─┴─┴─┴─┴─┘</p>
-<p></pre></p>
-<ul><li><b>Guarantees</b>: Shortest path</li>
-<li><b>Time</b>: O(b^d)</li>
-<li><b>Space</b>: O(b^d)</li>
-<li><b>Problem</b>: Explores everywhere equally</li>
-<br>
-<p>#### Depth-First Search (DFS)</p>
-<pre>
-<p>Exploration Pattern:</p>
-<p>┌─┬─┬─┬─┬─┐</p>
-<p>│1│ │ │ │ │</p>
-<p>├─┼─┼─┼─┼─┤</p>
-<p>│2│ │ │ │ │</p>
-<p>├─┼─┼─┼─┼─┤</p>
-<p>│3│4│5│6│7│</p>
-<p>└─┴─┴─┴─┴─┘</p>
-<p></pre></p>
-<li><b>Guarantees</b>: None</li>
-<li><b>Time</b>: O(b^m)</li>
-<li><b>Space</b>: O(bm)</li>
-<li><b>Problem</b>: May find suboptimal paths</li>
-<br>
-<h3>Informed Search (Heuristic Search)</h3>
-<p>Algorithms that use domain knowledge to guide exploration.</p>
-<br>
-<p>#### Greedy Best-First Search</p>
-<pre>
-<p>Exploration Pattern (toward goal):</p>
-<p>┌─┬─┬─┬─┬─┐</p>
-<p>│ │ │ │ │G│</p>
-<p>├─┼─┼─┼─┼─┤</p>
-<p>│ │ │ │4│3│</p>
-<p>├─┼─┼─┼─┼─┤</p>
-<p>│S│1│2│ │ │</p>
-<p>└─┴─┴─┴─┴─┘</p>
-<p></pre></p>
-<li><b>Guarantees</b>: None</li>
-<li><b>Time</b>: O(b^m)</li>
-<li><b>Space</b>: O(b^m)</li>
-<li><b>Problem</b>: Can get trapped by local optima</li>
-<br>
-<p>#### Dijkstra's Algorithm</p>
-<pre>
-<p>Exploration Pattern (uniform cost):</p>
-<p>┌─┬─┬─┬─┬─┐</p>
-<p>│4│3│4│5│6│</p>
-<p>├─┼─┼─┼─┼─┤</p>
-<p>│3│2│3│4│5│</p>
-<p>├─┼─┼─┼─┼─┤</p>
-<p>│2│1│2│3│4│</p>
-<p>├─┼─┼─┼─┼─┤</p>
-<p>│1│S│1│2│3│</p>
-<p>└─┴─┴─┴─┴─┘</p>
-<p></pre></p>
-<li><b>Guarantees</b>: Optimal path</li>
-<li><b>Time</b>: O((V + E) log V)</li>
-<li><b>Space</b>: O(V)</li>
-<li><b>Problem</b>: Explores in all directions equally</li>
-<br>
-<h2>A* Algorithm: The Best of Both Worlds</h2>
-<br>
-<h3>Formula: f(n) = g(n) + h(n)</h3>
-<li><b>g(n)</b>: Actual cost from start</li>
-<li><b>h(n)</b>: Heuristic estimate to goal</li>
-<li><b>f(n)</b>: Total estimated cost</li></ul>
-<br>
-<pre>
-<p>A* Exploration Pattern:</p>
-<p>┌─┬─┬─┬─┬─┐</p>
-<p>│ │ │ │ │G│</p>
-<p>├─┼─┼─┼─┼─┤</p>
-<p>│ │ │3│2│1│</p>
-<p>├─┼─┼─┼─┼─┤</p>
-<p>│ │4│3│2│ │</p>
-<p>├─┼─┼─┼─┼─┤</p>
-<p>│S│1│2│ │ │</p>
-<p>└─┴─┴─┴─┴─┘</p>
-<p></pre></p>
-<br>
-<h3>Why A* is Optimal</h3>
-<p>1. <b>Admissible Heuristic</b>: Never overestimates</p>
-<p>2. <b>Consistent</b>: Satisfies triangle inequality</p>
-<p>3. <b>Complete</b>: Always finds solution if exists</p>
-<p>4. <b>Optimal</b>: Finds shortest path</p>
-<br>
-<h2>Performance Comparison</h2>
-<br>
-<p>| Algorithm | Optimal | Complete | Time | Space |</p>
-<p>|-----------|---------|----------|------|-------|</p>
-<p>| BFS | ✓ | ✓ | O(b^d) | O(b^d) |</p>
-<p>| DFS | ✗ | ✗ | O(b^m) | O(bm) |</p>
-<p>| Greedy | ✗ | ✗ | O(b^m) | O(b^m) |</p>
-<p>| Dijkstra | ✓ | ✓ | O((V+E)logV) | O(V) |</p>
-<p>| A* | ✓ | ✓ | O(b^d) | O(b^d) |</p>
-<br>
-<b>Key Advantage</b>: A* typically explores fewer nodes than other optimal algorithms.
-<br>
-<p>---</p>
-<b>Previous:</b> <a href="01-graph-theory-basics.md">Graph Theory Basics</a>
-<b>Next:</b> <a href="03-heuristic-mathematics.md">Heuristic Mathematics</a>
-<br>
-<b>Interactive:</b> <a href="demo.html">Compare algorithms</a>
-    </div>
+        
+        <section>
+            <h2>Uninformed vs Informed Search</h2>
+            
+            <h3>Uninformed Search (Blind Search)</h3>
+            <p>Algorithms that explore without knowledge of the goal location. Examples include Breadth-First Search (BFS) and Depth-First Search (DFS).</p>
+            <ul>
+                <li><strong>Breadth-First Search (BFS):</strong> Explores all neighbors at the current depth before moving to the next depth. Guarantees the shortest path in unweighted graphs but explores extensively in all directions.</li>
+                <li><strong>Depth-First Search (DFS):</strong> Explores as deep as possible along each branch before backtracking. Does not guarantee the shortest path and may get stuck in infinite loops on infinite graphs.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h3>Informed Search (Heuristic Search)</h3>
+            <p>Algorithms that use domain knowledge (a heuristic) to guide the search towards the goal. Examples include Greedy Best-First Search, Dijkstra's Algorithm, and A*.</p>
+            <ul>
+                <li><strong>Greedy Best-First Search:</strong> Expands the node that appears closest to the goal based on the heuristic. Fast, but not optimal.</li>
+                <li><strong>Dijkstra's Algorithm:</strong> Explores nodes in order of their cost from the start node. Guarantees optimality but explores uniformly in all directions.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>A* Algorithm: The Best of Both Worlds</h2>
+            <p>A* combines the cost-optimality of Dijkstra's algorithm with the goal-oriented focus of Greedy Best-First Search.</p>
+            <p>The core formula is:</p>
+            <p style="text-align: center; font-weight: bold;">f(n) = g(n) + h(n)</p>
+            <ul>
+                <li><strong>g(n):</strong> The actual cost from the start node to node <em>n</em>.</li>
+                <li><strong>h(n):</strong> The heuristic estimate from node <em>n</em> to the goal.</li>
+                <li><strong>f(n):</strong> The total estimated cost of the path through node <em>n</em>.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Performance Comparison</h2>
+            <table border="1" style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+                <thead>
+                    <tr style="background: #f4f4f4;">
+                        <th>Algorithm</th>
+                        <th>Optimal</th>
+                        <th>Complete</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>BFS</td><td>✓</td><td>✓</td></tr>
+                    <tr><td>DFS</td><td>✗</td><td>✗</td></tr>
+                    <tr><td>Greedy</td><td>✗</td><td>✗</td></tr>
+                    <tr><td>Dijkstra</td><td>✓</td><td>✓</td></tr>
+                    <tr><td>A*</td><td>✓</td><td>✓</td></tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <footer class="container" style="text-align: center; margin-top: 2rem; font-size: 0.8rem; color: #777;">
+        <p>&copy; 2026 Mastering A* Pathfinding Algorithm</p>
+    </footer>
 </body>
 </html>
