@@ -15,170 +15,170 @@
     </nav>
     <div class="container">
         <h1>Frequently Asked Questions (FAQ)</h1>
-
+<br>
 <p>> <b>Common questions and detailed answers about A* pathfinding algorithm</b></p>
-
+<br>
 <p>This FAQ addresses the most common questions learners have about A* pathfinding. If you don't find your question here, check the <a href="17-glossary.md">Glossary</a> or <a href="19-index.md">Index</a>.</p>
-
+<br>
 <h2>🎯 Getting Started</h2>
-
-<p>### Q: What is A* and why should I learn it?</p>
+<br>
+<h3>Q: What is A* and why should I learn it?</h3>
 <b>A:</b> A* (A-Star) is the most widely used pathfinding algorithm in computer science. It efficiently finds the shortest path between two points while being optimal and complete. You should learn it because:
-<li><b>Universal application</b> - Used in games, robotics, GPS navigation, network routing</li>
+<ul><li><b>Universal application</b> - Used in games, robotics, GPS navigation, network routing</li>
 <li><b>Optimal performance</b> - Best balance of speed and accuracy</li>
 <li><b>Industry standard</b> - Expected knowledge for many programming roles</li>
 <li><b>Foundation for advanced algorithms</b> - Gateway to more complex pathfinding techniques</li>
-
-<p>### Q: Do I need advanced math to understand A*?</p>
+<br>
+<h3>Q: Do I need advanced math to understand A*?</h3>
 <b>A:</b> No! A* uses basic concepts:
 <li><b>Addition and comparison</b> - For calculating costs</li>
 <li><b>Distance formulas</b> - Manhattan, Euclidean (high school level)</li>
 <li><b>Basic graph theory</b> - Nodes and edges (explained from scratch)</li>
 <li><b>Simple data structures</b> - Arrays, priority queues</li>
-
+<br>
 <p>Our <a href="README.md#progressive-learning-journey">learning path</a> starts with fundamentals and builds up gradually.</p>
-
-<p>### Q: What programming experience do I need?</p>
+<br>
+<h3>Q: What programming experience do I need?</h3>
 <b>A:</b> Basic programming knowledge is helpful:
 <li><b>Variables and functions</b> - Understanding basic syntax</li>
 <li><b>Arrays and objects</b> - Simple data structures</li>
 <li><b>Loops and conditionals</b> - Basic control flow</li>
 <li><b>No advanced concepts required</b> - We explain everything step by step</li>
-
+<br>
 <p>The examples use JavaScript, but concepts apply to any language.</p>
-
-<p>### Q: How long does it take to learn A*?</p>
+<br>
+<h3>Q: How long does it take to learn A*?</h3>
 <b>A:</b> Depends on your goals:
 <li><b>Basic understanding</b> - 2-4 hours with our interactive demo</li>
 <li><b>Implementation ability</b> - 1-2 days following our guides</li>
 <li><b>Production-ready skills</b> - 1-2 weeks including optimization</li>
 <li><b>Advanced mastery</b> - Several weeks exploring variants and research</li>
-
+<br>
 <p>Use our <a href="20-learning-checklist.md">Learning Checklist</a> to track progress.</p>
-
+<br>
 <p>---</p>
-
+<br>
 <h2>🔧 Algorithm Understanding</h2>
-
-<p>### Q: How does A* differ from Dijkstra's algorithm?</p>
+<br>
+<h3>Q: How does A* differ from Dijkstra's algorithm?</h3>
 <b>A:</b> Key differences:
-
+<br>
 <p>| Aspect | Dijkstra's | A* |</p>
 <p>|--------|------------|----|</p>
 <p>| <b>Guidance</b> | Explores uniformly | Uses heuristic to guide search |</p>
 <p>| <b>Performance</b> | Slower, explores more nodes | Faster, more focused |</p>
 <p>| <b>Optimality</b> | Always optimal | Optimal with admissible heuristic |</p>
 <p>| <b>Use case</b> | When no goal direction known | When goal location is known |</p>
-
+<br>
 <p>A* = Dijkstra's + heuristic guidance. See <a href="02-search-algorithms.md">Search Algorithms</a> for detailed comparison.</p>
-
-<p>### Q: What makes a heuristic "admissible"?</p>
+<br>
+<h3>Q: What makes a heuristic "admissible"?</h3>
 <b>A:</b> An admissible heuristic <b>never overestimates</b> the actual cost to reach the goal:
 <li><b>h(n) ≤ actual_cost(n, goal)</b> for all nodes n</li>
 <li><b>Examples:</b> Manhattan distance for grid movement, Euclidean distance for any movement</li>
 <li><b>Why important:</b> Guarantees A* finds optimal path</li>
 <li><b>Common mistake:</b> Using heuristics that overestimate</li>
-
+<br>
 <p>See <a href="03-heuristic-mathematics.md">Heuristic Mathematics</a> for detailed explanation and proofs.</p>
-
-<p>### Q: What's the difference between admissible and consistent heuristics?</p>
+<br>
+<h3>Q: What's the difference between admissible and consistent heuristics?</h3>
 <b>A:</b> 
 <li><b>Admissible:</b> Never overestimates total cost to goal</li>
 <li><b>Consistent (Monotonic):</b> Satisfies triangle inequality: h(n) ≤ cost(n,n') + h(n')</li>
 <li><b>Relationship:</b> All consistent heuristics are admissible, but not vice versa</li>
 <li><b>Practical impact:</b> Consistent heuristics are more efficient (no node re-expansion)</li>
 <li><b>Most common heuristics</b> (Manhattan, Euclidean) are both admissible and consistent</li>
-
-<p>### Q: Why does A* use f(n) = g(n) + h(n)?</p>
+<br>
+<h3>Q: Why does A* use f(n) = g(n) + h(n)?</h3>
 <b>A:</b> This formula balances two important factors:
 <li><b>g(n)</b> - Actual cost from start (ensures we don't ignore distance traveled)</li>
 <li><b>h(n)</b> - Estimated cost to goal (guides search toward target)</li>
 <li><b>f(n)</b> - Total estimated cost of path through node n</li>
 <li><b>Result:</b> Explores most promising nodes first while maintaining optimality</li>
-
+<br>
 <p>See <a href="04-node-evaluation.md">Node Evaluation</a> for step-by-step examples.</p>
-
+<br>
 <p>---</p>
-
+<br>
 <h2>💻 Implementation Questions</h2>
-
-<p>### Q: What data structures should I use for A*?</p>
+<br>
+<h3>Q: What data structures should I use for A*?</h3>
 <b>A:</b> Essential data structures:
-
+<br>
 <p>| Component | Best Structure | Why |</p>
 <p>|-----------|----------------|-----|</p>
 <p>| <b>Open Set</b> | Min-Heap (Priority Queue) | Efficiently get lowest f-cost node |</p>
 <p>| <b>Closed Set</b> | Hash Set | Fast O(1) membership testing |</p>
 <p>| <b>Grid</b> | 2D Array | Direct coordinate access |</p>
 <p>| <b>Path</b> | Array or Linked List | Store final path sequence |</p>
-
+<br>
 <p>See <a href="05-set-management.md">Set Management</a> for implementations and alternatives.</p>
-
-<p>### Q: How do I handle diagonal movement?</p>
+<br>
+<h3>Q: How do I handle diagonal movement?</h3>
 <b>A:</b> Two approaches:
-
+<br>
 <b>8-Directional Movement:</b>
 <li><b>Cost:</b> √2 ≈ 1.414 for diagonals, 1.0 for orthogonal</li>
 <li><b>Heuristic:</b> Euclidean or Chebyshev distance</li>
 <li><b>Use case:</b> More realistic movement</li>
-
+<br>
 <b>4-Directional Movement:</b>
 <li><b>Cost:</b> 1.0 for all moves (up, down, left, right)</li>
 <li><b>Heuristic:</b> Manhattan distance</li>
 <li><b>Use case:</b> Grid-based games, simpler implementation</li>
-
+<br>
 <p>See <a href="01-graph-theory-basics.md#movement-types">Graph Theory Basics</a> for details.</p>
-
-<p>### Q: How do I prevent A* from cutting corners?</p>
+<br>
+<h3>Q: How do I prevent A* from cutting corners?</h3>
 <b>A:</b> Corner-cutting occurs when diagonal movement passes through blocked cells. Solutions:
-
+<br>
 <p>1. <b>Check intermediate cells:</b></p>
-<p>   ```javascript</p>
+   <pre>javascript
 <p>   function canMoveDiagonally(x1, y1, x2, y2) {</p>
 <p>       return !isBlocked(x1, y2) && !isBlocked(x2, y1);</p>
 <p>   }</p>
-<p>   ```</p>
-
+<p>   </pre></p>
+<br>
 <p>2. <b>Use line-of-sight checks:</b></p>
-<p>   ```javascript</p>
+   <pre>javascript
 <p>   function hasLineOfSight(start, end) {</p>
 <p>       // Bresenham's line algorithm</p>
 <p>   }</p>
-<p>   ```</p>
-
+<p>   </pre></p>
+<br>
 <p>3. <b>Implement Jump Point Search</b> for more sophisticated handling</p>
-
+<br>
 <p>See <a href="07-complete-implementation.md">Complete Implementation</a> for full examples.</p>
-
-<p>### Q: How do I handle dynamic obstacles?</p>
+<br>
+<h3>Q: How do I handle dynamic obstacles?</h3>
 <b>A:</b> Several approaches:
-
+<br>
 <b>Simple Re-planning:</b>
 <li>Detect obstacle change</li>
 <li>Re-run A* from current position</li>
 <li><b>Pros:</b> Simple to implement</li>
 <li><b>Cons:</b> Computationally expensive</li>
-
+<br>
 <b>D* (Dynamic A*):</b>
 <li>Incrementally update path when obstacles change</li>
 <li><b>Pros:</b> More efficient for frequent changes</li>
 <li><b>Cons:</b> More complex implementation</li>
-
+<br>
 <b>Local Repair:</b>
 <li>Only re-plan affected path segments</li>
 <li><b>Pros:</b> Good balance of simplicity and efficiency</li>
-
+<br>
 <p>See <a href="14-advanced-topics.md#dynamic-a-d">Advanced Topics</a> for D* implementation.</p>
-
+<br>
 <p>---</p>
-
+<br>
 <h2>🎮 Practical Applications</h2>
-
-<p>### Q: How do I integrate A* into a game?</p>
+<br>
+<h3>Q: How do I integrate A* into a game?</h3>
 <b>A:</b> Common integration patterns:
-
+<br>
 <b>Real-time Games:</b>
-<p>```javascript</p>
+<pre>javascript
 <p>class GameEntity {</p>
 <p>    update(deltaTime) {</p>
 <p>        if (this.needsNewPath) {</p>
@@ -188,361 +188,361 @@
 <p>        this.followPath(deltaTime);</p>
 <p>    }</p>
 <p>}</p>
-<p>```</p>
-
+<p></pre></p>
+<br>
 <b>Turn-based Games:</b>
-<p>```javascript</p>
+<pre>javascript
 <p>function planTurn(unit, targetPosition) {</p>
 <p>    const path = pathfinder.findPath(unit.position, targetPosition);</p>
 <p>    return createMoveActions(path);</p>
 <p>}</p>
-<p>```</p>
-
+<p></pre></p>
+<br>
 <p>See <a href="08-applications.md#game-development">Applications</a> for complete examples.</p>
-
-<p>### Q: How do I optimize A* for real-time performance?</p>
+<br>
+<h3>Q: How do I optimize A* for real-time performance?</h3>
 <b>A:</b> Key optimization strategies:
-
+<br>
 <p>1. <b>Limit search time:</b></p>
-<p>   ```javascript</p>
+   <pre>javascript
 <p>   const MAX_NODES = 1000;</p>
 <p>   let nodesExplored = 0;</p>
 <p>   while (openSet.length > 0 && nodesExplored < MAX_NODES) {</p>
 <p>       // A* iteration</p>
 <p>       nodesExplored++;</p>
 <p>   }</p>
-<p>   ```</p>
-
+<p>   </pre></p>
+<br>
 <p>2. <b>Use hierarchical pathfinding:</b></p>
 <p>   - High-level path between regions</p>
 <p>   - Low-level path within regions</p>
-
+<br>
 <p>3. <b>Cache and reuse paths:</b></p>
 <p>   - Store recently computed paths</p>
 <p>   - Validate cached paths before reuse</p>
-
+<br>
 <p>4. <b>Optimize data structures:</b></p>
 <p>   - Use efficient priority queue</p>
 <p>   - Minimize memory allocations</p>
-
+<br>
 <p>See <a href="09-optimizations.md">Optimizations</a> for detailed techniques.</p>
-
-<p>### Q: How many units can A* handle simultaneously?</p>
+<br>
+<h3>Q: How many units can A* handle simultaneously?</h3>
 <b>A:</b> Depends on several factors:
-
+<br>
 <b>Single-threaded JavaScript:</b>
 <li><b>Small grids (50x50):</b> 10-20 units at 60 FPS</li>
 <li><b>Medium grids (200x200):</b> 5-10 units at 60 FPS</li>
 <li><b>Large grids (1000x1000):</b> 1-3 units at 60 FPS</li>
-
+<br>
 <b>Optimization techniques:</b>
 <li><b>Time-slicing:</b> Spread pathfinding across multiple frames</li>
 <li><b>Hierarchical pathfinding:</b> Reduce search space</li>
 <li><b>Path sharing:</b> Multiple units use same high-level path</li>
 <li><b>Web Workers:</b> Offload pathfinding to background threads</li>
-
+<br>
 <p>See <a href="13-performance.md">Performance</a> for benchmarking and optimization.</p>
-
+<br>
 <p>---</p>
-
+<br>
 <h2>🐛 Debugging and Troubleshooting</h2>
-
-<p>### Q: My A* implementation doesn't find the optimal path. What's wrong?</p>
+<br>
+<h3>Q: My A* implementation doesn't find the optimal path. What's wrong?</h3>
 <b>A:</b> Common causes:
-
+<br>
 <p>1. <b>Non-admissible heuristic:</b></p>
-<p>   ```javascript</p>
+   <pre>javascript
 <p>   // Wrong: Overestimates</p>
 <p>   function badHeuristic(a, b) {</p>
 <p>       return Math.abs(a.x - b.x) + Math.abs(a.y - b.y) * 2; // Too high!</p>
 <p>   }</p>
-   
+<br>
 <p>   // Correct: Admissible</p>
 <p>   function manhattanDistance(a, b) {</p>
 <p>       return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);</p>
 <p>   }</p>
-<p>   ```</p>
-
+<p>   </pre></p>
+<br>
 <p>2. <b>Incorrect movement costs:</b></p>
-<p>   ```javascript</p>
+   <pre>javascript
 <p>   // Wrong: All moves cost 1</p>
 <p>   const cost = 1;</p>
-   
+<br>
 <p>   // Correct: Diagonal costs √2</p>
 <p>   const cost = isDiagonal ? Math.sqrt(2) : 1;</p>
-<p>   ```</p>
-
+<p>   </pre></p>
+<br>
 <p>3. <b>Early termination:</b></p>
-<p>   ```javascript</p>
+   <pre>javascript
 <p>   // Wrong: Stop when goal is added to open set</p>
 <p>   if (neighbor === goal) return reconstructPath(goal);</p>
-   
+<br>
 <p>   // Correct: Stop when goal is selected from open set</p>
 <p>   if (current === goal) return reconstructPath(goal);</p>
-<p>   ```</p>
-
-<p>### Q: A* is too slow. How do I speed it up?</p>
+<p>   </pre></p>
+<br>
+<h3>Q: A* is too slow. How do I speed it up?</h3>
 <b>A:</b> Performance optimization checklist:
-
+<br>
 <p>1. <b>Profile first:</b> Identify actual bottlenecks</p>
 <p>2. <b>Optimize data structures:</b> Use efficient priority queue</p>
 <p>3. <b>Reduce memory allocations:</b> Reuse objects</p>
 <p>4. <b>Limit search space:</b> Use bounds or time limits</p>
 <p>5. <b>Consider alternatives:</b> JPS, hierarchical pathfinding</p>
 <p>6. <b>Use better heuristics:</b> More informed estimates</p>
-
+<br>
 <p>See <a href="13-performance.md">Performance</a> for detailed analysis.</p>
-
-<p>### Q: A* finds paths through walls. How do I fix this?</p>
+<br>
+<h3>Q: A* finds paths through walls. How do I fix this?</h3>
 <b>A:</b> Check obstacle detection:
-
-<p>```javascript</p>
+<br>
+<pre>javascript
 <p>// Ensure proper boundary checking</p>
 <p>function isValidPosition(x, y) {</p>
 <p>    return x >= 0 && x < gridWidth && </p>
 <p>           y >= 0 && y < gridHeight && </p>
 <p>           !grid[y][x].isObstacle;</p>
 <p>}</p>
-
+<br>
 <p>// For diagonal movement, check intermediate cells</p>
 <p>function canMoveDiagonally(fromX, fromY, toX, toY) {</p>
 <p>    if (!isValidPosition(toX, toY)) return false;</p>
-    
+<br>
 <p>    // Check if diagonal movement cuts through obstacles</p>
 <p>    return isValidPosition(fromX, toY) && isValidPosition(toX, fromY);</p>
 <p>}</p>
-<p>```</p>
-
-<p>### Q: How do I debug A* visually?</p>
+<p></pre></p>
+<br>
+<h3>Q: How do I debug A* visually?</h3>
 <b>A:</b> Use our <a href="demo.html">Interactive Demo</a> or add visualization:
-
-<p>```javascript</p>
+<br>
+<pre>javascript
 <p>function visualizeSearch(openSet, closedSet, current) {</p>
 <p>    // Color nodes based on their state</p>
 <p>    openSet.forEach(node => colorNode(node, 'green'));</p>
 <p>    closedSet.forEach(node => colorNode(node, 'red'));</p>
 <p>    colorNode(current, 'blue');</p>
-    
+<br>
 <p>    // Display f, g, h values</p>
 <p>    displayNodeCosts(current);</p>
 <p>}</p>
-<p>```</p>
-
+<p></pre></p>
+<br>
 <p>See <a href="10-demo-guide.md">Demo Guide</a> for interactive debugging techniques.</p>
-
+<br>
 <p>---</p>
-
+<br>
 <h2>🚀 Advanced Topics</h2>
-
-<p>### Q: When should I use Jump Point Search instead of A*?</p>
+<br>
+<h3>Q: When should I use Jump Point Search instead of A*?</h3>
 <b>A:</b> JPS is beneficial when:
 <li><b>Large open areas</b> with few obstacles</li>
 <li><b>Grid-based movement</b> (doesn't work well with arbitrary graphs)</li>
 <li><b>Performance is critical</b> and you can accept implementation complexity</li>
 <li><b>Memory is limited</b> (JPS explores fewer nodes)</li>
-
+<br>
 <b>Don't use JPS when:</b>
 <li>Grids are densely packed with obstacles</li>
 <li>You need the simplicity of standard A*</li>
 <li>Working with non-grid graphs</li>
-
+<br>
 <p>See <a href="14-advanced-topics.md#jump-point-search">Advanced Topics</a> for implementation.</p>
-
-<p>### Q: How do I handle multiple agents without collisions?</p>
+<br>
+<h3>Q: How do I handle multiple agents without collisions?</h3>
 <b>A:</b> Several approaches:
-
+<br>
 <b>Conflict-Based Search (CBS):</b>
 <li>Plan paths independently</li>
 <li>Detect conflicts</li>
 <li>Re-plan with conflict constraints</li>
-
+<br>
 <b>Cooperative A*:</b>
 <li>Include time dimension in search</li>
 <li>Avoid spatiotemporal conflicts</li>
-
+<br>
 <b>Flow-based methods:</b>
 <li>Treat agents as flow through network</li>
 <li>Optimize global throughput</li>
-
+<br>
 <p>See <a href="14-advanced-topics.md#multi-agent-pathfinding">Advanced Topics</a> for detailed implementations.</p>
-
-<p>### Q: Can I use machine learning with A*?</p>
+<br>
+<h3>Q: Can I use machine learning with A*?</h3>
 <b>A:</b> Yes! Several approaches:
-
+<br>
 <b>Learned Heuristics:</b>
 <li>Train neural networks to predict remaining cost</li>
 <li>Often more accurate than hand-crafted heuristics</li>
-
+<br>
 <b>Reinforcement Learning:</b>
 <li>Learn optimal policies for pathfinding</li>
 <li>Can handle dynamic environments</li>
-
+<br>
 <b>Hybrid Approaches:</b>
 <li>Use ML for high-level planning</li>
 <li>Use A* for low-level execution</li>
-
+<br>
 <p>See <a href="15-research.md#machine-learning-enhanced-pathfinding">Research</a> for cutting-edge techniques.</p>
-
+<br>
 <p>---</p>
-
+<br>
 <h2>📚 Learning and Resources</h2>
-
-<p>### Q: What's the best way to learn A*?</p>
+<br>
+<h3>Q: What's the best way to learn A*?</h3>
 <b>A:</b> Follow our structured approach:
-
+<br>
 <p>1. <b>Start with basics:</b> <a href="01-graph-theory-basics.md">Graph Theory</a></p>
 <p>2. <b>Use interactive demo:</b> <a href="10-demo-guide.md">Demo Guide</a></p>
 <p>3. <b>Implement step by step:</b> <a href="07-complete-implementation.md">Complete Implementation</a></p>
 <p>4. <b>Test thoroughly:</b> <a href="12-testing.md">Testing</a></p>
 <p>5. <b>Optimize for your use case:</b> <a href="09-optimizations.md">Optimizations</a></p>
 <p>6. <b>Track progress:</b> <a href="20-learning-checklist.md">Learning Checklist</a></p>
-
-<p>### Q: What are the best books on pathfinding?</p>
+<br>
+<h3>Q: What are the best books on pathfinding?</h3>
 <b>A:</b> Recommended reading:
-
+<br>
 <b>Beginner-friendly:</b>
 <li>"Artificial Intelligence: A Modern Approach" by Russell & Norvig</li>
 <li>"Introduction to Algorithms" by Cormen et al.</li>
-
+<br>
 <b>Game-focused:</b>
 <li>"AI for Game Developers" by Bourg & Seemann</li>
 <li>"Programming Game AI by Example" by Buckland</li>
-
+<br>
 <b>Advanced:</b>
 <li>"Heuristic Search" by Edelkamp & Schroedl</li>
 <li>"Multi-Agent Pathfinding" by Stern et al.</li>
-
+<br>
 <p>See <a href="18-references.md">References</a> for complete bibliography.</p>
-
-<p>### Q: How do I stay updated on pathfinding research?</p>
+<br>
+<h3>Q: How do I stay updated on pathfinding research?</h3>
 <b>A:</b> Key resources:
-
+<br>
 <b>Academic Venues:</b>
 <li>AAAI Conference on Artificial Intelligence</li>
 <li>International Conference on Automated Planning and Scheduling (ICAPS)</li>
 <li>Symposium on Combinatorial Search (SoCS)</li>
-
+<br>
 <b>Online Communities:</b>
 <li>AI/GameDev subreddits</li>
 <li>Stack Overflow pathfinding tags</li>
 <li>Academic Twitter (#pathfinding #AI)</li>
-
+<br>
 <b>Journals:</b>
 <li>Journal of Artificial Intelligence Research</li>
 <li>Artificial Intelligence journal</li>
 <li>IEEE Transactions on Games</li>
-
+<br>
 <p>See <a href="18-references.md#research-venues">References</a> for links and details.</p>
-
-<p>### Q: Can I contribute to this learning resource?</p>
+<br>
+<h3>Q: Can I contribute to this learning resource?</h3>
 <b>A:</b> Absolutely! We welcome:
-
+<br>
 <b>Content Contributions:</b>
 <li>Additional examples and use cases</li>
 <li>Improved explanations</li>
 <li>New optimization techniques</li>
 <li>Research updates</li>
-
+<br>
 <b>Code Contributions:</b>
 <li>Bug fixes and improvements</li>
 <li>Additional language implementations</li>
 <li>Performance optimizations</li>
 <li>New features for the demo</li>
-
+<br>
 <b>Community Contributions:</b>
 <li>Answering questions</li>
 <li>Reviewing contributions</li>
 <li>Sharing the resource</li>
 <li>Providing feedback</li>
-
+<br>
 <p>See <a href="16-contributing.md">Contributing Guide</a> for detailed instructions.</p>
-
+<br>
 <p>---</p>
-
+<br>
 <h2>🔍 Quick Problem Solving</h2>
-
-<p>### Common Error Messages</p>
-
+<br>
+<h3>Common Error Messages</h3>
+<br>
 <b>"Cannot read property 'x' of undefined"</b>
 <li>Check node object creation</li>
 <li>Verify grid initialization</li>
 <li>Ensure proper boundary checking</li>
-
+<br>
 <b>"Maximum call stack size exceeded"</b>
 <li>Infinite loop in pathfinding</li>
 <li>Check termination conditions</li>
 <li>Verify closed set management</li>
-
+<br>
 <b>"Path not found when one should exist"</b>
 <li>Check obstacle detection logic</li>
 <li>Verify neighbor generation</li>
 <li>Ensure proper grid connectivity</li>
-
+<br>
 <b>"Path goes through obstacles"</b>
 <li>Check diagonal movement validation</li>
 <li>Verify obstacle checking in neighbor generation</li>
 <li>Ensure grid coordinates are correct</li>
-
-<p>### Performance Issues</p>
-
+<br>
+<h3>Performance Issues</h3>
+<br>
 <b>"A* is too slow"</b>
 <p>1. Profile to find bottlenecks</p>
 <p>2. Optimize data structures</p>
 <p>3. Limit search space</p>
 <p>4. Consider algorithm variants</p>
-
+<br>
 <b>"Running out of memory"</b>
 <p>1. Implement node pooling</p>
 <p>2. Use coordinate hashing</p>
 <p>3. Limit search area</p>
 <p>4. Clean up data structures</p>
-
+<br>
 <b>"Inconsistent performance"</b>
 <p>1. Check for memory leaks</p>
 <p>2. Verify garbage collection</p>
 <p>3. Profile different scenarios</p>
 <p>4. Implement performance monitoring</p>
-
+<br>
 <p>---</p>
-
+<br>
 <h2>📞 Getting Help</h2>
-
-<p>### Before Asking for Help</p>
+<br>
+<h3>Before Asking for Help</h3>
 <p>1. <b>Check this FAQ</b> for common issues</p>
 <p>2. <b>Use the <a href="19-index.md">Index</a></b> to find relevant topics</p>
 <p>3. <b>Try the <a href="demo.html">Interactive Demo</a></b> to understand behavior</p>
 <p>4. <b>Review <a href="11-code-walkthrough.md">Code Walkthrough</a></b> for implementation details</p>
 <p>5. <b>Check <a href="10-demo-guide.md#troubleshooting">Troubleshooting</a></b> section</p>
-
-<p>### When Asking for Help</p>
+<br>
+<h3>When Asking for Help</h3>
 <b>Provide:</b>
 <li>Specific error messages</li>
 <li>Minimal code example</li>
 <li>Expected vs actual behavior</li>
 <li>Grid configuration and test case</li>
 <li>What you've already tried</li>
-
+<br>
 <b>Good question format:</b>
-<p>```</p>
+<pre>
 <p>Problem: A* finds suboptimal path</p>
 <p>Code: [minimal example]</p>
 <p>Expected: Path cost 10</p>
 <p>Actual: Path cost 12</p>
 <p>Tried: Checked heuristic admissibility</p>
 <p>Grid: 10x10 with obstacles at...</p>
-<p>```</p>
-
-<p>### Community Resources</p>
+<p></pre></p>
+<br>
+<h3>Community Resources</h3>
 <li><b>Project Issues:</b> For bugs and feature requests</li>
 <li><b>Stack Overflow:</b> For implementation questions</li>
 <li><b>Reddit r/gamedev:</b> For game-specific applications</li>
-<li><b>Academic forums:</b> For research-related questions</li>
-
+<li><b>Academic forums:</b> For research-related questions</li></ul>
+<br>
 <p>---</p>
-
+<br>
 <b>Previous:</b> <a href="20-learning-checklist.md">Learning Checklist</a> | <b>Next:</b> <a href="01-graph-theory-basics.md">Graph Theory Basics</a>
 <b>Home:</b> <a href="README.md">README</a> | <b>Interactive:</b> <a href="demo.html">Try the demo</a>
-
+<br>
 <p>*Can't find your question? Check the <a href="19-index.md">Index</a> or <a href="17-glossary.md">Glossary</a> for more specific topics.*</p>
     </div>
 </body>

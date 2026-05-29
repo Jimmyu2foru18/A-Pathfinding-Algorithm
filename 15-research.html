@@ -15,62 +15,62 @@
     </nav>
     <div class="container">
         <h1>Research Frontiers</h1>
-
+<br>
 <h2>Current Research Areas</h2>
-
-<p>### Machine Learning Enhanced Pathfinding</p>
-
+<br>
+<h3>Machine Learning Enhanced Pathfinding</h3>
+<br>
 <p>#### Neural Network Heuristics</p>
 <p>Researchers are exploring the use of neural networks to learn better heuristic functions that can outperform traditional distance-based heuristics.</p>
-
-<p>```javascript</p>
+<br>
+<pre>javascript
 <p>class NeuralHeuristicAStar {</p>
 <p>    constructor(neuralNetwork) {</p>
 <p>        this.neuralNetwork = neuralNetwork;</p>
 <p>        this.traditionalHeuristic = manhattanDistance;</p>
 <p>        this.useNeuralHeuristic = true;</p>
 <p>    }</p>
-    
+<br>
 <p>    async computeHeuristic(node, goal, gridContext) {</p>
 <p>        if (!this.useNeuralHeuristic) {</p>
 <p>            return this.traditionalHeuristic(node, goal);</p>
 <p>        }</p>
-        
+<br>
 <p>        try {</p>
 <p>            // Prepare input features for neural network</p>
 <p>            const features = this.extractFeatures(node, goal, gridContext);</p>
-            
+<br>
 <p>            // Get prediction from neural network</p>
 <p>            const prediction = await this.neuralNetwork.predict(features);</p>
-            
+<br>
 <p>            // Ensure admissibility by taking minimum with traditional heuristic</p>
 <p>            const traditionalH = this.traditionalHeuristic(node, goal);</p>
 <p>            return Math.min(prediction, traditionalH);</p>
-            
+<br>
 <p>        } catch (error) {</p>
 <p>            console.warn('Neural heuristic failed, falling back to traditional:', error);</p>
 <p>            return this.traditionalHeuristic(node, goal);</p>
 <p>        }</p>
 <p>    }</p>
-    
+<br>
 <p>    extractFeatures(node, goal, gridContext) {</p>
 <p>        const features = [];</p>
-        
+<br>
 <p>        // Basic distance features</p>
 <p>        features.push(Math.abs(node.x - goal.x)); // Manhattan X</p>
 <p>        features.push(Math.abs(node.y - goal.y)); // Manhattan Y</p>
 <p>        features.push(Math.sqrt(Math.pow(node.x - goal.x, 2) + Math.pow(node.y - goal.y, 2))); // Euclidean</p>
-        
+<br>
 <p>        // Local obstacle density</p>
 <p>        const radius = 3;</p>
 <p>        let obstacleCount = 0;</p>
 <p>        let totalCells = 0;</p>
-        
+<br>
 <p>        for (let dy = -radius; dy <= radius; dy++) {</p>
 <p>            for (let dx = -radius; dx <= radius; dx++) {</p>
 <p>                const x = node.x + dx;</p>
 <p>                const y = node.y + dy;</p>
-                
+<br>
 <p>                if (x >= 0 && x < GRID_WIDTH && y >= 0 && y < GRID_HEIGHT) {</p>
 <p>                    totalCells++;</p>
 <p>                    if (grid[y][x].isObstacle) {</p>
@@ -79,21 +79,21 @@
 <p>                }</p>
 <p>            }</p>
 <p>        }</p>
-        
+<br>
 <p>        features.push(obstacleCount / totalCells); // Local obstacle density</p>
-        
+<br>
 <p>        // Direction to goal</p>
 <p>        const directionX = Math.sign(goal.x - node.x);</p>
 <p>        const directionY = Math.sign(goal.y - node.y);</p>
 <p>        features.push(directionX);</p>
 <p>        features.push(directionY);</p>
-        
+<br>
 <p>        // Path clearance in goal direction</p>
 <p>        let clearance = 0;</p>
 <p>        for (let i = 1; i <= 5; i++) {</p>
 <p>            const checkX = node.x + directionX * i;</p>
 <p>            const checkY = node.y + directionY * i;</p>
-            
+<br>
 <p>            if (checkX >= 0 && checkX < GRID_WIDTH && </p>
 <p>                checkY >= 0 && checkY < GRID_HEIGHT && </p>
 <p>                !grid[checkY][checkX].isObstacle) {</p>
@@ -103,40 +103,40 @@
 <p>            }</p>
 <p>        }</p>
 <p>        features.push(clearance / 5); // Normalized clearance</p>
-        
+<br>
 <p>        // Grid position features (normalized)</p>
 <p>        features.push(node.x / GRID_WIDTH);</p>
 <p>        features.push(node.y / GRID_HEIGHT);</p>
 <p>        features.push(goal.x / GRID_WIDTH);</p>
 <p>        features.push(goal.y / GRID_HEIGHT);</p>
-        
+<br>
 <p>        return features;</p>
 <p>    }</p>
-    
+<br>
 <p>    // Training data collection for supervised learning</p>
 <p>    collectTrainingData(optimalPaths) {</p>
 <p>        const trainingData = [];</p>
-        
+<br>
 <p>        for (const pathData of optimalPaths) {</p>
 <p>            const { path, goal, gridState } = pathData;</p>
-            
+<br>
 <p>            for (let i = 0; i < path.length - 1; i++) {</p>
 <p>                const node = path[i];</p>
 <p>                const remainingCost = path.length - 1 - i; // Actual cost to goal</p>
-                
+<br>
 <p>                const features = this.extractFeatures(node, goal, gridState);</p>
-                
+<br>
 <p>                trainingData.push({</p>
 <p>                    input: features,</p>
 <p>                    output: remainingCost</p>
 <p>                });</p>
 <p>            }</p>
 <p>        }</p>
-        
+<br>
 <p>        return trainingData;</p>
 <p>    }</p>
 <p>}</p>
-
+<br>
 <p>// Simple neural network implementation for heuristic learning</p>
 <p>class SimpleNeuralNetwork {</p>
 <p>    constructor(inputSize, hiddenSize, outputSize) {</p>
@@ -146,7 +146,7 @@
 <p>        this.bias2 = this.randomArray(outputSize);</p>
 <p>        this.learningRate = 0.01;</p>
 <p>    }</p>
-    
+<br>
 <p>    randomMatrix(rows, cols) {</p>
 <p>        const matrix = [];</p>
 <p>        for (let i = 0; i < rows; i++) {</p>
@@ -157,7 +157,7 @@
 <p>        }</p>
 <p>        return matrix;</p>
 <p>    }</p>
-    
+<br>
 <p>    randomArray(size) {</p>
 <p>        const array = [];</p>
 <p>        for (let i = 0; i < size; i++) {</p>
@@ -165,25 +165,25 @@
 <p>        }</p>
 <p>        return array;</p>
 <p>    }</p>
-    
+<br>
 <p>    sigmoid(x) {</p>
 <p>        return 1 / (1 + Math.exp(-x));</p>
 <p>    }</p>
-    
+<br>
 <p>    relu(x) {</p>
 <p>        return Math.max(0, x);</p>
 <p>    }</p>
-    
+<br>
 <p>    async predict(input) {</p>
 <p>        // Forward pass</p>
 <p>        const hidden = this.matrixVectorMultiply(this.weights1, input, this.bias1)</p>
 <p>                          .map(x => this.relu(x));</p>
-        
+<br>
 <p>        const output = this.matrixVectorMultiply(this.weights2, hidden, this.bias2);</p>
-        
+<br>
 <p>        return Math.max(0, output[0]); // Ensure non-negative heuristic</p>
 <p>    }</p>
-    
+<br>
 <p>    matrixVectorMultiply(matrix, vector, bias) {</p>
 <p>        const result = [];</p>
 <p>        for (let i = 0; i < matrix[0].length; i++) {</p>
@@ -195,50 +195,50 @@
 <p>        }</p>
 <p>        return result;</p>
 <p>    }</p>
-    
+<br>
 <p>    train(trainingData, epochs = 1000) {</p>
 <p>        for (let epoch = 0; epoch < epochs; epoch++) {</p>
 <p>            let totalLoss = 0;</p>
-            
+<br>
 <p>            for (const sample of trainingData) {</p>
 <p>                const loss = this.trainSample(sample.input, sample.output);</p>
 <p>                totalLoss += loss;</p>
 <p>            }</p>
-            
+<br>
 <p>            if (epoch % 100 === 0) {</p>
 <p>                console.log(`Epoch ${epoch}, Average Loss: ${totalLoss / trainingData.length}`);</p>
 <p>            }</p>
 <p>        }</p>
 <p>    }</p>
-    
+<br>
 <p>    trainSample(input, target) {</p>
 <p>        // Forward pass</p>
 <p>        const hidden = this.matrixVectorMultiply(this.weights1, input, this.bias1)</p>
 <p>                          .map(x => this.relu(x));</p>
-        
+<br>
 <p>        const output = this.matrixVectorMultiply(this.weights2, hidden, this.bias2);</p>
 <p>        const prediction = Math.max(0, output[0]);</p>
-        
+<br>
 <p>        // Calculate loss</p>
 <p>        const loss = Math.pow(prediction - target, 2);</p>
-        
+<br>
 <p>        // Backward pass (simplified gradient descent)</p>
 <p>        const outputError = 2 * (prediction - target);</p>
-        
+<br>
 <p>        // Update weights (simplified)</p>
 <p>        for (let i = 0; i < this.weights2.length; i++) {</p>
 <p>            for (let j = 0; j < this.weights2[i].length; j++) {</p>
 <p>                this.weights2[i][j] -= this.learningRate * outputError * hidden[i];</p>
 <p>            }</p>
 <p>        }</p>
-        
+<br>
 <p>        return loss;</p>
 <p>    }</p>
 <p>}</p>
-<p>```</p>
-
+<p></pre></p>
+<br>
 <p>#### Reinforcement Learning for Pathfinding</p>
-<p>```javascript</p>
+<pre>javascript
 <p>class RLPathfinder {</p>
 <p>    constructor() {</p>
 <p>        this.qTable = new Map();</p>
@@ -252,21 +252,21 @@
 <p>            { dx: -1, dy: 0, name: 'left' }</p>
 <p>        ];</p>
 <p>    }</p>
-    
+<br>
 <p>    getStateKey(x, y, goalX, goalY) {</p>
 <p>        return `${x}_${y}_${goalX}_${goalY}`;</p>
 <p>    }</p>
-    
+<br>
 <p>    getQValue(state, action) {</p>
 <p>        const key = `${state}_${action}`;</p>
 <p>        return this.qTable.get(key) || 0;</p>
 <p>    }</p>
-    
+<br>
 <p>    setQValue(state, action, value) {</p>
 <p>        const key = `${state}_${action}`;</p>
 <p>        this.qTable.set(key, value);</p>
 <p>    }</p>
-    
+<br>
 <p>    selectAction(state) {</p>
 <p>        if (Math.random() < this.epsilon) {</p>
 <p>            // Exploration: random action</p>
@@ -275,7 +275,7 @@
 <p>            // Exploitation: best known action</p>
 <p>            let bestAction = this.actions[0];</p>
 <p>            let bestValue = this.getQValue(state, bestAction.name);</p>
-            
+<br>
 <p>            for (const action of this.actions) {</p>
 <p>                const qValue = this.getQValue(state, action.name);</p>
 <p>                if (qValue > bestValue) {</p>
@@ -283,51 +283,51 @@
 <p>                    bestAction = action;</p>
 <p>                }</p>
 <p>            }</p>
-            
+<br>
 <p>            return bestAction;</p>
 <p>        }</p>
 <p>    }</p>
-    
+<br>
 <p>    calculateReward(x, y, goalX, goalY, isObstacle, reachedGoal) {</p>
 <p>        if (isObstacle) {</p>
 <p>            return -10; // Penalty for hitting obstacle</p>
 <p>        }</p>
-        
+<br>
 <p>        if (reachedGoal) {</p>
 <p>            return 100; // Large reward for reaching goal</p>
 <p>        }</p>
-        
+<br>
 <p>        // Distance-based reward (closer to goal is better)</p>
 <p>        const distance = Math.abs(x - goalX) + Math.abs(y - goalY);</p>
 <p>        return -distance * 0.1; // Small penalty for distance</p>
 <p>    }</p>
-    
+<br>
 <p>    trainEpisode(startX, startY, goalX, goalY, maxSteps = 1000) {</p>
 <p>        let x = startX;</p>
 <p>        let y = startY;</p>
 <p>        let steps = 0;</p>
 <p>        const path = [{ x, y }];</p>
-        
+<br>
 <p>        while (steps < maxSteps) {</p>
 <p>            const currentState = this.getStateKey(x, y, goalX, goalY);</p>
 <p>            const action = this.selectAction(currentState);</p>
-            
+<br>
 <p>            const newX = x + action.dx;</p>
 <p>            const newY = y + action.dy;</p>
-            
+<br>
 <p>            // Check bounds and obstacles</p>
 <p>            const isValidMove = newX >= 0 && newX < GRID_WIDTH && </p>
 <p>                               newY >= 0 && newY < GRID_HEIGHT && </p>
 <p>                               !grid[newY][newX].isObstacle;</p>
-            
+<br>
 <p>            let nextX, nextY, reward;</p>
-            
+<br>
 <p>            if (isValidMove) {</p>
 <p>                nextX = newX;</p>
 <p>                nextY = newY;</p>
 <p>                const reachedGoal = nextX === goalX && nextY === goalY;</p>
 <p>                reward = this.calculateReward(nextX, nextY, goalX, goalY, false, reachedGoal);</p>
-                
+<br>
 <p>                if (reachedGoal) {</p>
 <p>                    path.push({ x: nextX, y: nextY });</p>
 <p>                    this.updateQValue(currentState, action.name, reward, null);</p>
@@ -338,25 +338,25 @@
 <p>                nextY = y;</p>
 <p>                reward = this.calculateReward(x, y, goalX, goalY, true, false);</p>
 <p>            }</p>
-            
+<br>
 <p>            const nextState = this.getStateKey(nextX, nextY, goalX, goalY);</p>
 <p>            this.updateQValue(currentState, action.name, reward, nextState);</p>
-            
+<br>
 <p>            x = nextX;</p>
 <p>            y = nextY;</p>
 <p>            steps++;</p>
-            
+<br>
 <p>            if (isValidMove) {</p>
 <p>                path.push({ x, y });</p>
 <p>            }</p>
 <p>        }</p>
-        
+<br>
 <p>        return { success: false, steps, path };</p>
 <p>    }</p>
-    
+<br>
 <p>    updateQValue(state, action, reward, nextState) {</p>
 <p>        const currentQ = this.getQValue(state, action);</p>
-        
+<br>
 <p>        let maxNextQ = 0;</p>
 <p>        if (nextState) {</p>
 <p>            for (const nextAction of this.actions) {</p>
@@ -364,35 +364,35 @@
 <p>                maxNextQ = Math.max(maxNextQ, nextQ);</p>
 <p>            }</p>
 <p>        }</p>
-        
+<br>
 <p>        const newQ = currentQ + this.learningRate * </p>
 <p>                    (reward + this.discountFactor * maxNextQ - currentQ);</p>
-        
+<br>
 <p>        this.setQValue(state, action, newQ);</p>
 <p>    }</p>
-    
+<br>
 <p>    findPath(startX, startY, goalX, goalY) {</p>
 <p>        // Use trained policy (no exploration)</p>
 <p>        const originalEpsilon = this.epsilon;</p>
 <p>        this.epsilon = 0;</p>
-        
+<br>
 <p>        let x = startX;</p>
 <p>        let y = startY;</p>
 <p>        const path = [{ x, y }];</p>
 <p>        const maxSteps = GRID_WIDTH * GRID_HEIGHT;</p>
-        
+<br>
 <p>        for (let step = 0; step < maxSteps; step++) {</p>
 <p>            if (x === goalX && y === goalY) {</p>
 <p>                this.epsilon = originalEpsilon;</p>
 <p>                return path;</p>
 <p>            }</p>
-            
+<br>
 <p>            const state = this.getStateKey(x, y, goalX, goalY);</p>
 <p>            const action = this.selectAction(state);</p>
-            
+<br>
 <p>            const newX = x + action.dx;</p>
 <p>            const newY = y + action.dy;</p>
-            
+<br>
 <p>            if (newX >= 0 && newX < GRID_WIDTH && </p>
 <p>                newY >= 0 && newY < GRID_HEIGHT && </p>
 <p>                !grid[newY][newX].isObstacle) {</p>
@@ -401,34 +401,34 @@
 <p>                path.push({ x, y });</p>
 <p>            }</p>
 <p>        }</p>
-        
+<br>
 <p>        this.epsilon = originalEpsilon;</p>
 <p>        return null; // No path found</p>
 <p>    }</p>
-    
+<br>
 <p>    train(episodes = 10000) {</p>
 <p>        let successCount = 0;</p>
-        
+<br>
 <p>        for (let episode = 0; episode < episodes; episode++) {</p>
 <p>            // Random start and goal positions</p>
 <p>            let startX, startY, goalX, goalY;</p>
-            
+<br>
 <p>            do {</p>
 <p>                startX = Math.floor(Math.random() * GRID_WIDTH);</p>
 <p>                startY = Math.floor(Math.random() * GRID_HEIGHT);</p>
 <p>            } while (grid[startY][startX].isObstacle);</p>
-            
+<br>
 <p>            do {</p>
 <p>                goalX = Math.floor(Math.random() * GRID_WIDTH);</p>
 <p>                goalY = Math.floor(Math.random() * GRID_HEIGHT);</p>
 <p>            } while (grid[goalY][goalX].isObstacle || (goalX === startX && goalY === startY));</p>
-            
+<br>
 <p>            const result = this.trainEpisode(startX, startY, goalX, goalY);</p>
-            
+<br>
 <p>            if (result.success) {</p>
 <p>                successCount++;</p>
 <p>            }</p>
-            
+<br>
 <p>            // Decay exploration rate</p>
 <p>            if (episode % 1000 === 0) {</p>
 <p>                this.epsilon = Math.max(0.01, this.epsilon * 0.995);</p>
@@ -436,23 +436,23 @@
 <p>                console.log(`Episode ${episode}, Success Rate: ${(successRate * 100).toFixed(2)}%, Epsilon: ${this.epsilon.toFixed(3)}`);</p>
 <p>            }</p>
 <p>        }</p>
-        
+<br>
 <p>        console.log(`Training completed. Final success rate: ${(successCount / episodes * 100).toFixed(2)}%`);</p>
 <p>    }</p>
 <p>}</p>
-<p>```</p>
-
-<p>### Quantum-Inspired Algorithms</p>
-
+<p></pre></p>
+<br>
+<h3>Quantum-Inspired Algorithms</h3>
+<br>
 <p>#### Quantum Pathfinding Concepts</p>
-<p>```javascript</p>
+<pre>javascript
 <p>class QuantumInspiredPathfinder {</p>
 <p>    constructor() {</p>
 <p>        this.superpositionStates = new Map();</p>
 <p>        this.entanglementMatrix = new Map();</p>
 <p>        this.coherenceTime = 100; // Steps before decoherence</p>
 <p>    }</p>
-    
+<br>
 <p>    // Quantum superposition of multiple paths</p>
 <p>    createSuperposition(startX, startY, goalX, goalY) {</p>
 <p>        const superposition = {</p>
@@ -460,14 +460,14 @@
 <p>            amplitudes: [],</p>
 <p>            phase: 0</p>
 <p>        };</p>
-        
+<br>
 <p>        // Generate multiple potential paths using different heuristics</p>
 <p>        const heuristics = [</p>
 <p>            this.manhattanHeuristic,</p>
 <p>            this.euclideanHeuristic,</p>
 <p>            this.chebyshevHeuristic</p>
 <p>        ];</p>
-        
+<br>
 <p>        for (const heuristic of heuristics) {</p>
 <p>            const path = this.findPathWithHeuristic(startX, startY, goalX, goalY, heuristic);</p>
 <p>            if (path) {</p>
@@ -475,33 +475,33 @@
 <p>                superposition.amplitudes.push(1 / Math.sqrt(heuristics.length));</p>
 <p>            }</p>
 <p>        }</p>
-        
+<br>
 <p>        return superposition;</p>
 <p>    }</p>
-    
+<br>
 <p>    // Quantum interference between paths</p>
 <p>    applyInterference(superposition) {</p>
 <p>        const interferenceMatrix = this.calculateInterference(superposition.states);</p>
-        
+<br>
 <p>        for (let i = 0; i < superposition.amplitudes.length; i++) {</p>
 <p>            let newAmplitude = 0;</p>
-            
+<br>
 <p>            for (let j = 0; j < superposition.amplitudes.length; j++) {</p>
 <p>                newAmplitude += interferenceMatrix[i][j] * superposition.amplitudes[j];</p>
 <p>            }</p>
-            
+<br>
 <p>            superposition.amplitudes[i] = newAmplitude;</p>
 <p>        }</p>
-        
+<br>
 <p>        // Normalize amplitudes</p>
 <p>        const norm = Math.sqrt(superposition.amplitudes.reduce((sum, amp) => sum + amp * amp, 0));</p>
 <p>        superposition.amplitudes = superposition.amplitudes.map(amp => amp / norm);</p>
 <p>    }</p>
-    
+<br>
 <p>    calculateInterference(paths) {</p>
 <p>        const n = paths.length;</p>
 <p>        const matrix = Array(n).fill().map(() => Array(n).fill(0));</p>
-        
+<br>
 <p>        for (let i = 0; i < n; i++) {</p>
 <p>            for (let j = 0; j < n; j++) {</p>
 <p>                if (i === j) {</p>
@@ -513,46 +513,46 @@
 <p>                }</p>
 <p>            }</p>
 <p>        }</p>
-        
+<br>
 <p>        return matrix;</p>
 <p>    }</p>
-    
+<br>
 <p>    calculatePathSimilarity(path1, path2) {</p>
 <p>        let commonNodes = 0;</p>
 <p>        const maxLength = Math.max(path1.length, path2.length);</p>
-        
+<br>
 <p>        for (let i = 0; i < maxLength; i++) {</p>
 <p>            const node1 = i < path1.length ? path1[i] : path1[path1.length - 1];</p>
 <p>            const node2 = i < path2.length ? path2[i] : path2[path2.length - 1];</p>
-            
+<br>
 <p>            if (node1.x === node2.x && node1.y === node2.y) {</p>
 <p>                commonNodes++;</p>
 <p>            }</p>
 <p>        }</p>
-        
+<br>
 <p>        return commonNodes / maxLength;</p>
 <p>    }</p>
-    
+<br>
 <p>    // Quantum measurement - collapse to single path</p>
 <p>    measurePath(superposition) {</p>
 <p>        const probabilities = superposition.amplitudes.map(amp => amp * amp);</p>
 <p>        const random = Math.random();</p>
 <p>        let cumulativeProbability = 0;</p>
-        
+<br>
 <p>        for (let i = 0; i < probabilities.length; i++) {</p>
 <p>            cumulativeProbability += probabilities[i];</p>
 <p>            if (random <= cumulativeProbability) {</p>
 <p>                return superposition.states[i];</p>
 <p>            }</p>
 <p>        }</p>
-        
+<br>
 <p>        return superposition.states[superposition.states.length - 1];</p>
 <p>    }</p>
-    
+<br>
 <p>    // Quantum tunneling through obstacles</p>
 <p>    quantumTunnel(node, goal, tunnelProbability = 0.1) {</p>
 <p>        const directPath = this.getDirectPath(node, goal);</p>
-        
+<br>
 <p>        for (const pathNode of directPath) {</p>
 <p>            if (grid[pathNode.y][pathNode.x].isObstacle) {</p>
 <p>                if (Math.random() < tunnelProbability) {</p>
@@ -565,32 +565,32 @@
 <p>                }</p>
 <p>            }</p>
 <p>        }</p>
-        
+<br>
 <p>        return { success: false };</p>
 <p>    }</p>
-    
+<br>
 <p>    getDirectPath(start, goal) {</p>
 <p>        const path = [];</p>
 <p>        const dx = Math.sign(goal.x - start.x);</p>
 <p>        const dy = Math.sign(goal.y - start.y);</p>
-        
+<br>
 <p>        let x = start.x;</p>
 <p>        let y = start.y;</p>
-        
+<br>
 <p>        while (x !== goal.x || y !== goal.y) {</p>
 <p>            if (x !== goal.x) x += dx;</p>
 <p>            if (y !== goal.y) y += dy;</p>
 <p>            path.push({ x, y });</p>
 <p>        }</p>
-        
+<br>
 <p>        return path;</p>
 <p>    }</p>
-    
+<br>
 <p>    findPathWithHeuristic(startX, startY, goalX, goalY, heuristic) {</p>
 <p>        // Standard A* with specified heuristic</p>
 <p>        const openSet = new MinHeap();</p>
 <p>        const closedSet = new Set();</p>
-        
+<br>
 <p>        const startNode = {</p>
 <p>            x: startX,</p>
 <p>            y: startY,</p>
@@ -599,28 +599,28 @@
 <p>            parent: null</p>
 <p>        };</p>
 <p>        startNode.fCost = startNode.gCost + startNode.hCost;</p>
-        
+<br>
 <p>        openSet.insert(startNode);</p>
-        
+<br>
 <p>        while (!openSet.isEmpty()) {</p>
 <p>            const currentNode = openSet.extractMin();</p>
 <p>            const nodeKey = `${currentNode.x}_${currentNode.y}`;</p>
-            
+<br>
 <p>            if (closedSet.has(nodeKey)) continue;</p>
 <p>            closedSet.add(nodeKey);</p>
-            
+<br>
 <p>            if (currentNode.x === goalX && currentNode.y === goalY) {</p>
 <p>                return this.reconstructPath(currentNode);</p>
 <p>            }</p>
-            
+<br>
 <p>            const neighbors = this.getNeighbors(currentNode.x, currentNode.y);</p>
-            
+<br>
 <p>            for (const neighbor of neighbors) {</p>
 <p>                const neighborKey = `${neighbor.x}_${neighbor.y}`;</p>
 <p>                if (closedSet.has(neighborKey)) continue;</p>
-                
+<br>
 <p>                const tentativeGCost = currentNode.gCost + 1;</p>
-                
+<br>
 <p>                const neighborNode = {</p>
 <p>                    x: neighbor.x,</p>
 <p>                    y: neighbor.y,</p>
@@ -629,90 +629,90 @@
 <p>                    parent: currentNode</p>
 <p>                };</p>
 <p>                neighborNode.fCost = neighborNode.gCost + neighborNode.hCost;</p>
-                
+<br>
 <p>                openSet.insert(neighborNode);</p>
 <p>            }</p>
 <p>        }</p>
-        
+<br>
 <p>        return null;</p>
 <p>    }</p>
-    
+<br>
 <p>    manhattanHeuristic(node, goal) {</p>
 <p>        return Math.abs(node.x - goal.x) + Math.abs(node.y - goal.y);</p>
 <p>    }</p>
-    
+<br>
 <p>    euclideanHeuristic(node, goal) {</p>
 <p>        return Math.sqrt(Math.pow(node.x - goal.x, 2) + Math.pow(node.y - goal.y, 2));</p>
 <p>    }</p>
-    
+<br>
 <p>    chebyshevHeuristic(node, goal) {</p>
 <p>        return Math.max(Math.abs(node.x - goal.x), Math.abs(node.y - goal.y));</p>
 <p>    }</p>
-    
+<br>
 <p>    getNeighbors(x, y) {</p>
 <p>        const neighbors = [];</p>
 <p>        const directions = [</p>
 <p>            { dx: 0, dy: -1 }, { dx: 1, dy: 0 },</p>
 <p>            { dx: 0, dy: 1 }, { dx: -1, dy: 0 }</p>
 <p>        ];</p>
-        
+<br>
 <p>        for (const dir of directions) {</p>
 <p>            const newX = x + dir.dx;</p>
 <p>            const newY = y + dir.dy;</p>
-            
+<br>
 <p>            if (newX >= 0 && newX < GRID_WIDTH &&</p>
 <p>                newY >= 0 && newY < GRID_HEIGHT &&</p>
 <p>                !grid[newY][newX].isObstacle) {</p>
 <p>                neighbors.push({ x: newX, y: newY });</p>
 <p>            }</p>
 <p>        }</p>
-        
+<br>
 <p>        return neighbors;</p>
 <p>    }</p>
-    
+<br>
 <p>    reconstructPath(node) {</p>
 <p>        const path = [];</p>
 <p>        let current = node;</p>
-        
+<br>
 <p>        while (current) {</p>
 <p>            path.unshift({ x: current.x, y: current.y });</p>
 <p>            current = current.parent;</p>
 <p>        }</p>
-        
+<br>
 <p>        return path;</p>
 <p>    }</p>
-    
+<br>
 <p>    // Main quantum pathfinding algorithm</p>
 <p>    findQuantumPath(startX, startY, goalX, goalY) {</p>
 <p>        // Create superposition of paths</p>
 <p>        const superposition = this.createSuperposition(startX, startY, goalX, goalY);</p>
-        
+<br>
 <p>        if (superposition.states.length === 0) {</p>
 <p>            return null;</p>
 <p>        }</p>
-        
+<br>
 <p>        // Apply quantum interference</p>
 <p>        this.applyInterference(superposition);</p>
-        
+<br>
 <p>        // Measure to get final path</p>
 <p>        const finalPath = this.measurePath(superposition);</p>
-        
+<br>
 <p>        return finalPath;</p>
 <p>    }</p>
 <p>}</p>
-<p>```</p>
-
-<p>### Parallel and Distributed Pathfinding</p>
-
+<p></pre></p>
+<br>
+<h3>Parallel and Distributed Pathfinding</h3>
+<br>
 <p>#### Web Workers for Parallel Processing</p>
-<p>```javascript</p>
+<pre>javascript
 <p>class ParallelPathfinder {</p>
 <p>    constructor(numWorkers = 4) {</p>
 <p>        this.numWorkers = numWorkers;</p>
 <p>        this.workers = [];</p>
 <p>        this.initializeWorkers();</p>
 <p>    }</p>
-    
+<br>
 <p>    initializeWorkers() {</p>
 <p>        const workerCode = `</p>
 <p>            // A* implementation for worker</p>
@@ -720,10 +720,10 @@
 <p>                findPath(startX, startY, goalX, goalY, gridData, heuristicType) {</p>
 <p>                    const grid = this.reconstructGrid(gridData);</p>
 <p>                    const heuristic = this.getHeuristic(heuristicType);</p>
-                    
+<br>
 <p>                    const openSet = [];</p>
 <p>                    const closedSet = new Set();</p>
-                    
+<br>
 <p>                    const startNode = {</p>
 <p>                        x: startX,</p>
 <p>                        y: startY,</p>
@@ -732,9 +732,9 @@
 <p>                        parent: null</p>
 <p>                    };</p>
 <p>                    startNode.fCost = startNode.gCost + startNode.hCost;</p>
-                    
+<br>
 <p>                    openSet.push(startNode);</p>
-                    
+<br>
 <p>                    while (openSet.length > 0) {</p>
 <p>                        let currentNode = openSet[0];</p>
 <p>                        for (let i = 1; i < openSet.length; i++) {</p>
@@ -742,23 +742,23 @@
 <p>                                currentNode = openSet[i];</p>
 <p>                            }</p>
 <p>                        }</p>
-                        
+<br>
 <p>                        const currentIndex = openSet.indexOf(currentNode);</p>
 <p>                        openSet.splice(currentIndex, 1);</p>
 <p>                        closedSet.add(\`\${currentNode.x}_\${currentNode.y}\`);</p>
-                        
+<br>
 <p>                        if (currentNode.x === goalX && currentNode.y === goalY) {</p>
 <p>                            return this.reconstructPath(currentNode);</p>
 <p>                        }</p>
-                        
+<br>
 <p>                        const neighbors = this.getNeighbors(currentNode.x, currentNode.y, grid);</p>
-                        
+<br>
 <p>                        for (const neighbor of neighbors) {</p>
 <p>                            const neighborKey = \`\${neighbor.x}_\${neighbor.y}\`;</p>
 <p>                            if (closedSet.has(neighborKey)) continue;</p>
-                            
+<br>
 <p>                            const tentativeGCost = currentNode.gCost + 1;</p>
-                            
+<br>
 <p>                            let neighborNode = openSet.find(n => n.x === neighbor.x && n.y === neighbor.y);</p>
 <p>                            if (!neighborNode) {</p>
 <p>                                neighborNode = {</p>
@@ -777,10 +777,10 @@
 <p>                            }</p>
 <p>                        }</p>
 <p>                    }</p>
-                    
+<br>
 <p>                    return null;</p>
 <p>                }</p>
-                
+<br>
 <p>                reconstructGrid(gridData) {</p>
 <p>                    const grid = [];</p>
 <p>                    for (let y = 0; y < gridData.height; y++) {</p>
@@ -793,7 +793,7 @@
 <p>                    }</p>
 <p>                    return grid;</p>
 <p>                }</p>
-                
+<br>
 <p>                getHeuristic(type) {</p>
 <p>                    switch (type) {</p>
 <p>                        case 'manhattan':</p>
@@ -806,50 +806,50 @@
 <p>                            return (a, b) => Math.abs(a.x - b.x) + Math.abs(a.y - b.y);</p>
 <p>                    }</p>
 <p>                }</p>
-                
+<br>
 <p>                getNeighbors(x, y, grid) {</p>
 <p>                    const neighbors = [];</p>
 <p>                    const directions = [</p>
 <p>                        { dx: 0, dy: -1 }, { dx: 1, dy: 0 },</p>
 <p>                        { dx: 0, dy: 1 }, { dx: -1, dy: 0 }</p>
 <p>                    ];</p>
-                    
+<br>
 <p>                    for (const dir of directions) {</p>
 <p>                        const newX = x + dir.dx;</p>
 <p>                        const newY = y + dir.dy;</p>
-                        
+<br>
 <p>                        if (newX >= 0 && newX < grid[0].length &&</p>
 <p>                            newY >= 0 && newY < grid.length &&</p>
 <p>                            !grid[newY][newX].isObstacle) {</p>
 <p>                            neighbors.push({ x: newX, y: newY });</p>
 <p>                        }</p>
 <p>                    }</p>
-                    
+<br>
 <p>                    return neighbors;</p>
 <p>                }</p>
-                
+<br>
 <p>                reconstructPath(node) {</p>
 <p>                    const path = [];</p>
 <p>                    let current = node;</p>
-                    
+<br>
 <p>                    while (current) {</p>
 <p>                        path.unshift({ x: current.x, y: current.y });</p>
 <p>                        current = current.parent;</p>
 <p>                    }</p>
-                    
+<br>
 <p>                    return path;</p>
 <p>                }</p>
 <p>            }</p>
-            
+<br>
 <p>            const pathfinder = new WorkerAStar();</p>
-            
+<br>
 <p>            self.onmessage = function(e) {</p>
 <p>                const { startX, startY, goalX, goalY, gridData, heuristicType, workerId } = e.data;</p>
-                
+<br>
 <p>                const startTime = performance.now();</p>
 <p>                const path = pathfinder.findPath(startX, startY, goalX, goalY, gridData, heuristicType);</p>
 <p>                const endTime = performance.now();</p>
-                
+<br>
 <p>                self.postMessage({</p>
 <p>                    workerId,</p>
 <p>                    path,</p>
@@ -858,17 +858,17 @@
 <p>                });</p>
 <p>            };</p>
 <p>        `;</p>
-        
+<br>
 <p>        for (let i = 0; i < this.numWorkers; i++) {</p>
 <p>            const blob = new Blob([workerCode], { type: 'application/javascript' });</p>
 <p>            const worker = new Worker(URL.createObjectURL(blob));</p>
 <p>            this.workers.push(worker);</p>
 <p>        }</p>
 <p>    }</p>
-    
+<br>
 <p>    serializeGrid() {</p>
 <p>        const obstacles = [];</p>
-        
+<br>
 <p>        for (let y = 0; y < GRID_HEIGHT; y++) {</p>
 <p>            for (let x = 0; x < GRID_WIDTH; x++) {</p>
 <p>                if (grid[y][x].isObstacle) {</p>
@@ -876,23 +876,23 @@
 <p>                }</p>
 <p>            }</p>
 <p>        }</p>
-        
+<br>
 <p>        return {</p>
 <p>            width: GRID_WIDTH,</p>
 <p>            height: GRID_HEIGHT,</p>
 <p>            obstacles</p>
 <p>        };</p>
 <p>    }</p>
-    
+<br>
 <p>    async findParallelPaths(requests) {</p>
 <p>        const gridData = this.serializeGrid();</p>
 <p>        const promises = [];</p>
-        
+<br>
 <p>        for (let i = 0; i < requests.length; i++) {</p>
 <p>            const request = requests[i];</p>
 <p>            const workerId = i % this.numWorkers;</p>
 <p>            const worker = this.workers[workerId];</p>
-            
+<br>
 <p>            const promise = new Promise((resolve) => {</p>
 <p>                const messageHandler = (e) => {</p>
 <p>                    if (e.data.workerId === i) {</p>
@@ -903,22 +903,22 @@
 <p>                        });</p>
 <p>                    }</p>
 <p>                };</p>
-                
+<br>
 <p>                worker.addEventListener('message', messageHandler);</p>
-                
+<br>
 <p>                worker.postMessage({</p>
 <p>                    ...request,</p>
 <p>                    gridData,</p>
 <p>                    workerId: i</p>
 <p>                });</p>
 <p>            });</p>
-            
+<br>
 <p>            promises.push(promise);</p>
 <p>        }</p>
-        
+<br>
 <p>        return Promise.all(promises);</p>
 <p>    }</p>
-    
+<br>
 <p>    async benchmarkHeuristics(startX, startY, goalX, goalY) {</p>
 <p>        const heuristics = ['manhattan', 'euclidean', 'chebyshev'];</p>
 <p>        const requests = heuristics.map(heuristic => ({</p>
@@ -928,9 +928,9 @@
 <p>            goalY,</p>
 <p>            heuristicType: heuristic</p>
 <p>        }));</p>
-        
+<br>
 <p>        const results = await this.findParallelPaths(requests);</p>
-        
+<br>
 <p>        return results.map((result, index) => ({</p>
 <p>            heuristic: heuristics[index],</p>
 <p>            path: result.path,</p>
@@ -939,13 +939,13 @@
 <p>            pathLength: result.path ? result.path.length : 0</p>
 <p>        }));</p>
 <p>    }</p>
-    
+<br>
 <p>    async findBestPath(startX, startY, goalX, goalY) {</p>
 <p>        const results = await this.benchmarkHeuristics(startX, startY, goalX, goalY);</p>
-        
+<br>
 <p>        // Find the best result (shortest path, then fastest time)</p>
 <p>        let bestResult = null;</p>
-        
+<br>
 <p>        for (const result of results) {</p>
 <p>            if (result.success) {</p>
 <p>                if (!bestResult || </p>
@@ -956,13 +956,13 @@
 <p>                }</p>
 <p>            }</p>
 <p>        }</p>
-        
+<br>
 <p>        return {</p>
 <p>            bestPath: bestResult,</p>
 <p>            allResults: results</p>
 <p>        };</p>
 <p>    }</p>
-    
+<br>
 <p>    terminate() {</p>
 <p>        for (const worker of this.workers) {</p>
 <p>            worker.terminate();</p>
@@ -970,12 +970,12 @@
 <p>        this.workers = [];</p>
 <p>    }</p>
 <p>}</p>
-<p>```</p>
-
+<p></pre></p>
+<br>
 <h2>Future Research Directions</h2>
-
-<p>### Emerging Trends</p>
-
+<br>
+<h3>Emerging Trends</h3>
+<br>
 <p>1. <b>Neuromorphic Pathfinding</b>: Using brain-inspired computing architectures</p>
 <p>2. <b>Swarm Intelligence</b>: Collective pathfinding using ant colony optimization</p>
 <p>3. <b>Evolutionary Algorithms</b>: Genetic algorithms for path optimization</p>
@@ -984,10 +984,10 @@
 <p>6. <b>Energy-Aware Pathfinding</b>: Optimizing for energy consumption in mobile robots</p>
 <p>7. <b>Multi-Objective Optimization</b>: Balancing multiple criteria (time, energy, safety)</p>
 <p>8. <b>Probabilistic Pathfinding</b>: Handling uncertainty in environment knowledge</p>
-
-<p>### Research Challenges</p>
-
-<p>```javascript</p>
+<br>
+<h3>Research Challenges</h3>
+<br>
+<pre>javascript
 <p>// Example: Multi-objective pathfinding research framework</p>
 <p>class MultiObjectivePathfinder {</p>
 <p>    constructor() {</p>
@@ -997,7 +997,7 @@
 <p>            energy: (path) => this.calculateEnergyConsumption(path),</p>
 <p>            time: (path) => this.calculateTimeEstimate(path)</p>
 <p>        };</p>
-        
+<br>
 <p>        this.weights = {</p>
 <p>            distance: 0.4,</p>
 <p>            safety: 0.3,</p>
@@ -1005,116 +1005,116 @@
 <p>            time: 0.1</p>
 <p>        };</p>
 <p>    }</p>
-    
+<br>
 <p>    calculateSafetyScore(path) {</p>
 <p>        let safetyScore = 0;</p>
-        
+<br>
 <p>        for (const node of path) {</p>
 <p>            // Check proximity to obstacles</p>
 <p>            const dangerLevel = this.calculateDangerLevel(node.x, node.y);</p>
 <p>            safetyScore += (1 - dangerLevel); // Higher score for safer areas</p>
 <p>        }</p>
-        
+<br>
 <p>        return safetyScore / path.length;</p>
 <p>    }</p>
-    
+<br>
 <p>    calculateDangerLevel(x, y) {</p>
 <p>        let dangerLevel = 0;</p>
 <p>        const checkRadius = 2;</p>
-        
+<br>
 <p>        for (let dy = -checkRadius; dy <= checkRadius; dy++) {</p>
 <p>            for (let dx = -checkRadius; dx <= checkRadius; dx++) {</p>
 <p>                const checkX = x + dx;</p>
 <p>                const checkY = y + dy;</p>
-                
+<br>
 <p>                if (checkX >= 0 && checkX < GRID_WIDTH &&</p>
 <p>                    checkY >= 0 && checkY < GRID_HEIGHT &&</p>
 <p>                    grid[checkY][checkX].isObstacle) {</p>
-                    
+<br>
 <p>                    const distance = Math.sqrt(dx * dx + dy * dy);</p>
 <p>                    dangerLevel += 1 / (distance + 1); // Closer obstacles are more dangerous</p>
 <p>                }</p>
 <p>            }</p>
 <p>        }</p>
-        
+<br>
 <p>        return Math.min(dangerLevel, 1); // Normalize to [0, 1]</p>
 <p>    }</p>
-    
+<br>
 <p>    calculateEnergyConsumption(path) {</p>
 <p>        let energy = 0;</p>
-        
+<br>
 <p>        for (let i = 1; i < path.length; i++) {</p>
 <p>            const prev = path[i - 1];</p>
 <p>            const curr = path[i];</p>
-            
+<br>
 <p>            // Diagonal moves cost more energy</p>
 <p>            const isDiagonal = Math.abs(curr.x - prev.x) === 1 && Math.abs(curr.y - prev.y) === 1;</p>
 <p>            energy += isDiagonal ? 1.4 : 1.0;</p>
-            
+<br>
 <p>            // Moving near obstacles costs more energy (caution)</p>
 <p>            const dangerLevel = this.calculateDangerLevel(curr.x, curr.y);</p>
 <p>            energy += dangerLevel * 0.5;</p>
 <p>        }</p>
-        
+<br>
 <p>        return energy;</p>
 <p>    }</p>
-    
+<br>
 <p>    calculateTimeEstimate(path) {</p>
 <p>        // Simple time estimation based on path complexity</p>
 <p>        let time = path.length;</p>
-        
+<br>
 <p>        for (let i = 1; i < path.length - 1; i++) {</p>
 <p>            const prev = path[i - 1];</p>
 <p>            const curr = path[i];</p>
 <p>            const next = path[i + 1];</p>
-            
+<br>
 <p>            // Direction changes take extra time</p>
 <p>            const prevDir = { x: curr.x - prev.x, y: curr.y - prev.y };</p>
 <p>            const nextDir = { x: next.x - curr.x, y: next.y - curr.y };</p>
-            
+<br>
 <p>            if (prevDir.x !== nextDir.x || prevDir.y !== nextDir.y) {</p>
 <p>                time += 0.5; // Penalty for direction change</p>
 <p>            }</p>
 <p>        }</p>
-        
+<br>
 <p>        return time;</p>
 <p>    }</p>
-    
+<br>
 <p>    evaluatePath(path) {</p>
 <p>        const scores = {};</p>
 <p>        let totalScore = 0;</p>
-        
+<br>
 <p>        for (const [objective, evaluator] of Object.entries(this.objectives)) {</p>
 <p>            const score = evaluator(path);</p>
 <p>            scores[objective] = score;</p>
 <p>            totalScore += score * this.weights[objective];</p>
 <p>        }</p>
-        
+<br>
 <p>        return {</p>
 <p>            totalScore,</p>
 <p>            breakdown: scores</p>
 <p>        };</p>
 <p>    }</p>
-    
+<br>
 <p>    findParetoOptimalPaths(startX, startY, goalX, goalY, populationSize = 100) {</p>
 <p>        // Generate multiple paths using different strategies</p>
 <p>        const population = this.generateInitialPopulation(startX, startY, goalX, goalY, populationSize);</p>
-        
+<br>
 <p>        // Evaluate all paths</p>
 <p>        const evaluatedPaths = population.map(path => ({</p>
 <p>            path,</p>
 <p>            evaluation: this.evaluatePath(path)</p>
 <p>        }));</p>
-        
+<br>
 <p>        // Find Pareto-optimal solutions</p>
 <p>        const paretoFront = this.findParetoFront(evaluatedPaths);</p>
-        
+<br>
 <p>        return paretoFront;</p>
 <p>    }</p>
-    
+<br>
 <p>    generateInitialPopulation(startX, startY, goalX, goalY, size) {</p>
 <p>        const population = [];</p>
-        
+<br>
 <p>        // Use different algorithms and parameters to generate diverse paths</p>
 <p>        const strategies = [</p>
 <p>            () => this.findPathWithRandomizedHeuristic(startX, startY, goalX, goalY),</p>
@@ -1122,44 +1122,44 @@
 <p>            () => this.findEnergyEfficientPath(startX, startY, goalX, goalY),</p>
 <p>            () => this.findFastestPath(startX, startY, goalX, goalY)</p>
 <p>        ];</p>
-        
+<br>
 <p>        for (let i = 0; i < size; i++) {</p>
 <p>            const strategy = strategies[i % strategies.length];</p>
 <p>            const path = strategy();</p>
-            
+<br>
 <p>            if (path) {</p>
 <p>                population.push(path);</p>
 <p>            }</p>
 <p>        }</p>
-        
+<br>
 <p>        return population;</p>
 <p>    }</p>
-    
+<br>
 <p>    findParetoFront(evaluatedPaths) {</p>
 <p>        const paretoFront = [];</p>
-        
+<br>
 <p>        for (const candidate of evaluatedPaths) {</p>
 <p>            let isDominated = false;</p>
-            
+<br>
 <p>            for (const other of evaluatedPaths) {</p>
 <p>                if (this.dominates(other.evaluation.breakdown, candidate.evaluation.breakdown)) {</p>
 <p>                    isDominated = true;</p>
 <p>                    break;</p>
 <p>                }</p>
 <p>            }</p>
-            
+<br>
 <p>            if (!isDominated) {</p>
 <p>                paretoFront.push(candidate);</p>
 <p>            }</p>
 <p>        }</p>
-        
+<br>
 <p>        return paretoFront;</p>
 <p>    }</p>
-    
+<br>
 <p>    dominates(a, b) {</p>
 <p>        // Check if solution a dominates solution b</p>
 <p>        let betterInAtLeastOne = false;</p>
-        
+<br>
 <p>        for (const objective of Object.keys(this.objectives)) {</p>
 <p>            if (objective === 'distance' || objective === 'energy' || objective === 'time') {</p>
 <p>                // Lower is better for these objectives</p>
@@ -1177,35 +1177,35 @@
 <p>                }</p>
 <p>            }</p>
 <p>        }</p>
-        
+<br>
 <p>        return betterInAtLeastOne;</p>
 <p>    }</p>
-    
+<br>
 <p>    // Placeholder implementations for different path strategies</p>
 <p>    findPathWithRandomizedHeuristic(startX, startY, goalX, goalY) {</p>
 <p>        // Implementation would use A* with randomized heuristic weights</p>
 <p>        return null;</p>
 <p>    }</p>
-    
+<br>
 <p>    findSafestPath(startX, startY, goalX, goalY) {</p>
 <p>        // Implementation would prioritize safety over distance</p>
 <p>        return null;</p>
 <p>    }</p>
-    
+<br>
 <p>    findEnergyEfficientPath(startX, startY, goalX, goalY) {</p>
 <p>        // Implementation would minimize energy consumption</p>
 <p>        return null;</p>
 <p>    }</p>
-    
+<br>
 <p>    findFastestPath(startX, startY, goalX, goalY) {</p>
 <p>        // Implementation would minimize estimated travel time</p>
 <p>        return null;</p>
 <p>    }</p>
 <p>}</p>
-<p>```</p>
-
-<p>### Open Research Questions</p>
-
+<p></pre></p>
+<br>
+<h3>Open Research Questions</h3>
+<br>
 <p>1. <b>How can we better integrate real-time learning into pathfinding algorithms?</b></p>
 <p>2. <b>What are the theoretical limits of pathfinding performance in dynamic environments?</b></p>
 <p>3. <b>How can quantum computing principles be practically applied to pathfinding?</b></p>
@@ -1213,11 +1213,11 @@
 <p>5. <b>How can we optimize pathfinding for swarm robotics applications?</b></p>
 <p>6. <b>What are the best approaches for pathfinding in partially observable environments?</b></p>
 <p>7. <b>How can we balance optimality with computational efficiency in real-time systems?</b></p>
-
+<br>
 <p>---</p>
 <b>Previous:</b> <a href="14-advanced-topics.md">Advanced Topics</a>
 <b>Next:</b> <a href="16-contributing.md">Contributing Guide</a>
-
+<br>
 <b>Interactive:</b> <a href="demo.html">Experiment with research concepts</a>
     </div>
 </body>

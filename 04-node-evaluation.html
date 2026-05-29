@@ -15,18 +15,18 @@
     </nav>
     <div class="container">
         <h1>Node Evaluation Process</h1>
-
+<br>
 <h2>The Core Formula: f(n) = g(n) + h(n)</h2>
-
-<p>### Components Breakdown</p>
-<li><b>g(n)</b>: Actual cost from start to node n</li>
+<br>
+<h3>Components Breakdown</h3>
+<ul><li><b>g(n)</b>: Actual cost from start to node n</li>
 <li><b>h(n)</b>: Heuristic estimate from node n to goal</li>
 <li><b>f(n)</b>: Total estimated cost of path through n</li>
-
+<br>
 <h2>Step-by-Step Evaluation</h2>
-
-<p>### Example Setup</p>
-<p>```</p>
+<br>
+<h3>Example Setup</h3>
+<pre>
 <p>Grid with costs:</p>
 <p>┌─┬─┬─┬─┬─┐</p>
 <p>│ │ │ │G│ │  S = Start (0,2)</p>
@@ -35,64 +35,64 @@
 <p>├─┼─┼─┼─┼─┤  Numbers = step order</p>
 <p>│S│1│2│3│ │</p>
 <p>└─┴─┴─┴─┴─┘</p>
-<p>```</p>
-
-<p>### Step 1: Initialize Start Node</p>
-<p>```</p>
+<p></pre></p>
+<br>
+<h3>Step 1: Initialize Start Node</h3>
+<pre>
 <p>Node S (0,2):</p>
 <p>g(S) = 0           (distance from start)</p>
 <p>h(S) = 5           (Manhattan to goal: |3-0| + |0-2|)</p>
 <p>f(S) = 0 + 5 = 5   (total estimated cost)</p>
-<p>```</p>
-
-<p>### Step 2: Evaluate Neighbors</p>
-
+<p></pre></p>
+<br>
+<h3>Step 2: Evaluate Neighbors</h3>
+<br>
 <p>#### Node 1 (1,2)</p>
-<p>```</p>
+<pre>
 <p>g(1) = g(S) + 1 = 0 + 1 = 1    (cost to reach)</p>
 <p>h(1) = |3-1| + |0-2| = 4       (heuristic to goal)</p>
 <p>f(1) = 1 + 4 = 5               (total estimate)</p>
 <p>parent(1) = S                   (for path reconstruction)</p>
-<p>```</p>
-
+<p></pre></p>
+<br>
 <p>#### Node Up (0,1)</p>
-<p>```</p>
+<pre>
 <p>g(up) = g(S) + 1 = 1</p>
 <p>h(up) = |3-0| + |0-1| = 4</p>
 <p>f(up) = 1 + 4 = 5</p>
 <p>parent(up) = S</p>
-<p>```</p>
-
+<p></pre></p>
+<br>
 <p>#### Node Down (0,3) - Out of bounds, skip</p>
-
-<p>### Step 3: Select Best Node</p>
-<p>```</p>
+<br>
+<h3>Step 3: Select Best Node</h3>
+<pre>
 <p>Open Set: {Node1(f=5), NodeUp(f=5)}</p>
 <p>Both have same f-cost, choose Node1 (arbitrary tie-breaking)</p>
 <p>Current = Node1</p>
 <p>Move Node1 from Open to Closed set</p>
-<p>```</p>
-
-<p>### Step 4: Expand Node 1</p>
-
+<p></pre></p>
+<br>
+<h3>Step 4: Expand Node 1</h3>
+<br>
 <p>#### Node 2 (2,2)</p>
-<p>```</p>
+<pre>
 <p>g(2) = g(1) + 1 = 2</p>
 <p>h(2) = |3-2| + |0-2| = 3</p>
 <p>f(2) = 2 + 3 = 5</p>
 <p>parent(2) = Node1</p>
-<p>```</p>
-
+<p></pre></p>
+<br>
 <p>#### Node (1,1)</p>
-<p>```</p>
+<pre>
 <p>g(1,1) = g(1) + 1 = 2</p>
 <p>h(1,1) = |3-1| + |0-1| = 3</p>
 <p>f(1,1) = 2 + 3 = 5</p>
 <p>parent(1,1) = Node1</p>
-<p>```</p>
-
+<p></pre></p>
+<br>
 <h2>Complete Evaluation Table</h2>
-
+<br>
 <p>| Node | g(n) | h(n) | f(n) | Parent | Status |</p>
 <p>|------|------|------|------|--------|---------|</p>
 <p>| S(0,2) | 0 | 5 | 5 | null | Closed |</p>
@@ -104,29 +104,29 @@
 <p>| (2,1) | 3 | 2 | 5 | (1,1) | Open |</p>
 <p>| (3,1) | 4 | 1 | 5 | (3,2) | Open |</p>
 <p>| (3,0) | 5 | 0 | 5 | (3,1) | <b>GOAL</b> |</p>
-
+<br>
 <h2>Key Insights</h2>
-
-<p>### 1. Consistent f-values</p>
+<br>
+<h3>1. Consistent f-values</h3>
 <p>Notice all nodes have f(n) = 5, indicating optimal heuristic!</p>
-
-<p>### 2. Path Reconstruction</p>
-<p>```</p>
+<br>
+<h3>2. Path Reconstruction</h3>
+<pre>
 <p>Goal(3,0) ← (3,1) ← (3,2) ← (2,2) ← (1,2) ← Start(0,2)</p>
 <p>Final path: S → 1 → 2 → 3 → G</p>
 <p>Total cost: 5 (matches our estimate!)</p>
-<p>```</p>
-
-<p>### 3. Tie-Breaking Strategies</p>
+<p></pre></p>
+<br>
+<h3>3. Tie-Breaking Strategies</h3>
 <p>When f-values are equal:</p>
 <li><b>Prefer lower h-value</b>: Closer to goal</li>
 <li><b>Prefer higher g-value</b>: Further from start</li>
 <li><b>LIFO</b>: Last In, First Out</li>
-<li><b>Coordinate-based</b>: Consistent ordering</li>
-
+<li><b>Coordinate-based</b>: Consistent ordering</li></ul>
+<br>
 <h2>Implementation Details</h2>
-
-<p>```javascript</p>
+<br>
+<pre>javascript
 <p>class Node {</p>
 <p>    constructor(x, y) {</p>
 <p>        this.x = x;</p>
@@ -135,22 +135,22 @@
 <p>        this.hCost = 0;</p>
 <p>        this.parent = null;</p>
 <p>    }</p>
-    
+<br>
 <p>    get fCost() {</p>
 <p>        return this.gCost + this.hCost;</p>
 <p>    }</p>
-    
+<br>
 <p>    calculateHeuristic(goal) {</p>
 <p>        // Manhattan distance</p>
 <p>        this.hCost = Math.abs(this.x - goal.x) + Math.abs(this.y - goal.y);</p>
 <p>    }</p>
-    
+<br>
 <p>    updateCosts(parent, goal) {</p>
 <p>        this.gCost = parent.gCost + this.getMoveCost(parent);</p>
 <p>        this.calculateHeuristic(goal);</p>
 <p>        this.parent = parent;</p>
 <p>    }</p>
-    
+<br>
 <p>    getMoveCost(parent) {</p>
 <p>        // Diagonal movement costs √2, cardinal costs 1</p>
 <p>        const dx = Math.abs(this.x - parent.x);</p>
@@ -158,51 +158,51 @@
 <p>        return (dx === 1 && dy === 1) ? Math.sqrt(2) : 1;</p>
 <p>    }</p>
 <p>}</p>
-<p>```</p>
-
+<p></pre></p>
+<br>
 <h2>Common Mistakes</h2>
-
-<p>### 1. Forgetting to Update g-cost</p>
-<p>```javascript</p>
+<br>
+<h3>1. Forgetting to Update g-cost</h3>
+<pre>javascript
 <p>// WRONG: Only checking if node is in closed set</p>
 <p>if (!closedSet.has(neighbor)) {</p>
 <p>    openSet.add(neighbor);</p>
 <p>}</p>
-
+<br>
 <p>// CORRECT: Check if new path is better</p>
 <p>const tentativeG = current.gCost + moveCost;</p>
 <p>if (tentativeG < neighbor.gCost) {</p>
 <p>    neighbor.updateCosts(current, goal);</p>
 <p>    openSet.add(neighbor);</p>
 <p>}</p>
-<p>```</p>
-
-<p>### 2. Incorrect Heuristic Calculation</p>
-<p>```javascript</p>
+<p></pre></p>
+<br>
+<h3>2. Incorrect Heuristic Calculation</h3>
+<pre>javascript
 <p>// WRONG: Using Euclidean for 4-directional movement</p>
 <p>h = Math.sqrt(dx*dx + dy*dy);</p>
-
+<br>
 <p>// CORRECT: Using Manhattan for 4-directional</p>
 <p>h = Math.abs(dx) + Math.abs(dy);</p>
-<p>```</p>
-
-<p>### 3. Not Handling Ties</p>
-<p>```javascript</p>
+<p></pre></p>
+<br>
+<h3>3. Not Handling Ties</h3>
+<pre>javascript
 <p>// WRONG: Arbitrary selection</p>
 <p>let current = openSet.values().next().value;</p>
-
+<br>
 <p>// BETTER: Consistent tie-breaking</p>
 <p>let current = Array.from(openSet).reduce((best, node) => {</p>
 <p>    if (node.fCost < best.fCost) return node;</p>
 <p>    if (node.fCost === best.fCost && node.hCost < best.hCost) return node;</p>
 <p>    return best;</p>
 <p>});</p>
-<p>```</p>
-
+<p></pre></p>
+<br>
 <p>---</p>
 <b>Previous:</b> <a href="03-heuristic-mathematics.md">Heuristic Mathematics</a>
 <b>Next:</b> <a href="05-set-management.md">Open/Closed Set Management</a>
-
+<br>
 <b>Interactive:</b> <a href="demo.html">Step through evaluation</a>
     </div>
 </body>

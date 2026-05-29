@@ -15,17 +15,17 @@
     </nav>
     <div class="container">
         <h1>Graph Theory Basics</h1>
-
+<br>
 <h2>What is a Graph?</h2>
 <p>A graph is a mathematical structure consisting of:</p>
-<li><b>Vertices (Nodes)</b>: Points in space</li>
+<ul><li><b>Vertices (Nodes)</b>: Points in space</li>
 <li><b>Edges</b>: Connections between vertices</li>
 <li><b>Weights</b>: Optional costs for traversing edges</li>
-
+<br>
 <h2>Grid-Based Graphs</h2>
 <p>In pathfinding, we often use grid-based representations:</p>
-
-<p>```</p>
+<br>
+<pre>
 <p>┌─┬─┬─┬─┐</p>
 <p>│S│ │ │ │  S = Start</p>
 <p>├─┼─┼─┼─┤</p>
@@ -33,40 +33,40 @@
 <p>├─┼─┼─┼─┤</p>
 <p>│ │ │ │E│  E = End</p>
 <p>└─┴─┴─┴─┘</p>
-<p>```</p>
-
+<p></pre></p>
+<br>
 <h2>Movement Types</h2>
-
-<p>### 4-Directional Movement</p>
-<p>```</p>
+<br>
+<h3>4-Directional Movement</h3>
+<pre>
 <p>    ↑</p>
 <p>  ← N →</p>
 <p>    ↓</p>
-<p>```</p>
+<p></pre></p>
 <p>Cost: 1 unit per move</p>
-
-<p>### 8-Directional Movement</p>
-<p>```</p>
+<br>
+<h3>8-Directional Movement</h3>
+<pre>
 <p>  ↖ ↑ ↗</p>
 <p>  ← N →</p>
 <p>  ↙ ↓ ↘</p>
-<p>```</p>
+<p></pre></p>
 <p>Cost: 1 for cardinal, √2 for diagonal</p>
-
+<br>
 <h2>Key Properties</h2>
 <li><b>Connected</b>: Path exists between nodes</li>
 <li><b>Weighted</b>: Edges have movement costs</li>
 <li><b>Directed/Undirected</b>: Movement restrictions</li>
-
+<br>
 <h2>Real-World Examples</h2>
 <li>Video game maps</li>
 <li>Robot navigation grids</li>
 <li>City street networks</li>
-<li>Circuit board routing</li>
-
+<li>Circuit board routing</li></ul>
+<br>
 <p>---</p>
 <b>Next:</b> <a href="02-search-algorithms.md">Search Algorithms Comparison</a>
-
+<br>
 <b>Interactive:</b> <a href="demo.html">Try grid creation</a>
     </div>
 </body>
