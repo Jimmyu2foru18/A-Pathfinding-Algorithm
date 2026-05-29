@@ -10,11 +10,12 @@
         .main-content { display: flex; flex-direction: column; gap: 20px; padding: 10px; flex-grow: 1; }
         
         @media (min-width: 768px) {
-            .main-content { flex-direction: row; padding: 20px; }
+            .main-content { flex-direction: row; padding: 20px; align-items: flex-start; }
+            .visualization-area { width: auto; flex-grow: 1; }
             .controls-panel { width: 350px; flex-shrink: 0; }
         }
 
-        .visualization-area { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; overflow: hidden; }
+        .visualization-area { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; }
         .grid-container { border: 2px solid var(--secondary-color); border-radius: var(--border-radius); background: var(--white); box-shadow: var(--shadow); max-width: 100%; overflow: auto; }
         #gridCanvas { display: block; cursor: crosshair; touch-action: none; max-width: 100%; }
         .controls-panel { background: var(--white); padding: 15px; border-radius: var(--border-radius); box-shadow: var(--shadow); width: 100%; box-sizing: border-box; }
