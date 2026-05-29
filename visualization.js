@@ -335,6 +335,8 @@ class AStarVisualizer {
                 return Math.sqrt(dx * dx + dy * dy);
             case 'diagonal':
                 return Math.max(dx, dy) + (Math.sqrt(2) - 1) * Math.min(dx, dy);
+            case 'octile':
+                return Math.max(dx, dy) + (Math.sqrt(2) - 1) * Math.min(dx, dy);
             case 'dijkstra':
                 return 0;
             default:
