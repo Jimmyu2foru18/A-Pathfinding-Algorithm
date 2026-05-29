@@ -59,7 +59,29 @@ class AStarVisualizer {
         this.canvas.addEventListener('mousedown', (e) => this.handleMouseDown(e));
         this.canvas.addEventListener('mousemove', (e) => this.handleMouseMove(e));
         this.canvas.addEventListener('mouseup', () => this.handleMouseUp());
+        
+        // Touch events
+        this.canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            this.handleMouseDown(this.translateTouch(e));
+        }, {passive: false});
+        this.canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            this.handleMouseMove(this.translateTouch(e));
+        }, {passive: false});
+        this.canvas.addEventListener('touchend', () => this.handleMouseUp());
+        
         this.canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+        
+        // Helper to translate touch to mouse event structure
+        this.translateTouch = (e) => {
+            const touch = e.touches[0] || e.changedTouches[0];
+            return {
+                clientX: touch.clientX,
+                clientY: touch.clientY,
+                button: 0 // Assume left-click functionality for touch
+            };
+        };
         
         // Button events
         document.getElementById('startBtn').addEventListener('click', () => this.startSearch());

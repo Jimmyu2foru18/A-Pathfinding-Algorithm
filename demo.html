@@ -7,20 +7,26 @@
     <link rel="stylesheet" href="shared.css">
     <style>
         .page-layout { display: flex; flex-direction: column; min-height: 100vh; }
-        .main-content { display: grid; grid-template-columns: 1fr 350px; gap: 20px; padding: 20px; flex-grow: 1; }
-        .visualization-area { display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .grid-container { border: 2px solid var(--secondary-color); border-radius: var(--border-radius); background: var(--white); box-shadow: var(--shadow); }
-        #gridCanvas { display: block; cursor: crosshair; }
-        .controls-panel { background: var(--white); padding: 20px; border-radius: var(--border-radius); box-shadow: var(--shadow); overflow-y: auto; }
-        .btn { display: block; width: 100%; margin-bottom: 10px; padding: 10px; cursor: pointer; border: none; border-radius: 4px; color: white; transition: background 0.3s; }
+        .main-content { display: flex; flex-direction: column; gap: 20px; padding: 10px; flex-grow: 1; }
+        
+        @media (min-width: 768px) {
+            .main-content { flex-direction: row; padding: 20px; }
+            .controls-panel { width: 350px; flex-shrink: 0; }
+        }
+
+        .visualization-area { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; overflow: hidden; }
+        .grid-container { border: 2px solid var(--secondary-color); border-radius: var(--border-radius); background: var(--white); box-shadow: var(--shadow); max-width: 100%; overflow: auto; }
+        #gridCanvas { display: block; cursor: crosshair; touch-action: none; max-width: 100%; }
+        .controls-panel { background: var(--white); padding: 15px; border-radius: var(--border-radius); box-shadow: var(--shadow); width: 100%; box-sizing: border-box; }
+        .btn { display: block; width: 100%; margin-bottom: 10px; padding: 12px; cursor: pointer; border: none; border-radius: 4px; color: white; transition: background 0.3s; font-size: 1rem; }
         .btn:disabled { background-color: #bdc3c7; cursor: not-allowed; }
         .btn-primary { background-color: var(--primary-color); }
         .btn-secondary { background-color: var(--secondary-color); }
         .btn-danger { background-color: #e74c3c; }
         .stats { margin-top: 20px; padding: 10px; background: var(--bg-color); border-radius: 4px; }
-        .stat-item { display: flex; justify-content: space-between; margin-bottom: 5px; }
+        .stat-item { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9rem; }
         .control-section { margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
-        #stepDescription { font-size: 0.9rem; margin-top: 10px; color: var(--secondary-color); font-style: italic; }
+        #stepDescription { font-size: 0.9rem; margin-top: 10px; color: var(--secondary-color); font-style: italic; text-align: center; }
     </style>
 </head>
 <body class="page-layout">
