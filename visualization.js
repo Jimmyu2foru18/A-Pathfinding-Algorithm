@@ -74,6 +74,9 @@ class AStarVisualizer {
             this.animationSpeed = 101 - parseInt(e.target.value);
             document.getElementById('speedValue').textContent = this.animationSpeed + 'ms';
         });
+
+        // Config events
+        document.getElementById('demoSelect').addEventListener('change', (e) => this.handleDemoModeChange(e.target.value));
         
         // Keyboard events
         document.addEventListener('keydown', (e) => {
@@ -397,6 +400,14 @@ class AStarVisualizer {
         
         this.updateStepDescription('Random maze generated! Set start and end points to begin.');
         this.draw();
+    }
+
+    handleDemoModeChange(mode) {
+        if (mode === 'maze') {
+            this.generateMaze();
+        } else {
+            this.resetGrid();
+        }
     }
     
     draw() {

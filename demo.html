@@ -12,15 +12,15 @@
         .grid-container { border: 2px solid var(--secondary-color); border-radius: var(--border-radius); background: var(--white); box-shadow: var(--shadow); }
         #gridCanvas { display: block; cursor: crosshair; }
         .controls-panel { background: var(--white); padding: 20px; border-radius: var(--border-radius); box-shadow: var(--shadow); overflow-y: auto; }
-        .btn { display: block; width: 100%; margin-bottom: 10px; padding: 10px; cursor: pointer; border: none; border-radius: 4px; color: white; }
+        .btn { display: block; width: 100%; margin-bottom: 10px; padding: 10px; cursor: pointer; border: none; border-radius: 4px; color: white; transition: background 0.3s; }
+        .btn:disabled { background-color: #bdc3c7; cursor: not-allowed; }
         .btn-primary { background-color: var(--primary-color); }
         .btn-secondary { background-color: var(--secondary-color); }
         .btn-danger { background-color: #e74c3c; }
         .stats { margin-top: 20px; padding: 10px; background: var(--bg-color); border-radius: 4px; }
-        .stat-item { display: flex; justify-content: space-between; }
-        .legend { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-        .legend-item { display: flex; align-items: center; gap: 5px; font-size: 12px; }
-        .legend-color { width: 15px; height: 15px; border: 1px solid #ccc; border-radius: 2px; }
+        .stat-item { display: flex; justify-content: space-between; margin-bottom: 5px; }
+        .control-section { margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
+        #stepDescription { font-size: 0.9rem; margin-top: 10px; color: var(--secondary-color); font-style: italic; }
     </style>
 </head>
 <body class="page-layout">
@@ -37,6 +37,7 @@
             <div class="grid-container">
                 <canvas id="gridCanvas" width="800" height="600"></canvas>
             </div>
+            <div id="stepDescription">Click on the grid to set start and end points.</div>
         </div>
         
         <div class="controls-panel">
@@ -45,6 +46,7 @@
                 <button id="startBtn" class="btn btn-primary">Start Algorithm</button>
                 <button id="pauseBtn" class="btn btn-danger" disabled>Stop / Pause</button>
                 <button id="resetBtn" class="btn btn-secondary">Reset Grid</button>
+                <button id="clearPathBtn" class="btn btn-secondary">Clear Path</button>
                 <button id="generateMazeBtn" class="btn btn-secondary">Generate Random Maze</button>
             </div>
             
@@ -58,11 +60,9 @@
                     <option value="dijkstra">Dijkstra (No Heuristic)</option>
                 </select>
                 
-                <label for="demoSelect">Demo Mode:</label>
-                <select id="demoSelect" style="width: 100%; padding: 5px;">
-                    <option value="manual">Manual (Set Start/End)</option>
-                    <option value="maze">Run on Generated Maze</option>
-                </select>
+                <label for="speedSlider">Animation Speed:</label>
+                <input type="range" id="speedSlider" min="1" max="100" value="50" style="width: 100%;">
+                <span id="speedValue">50ms</span>
             </div>
             
             <div class="stats">
@@ -70,6 +70,7 @@
                 <div class="stat-item"><span>Status:</span><span id="algorithmStatus">Ready</span></div>
                 <div class="stat-item"><span>Nodes Explored:</span><span id="nodesExplored">0</span></div>
                 <div class="stat-item"><span>Path Length:</span><span id="pathLength">0</span></div>
+                <div class="stat-item"><span>Execution Time:</span><span id="executionTime">0ms</span></div>
             </div>
         </div>
     </div>
