@@ -60,6 +60,12 @@
                     <option value="dijkstra">Dijkstra (No Heuristic)</option>
                 </select>
                 
+                <label for="demoSelect">Demo Mode:</label>
+                <select id="demoSelect" style="width: 100%; margin-bottom: 10px; padding: 5px;">
+                    <option value="manual">Manual (Set Start/End)</option>
+                    <option value="maze">Run on Generated Maze</option>
+                </select>
+                
                 <label for="speedSlider">Animation Speed:</label>
                 <input type="range" id="speedSlider" min="1" max="100" value="50" style="width: 100%;">
                 <span id="speedValue">50ms</span>
