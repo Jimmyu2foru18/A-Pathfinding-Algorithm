@@ -15,47 +15,59 @@
     </nav>
     <div class="container">
         <h1>Graph Theory Basics</h1>
+
 <h2>What is a Graph?</h2>
-<p>A graph is a mathematical structure consisting of:
-- <strong>Vertices (Nodes)</strong>: Points in space
-- <strong>Edges</strong>: Connections between vertices
-- <strong>Weights</strong>: Optional costs for traversing edges</p>
+<p>A graph is a mathematical structure consisting of:</p>
+<li><b>Vertices (Nodes)</b>: Points in space</li>
+<li><b>Edges</b>: Connections between vertices</li>
+<li><b>Weights</b>: Optional costs for traversing edges</li>
+
 <h2>Grid-Based Graphs</h2>
 <p>In pathfinding, we often use grid-based representations:</p>
-<p><code>┌─┬─┬─┬─┐
-│S│ │ │ │  S = Start
-├─┼─┼─┼─┤
-│ │█│ │ │  █ = Obstacle
-├─┼─┼─┼─┤
-│ │ │ │E│  E = End
-└─┴─┴─┴─┘</code></p>
+
+<p>```</p>
+<p>┌─┬─┬─┬─┐</p>
+<p>│S│ │ │ │  S = Start</p>
+<p>├─┼─┼─┼─┤</p>
+<p>│ │█│ │ │  █ = Obstacle</p>
+<p>├─┼─┼─┼─┤</p>
+<p>│ │ │ │E│  E = End</p>
+<p>└─┴─┴─┴─┘</p>
+<p>```</p>
+
 <h2>Movement Types</h2>
-<h3>4-Directional Movement</h3>
-<p><code>↑
-  ← N →
-    ↓</code>
-Cost: 1 unit per move</p>
-<h3>8-Directional Movement</h3>
-<p><code>↖ ↑ ↗
-  ← N →
-  ↙ ↓ ↘</code>
-Cost: 1 for cardinal, √2 for diagonal</p>
+
+<p>### 4-Directional Movement</p>
+<p>```</p>
+<p>    ↑</p>
+<p>  ← N →</p>
+<p>    ↓</p>
+<p>```</p>
+<p>Cost: 1 unit per move</p>
+
+<p>### 8-Directional Movement</p>
+<p>```</p>
+<p>  ↖ ↑ ↗</p>
+<p>  ← N →</p>
+<p>  ↙ ↓ ↘</p>
+<p>```</p>
+<p>Cost: 1 for cardinal, √2 for diagonal</p>
+
 <h2>Key Properties</h2>
-<ul>
-<li><strong>Connected</strong>: Path exists between nodes</li>
-<li><strong>Weighted</strong>: Edges have movement costs</li>
-<li><strong>Directed/Undirected</strong>: Movement restrictions</li>
-</ul>
+<li><b>Connected</b>: Path exists between nodes</li>
+<li><b>Weighted</b>: Edges have movement costs</li>
+<li><b>Directed/Undirected</b>: Movement restrictions</li>
+
 <h2>Real-World Examples</h2>
-<ul>
 <li>Video game maps</li>
 <li>Robot navigation grids</li>
 <li>City street networks</li>
 <li>Circuit board routing</li>
-</ul>
-<hr />
-<p><strong>Next:</strong> <a href="02-search-algorithms.md">Search Algorithms Comparison</a></p>
-<p><strong>Interactive:</strong> <a href="demo.html">Try grid creation</a></p>
+
+<p>---</p>
+<b>Next:</b> <a href="02-search-algorithms.md">Search Algorithms Comparison</a>
+
+<b>Interactive:</b> <a href="demo.html">Try grid creation</a>
     </div>
 </body>
 </html>

@@ -15,632 +15,639 @@
     </nav>
     <div class="container">
         <h1>Code Walkthrough</h1>
+
 <h2>File Structure Overview</h2>
-<p><code>A* Algorithm Repository/
-├── README.md                    # Main learning guide
-├── demo.html                    # Interactive visualization
-├── visualization.js             # Core A* implementation
-├── 01-graph-theory-basics.md    # Foundational concepts
-├── 02-search-algorithms.md      # Algorithm comparisons
-├── 03-heuristic-mathematics.md  # Heuristic functions
-├── 04-node-evaluation.md        # Node scoring system
-├── 05-set-management.md         # Data structure management
-├── 06-path-reconstruction.md    # Path building techniques
-├── 07-complete-implementation.md # Production code
-├── 08-applications.md           # Real-world uses
-├── 09-optimizations.md          # Performance improvements
-├── 10-demo-guide.md            # Interactive tutorial
-└── 11-code-walkthrough.md      # This file</code></p>
+
+<p>```</p>
+<p>A* Algorithm Repository/</p>
+<p>├── README.md                    # Main learning guide</p>
+<p>├── demo.html                    # Interactive visualization</p>
+<p>├── visualization.js             # Core A* implementation</p>
+<p>├── 01-graph-theory-basics.md    # Foundational concepts</p>
+<p>├── 02-search-algorithms.md      # Algorithm comparisons</p>
+<p>├── 03-heuristic-mathematics.md  # Heuristic functions</p>
+<p>├── 04-node-evaluation.md        # Node scoring system</p>
+<p>├── 05-set-management.md         # Data structure management</p>
+<p>├── 06-path-reconstruction.md    # Path building techniques</p>
+<p>├── 07-complete-implementation.md # Production code</p>
+<p>├── 08-applications.md           # Real-world uses</p>
+<p>├── 09-optimizations.md          # Performance improvements</p>
+<p>├── 10-demo-guide.md            # Interactive tutorial</p>
+<p>└── 11-code-walkthrough.md      # This file</p>
+<p>```</p>
+
 <h2>Core Implementation Analysis</h2>
-<h3>HTML Structure (<code>demo.html</code>)</h3>
-<h4>Document Setup</h4>
+
+<p>### HTML Structure (`demo.html`)</p>
+
+<p>#### Document Setup</p>
 <p>```html</p>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A* Pathfinding Visualizer</title>
-    <style>
-        /* CSS styling for the visualization */
-    </style>
-</head>
-```
-**Purpose**: Standard HTML5 document structure with responsive viewport.
-
-#### Grid Styling
-```css
-.grid {
-    display: grid;
-    grid-template-columns: repeat(var(--grid-width), 20px);
-    grid-template-rows: repeat(var(--grid-height), 20px);
-    gap: 1px;
-    background-color: #333;
-    padding: 10px;
-    border-radius: 5px;
-}
-```
-**Key Points**:
-- Uses CSS Grid for perfect cell alignment
-- Dynamic sizing with CSS custom properties
-- Visual separation with gaps and background
-
-#### Cell States
-```css
-.cell {
-    width: 20px;
-    height: 20px;
-    background-color: white;
-    border: 1px solid #ddd;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-
-.cell.obstacle { background-color: #333; }
-.cell.start { background-color: #4CAF50; }
-.cell.goal { background-color: #f44336; }
-.cell.open { background-color: #FFC107; }
-.cell.closed { background-color: #FF9800; }
-.cell.path { background-color: #2196F3; }
-```
-**Design Rationale**:
-- Distinct colors for each state
-- Smooth transitions for visual feedback
-- Accessible color choices
-
-### JavaScript Implementation (`visualization.js`)
-
-#### Global Variables
-```javascript
-const GRID_WIDTH = 30;
-const GRID_HEIGHT = 20;
-let grid = [];
-let startNode = null;
-let goalNode = null;
-let isSearching = false;
-```
-**Analysis**:
-- Constants for grid dimensions (easy to modify)
-- Global state management
-- Search state tracking
-
-#### Grid Initialization
-```javascript
-function initializeGrid() {
-    grid = [];
-    for (let y = 0; y < GRID_HEIGHT; y++) {
-        grid[y] = [];
-        for (let x = 0; x < GRID_WIDTH; x++) {
-            grid[y][x] = {
-                x: x,
-                y: y,
-                isObstacle: false,
-                gCost: Infinity,
-                hCost: 0,
-                fCost: Infinity,
-                parent: null,
-                element: null
-            };
-        }
-    }
-}
-```
-**Deep Dive**:
-- **2D Array Structure**: `grid[y][x]` follows mathematical convention
-- **Node Properties**:
-  - `x, y`: Coordinates for identification
-  - `isObstacle`: Boolean for walkability
-  - `gCost`: Distance from start (actual cost)
-  - `hCost`: Heuristic distance to goal (estimated cost)
-  - `fCost`: Total cost (g + h)
-  - `parent`: For path reconstruction
-  - `element`: DOM reference for visualization
-
-#### DOM Grid Creation
-```javascript
-function createGridDOM() {
-    const gridContainer = document.getElementById('grid');
-    gridContainer.innerHTML = '';
-    gridContainer.style.setProperty('--grid-width', GRID_WIDTH);
-    gridContainer.style.setProperty('--grid-height', GRID_HEIGHT);
-
-    for (let y = 0; y < GRID_HEIGHT; y++) {
-        for (let x = 0; x < GRID_WIDTH; x++) {
-            const cell = document.createElement('div');
-            cell.className = 'cell';
-            cell.dataset.x = x;
-            cell.dataset.y = y;
-
-            // Event listeners for interaction
-            cell.addEventListener('click', handleCellClick);
-            cell.addEventListener('contextmenu', handleRightClick);
-
-            gridContainer.appendChild(cell);
-            grid[y][x].element = cell;
-        }
-    }
-}
-```
-**Implementation Details**:
-- **CSS Custom Properties**: Dynamic grid sizing
-- **Data Attributes**: Store coordinates in DOM
-- **Event Delegation**: Efficient event handling
-- **DOM Reference**: Link between data and visualization
-
-#### Cell Interaction Handlers
-```javascript
-function handleCellClick(event) {
-    if (isSearching) return;
-
-    const x = parseInt(event.target.dataset.x);
-    const y = parseInt(event.target.dataset.y);
-    const node = grid[y][x];
-
-    if (event.ctrlKey || event.metaKey) {
-        // Set goal with Ctrl+Click
-        setGoal(x, y);
-    } else {
-        // Toggle obstacle with regular click
-        toggleObstacle(x, y);
-    }
-}
-
-function handleRightClick(event) {
-    event.preventDefault();
-    if (isSearching) return;
-
-    const x = parseInt(event.target.dataset.x);
-    const y = parseInt(event.target.dataset.y);
-    setStart(x, y);
-}
-```
-**User Experience Design**:
-- **Modifier Keys**: Ctrl/Cmd for goal setting
-- **Right Click**: Intuitive start point setting
-- **State Checking**: Prevent interaction during search
-- **Event Prevention**: Stop context menu on right-click
-
-#### Heuristic Functions
-```javascript
-function manhattanDistance(nodeA, nodeB) {
-    return Math.abs(nodeA.x - nodeB.x) + Math.abs(nodeA.y - nodeB.y);
-}
-
-function euclideanDistance(nodeA, nodeB) {
-    const dx = nodeA.x - nodeB.x;
-    const dy = nodeA.y - nodeB.y;
-    return Math.sqrt(dx * dx + dy * dy);
-}
-```
-**Mathematical Analysis**:
-- **Manhattan**: `|x₁ - x₂| + |y₁ - y₂|`
-  - Grid-based movement (4-directional)
-  - Always admissible for grid pathfinding
-  - Faster computation (no square root)
-
-- **Euclidean**: `√[(x₁ - x₂)² + (y₁ - y₂)²]`
-  - Straight-line distance
-  - More accurate for diagonal movement
-  - Computationally more expensive
-
-#### Neighbor Generation
-```javascript
-function getNeighbors(node) {
-    const neighbors = [];
-    const directions = [
-        [-1, 0], [1, 0], [0, -1], [0, 1],  // Cardinal directions
-        [-1, -1], [-1, 1], [1, -1], [1, 1] // Diagonal directions
-    ];
-
-    for (const [dx, dy] of directions) {
-        const newX = node.x + dx;
-        const newY = node.y + dy;
-
-        // Bounds checking
-        if (newX >= 0 && newX < GRID_WIDTH && 
-            newY >= 0 && newY < GRID_HEIGHT) {
-
-            const neighbor = grid[newY][newX];
-
-            // Skip obstacles
-            if (!neighbor.isObstacle) {
-                neighbors.push(neighbor);
-            }
-        }
-    }
-
-    return neighbors;
-}
-```
-**Algorithm Considerations**:
-- **8-Directional Movement**: Includes diagonals
-- **Bounds Checking**: Prevents array access errors
-- **Obstacle Filtering**: Only returns walkable cells
-- **Coordinate System**: Consistent with grid structure
-
-#### Movement Cost Calculation
-```javascript
-function getMovementCost(nodeA, nodeB) {
-    const dx = Math.abs(nodeA.x - nodeB.x);
-    const dy = Math.abs(nodeA.y - nodeB.y);
-
-    // Diagonal movement costs more
-    if (dx === 1 && dy === 1) {
-        return 1.414; // √2 ≈ 1.414
-    }
-
-    return 1; // Cardinal movement
-}
-```
-**Cost Rationale**:
-- **Cardinal Moves**: Cost of 1 (unit distance)
-- **Diagonal Moves**: Cost of √2 ≈ 1.414 (actual distance)
-- **Realistic Pathfinding**: Prevents unrealistic diagonal shortcuts
-
-#### Core A* Algorithm
-```javascript
-async function findPath() {
-    if (!startNode || !goalNode || isSearching) {
-        return;
-    }
-
-    isSearching = true;
-    resetPathfinding();
-
-    // Initialize data structures
-    const openSet = [startNode];
-    const closedSet = new Set();
-
-    // Initialize start node
-    startNode.gCost = 0;
-    startNode.hCost = manhattanDistance(startNode, goalNode);
-    startNode.fCost = startNode.gCost + startNode.hCost;
-
-    while (openSet.length > 0) {
-        // Find node with lowest f-cost
-        let currentNode = openSet[0];
-        for (let i = 1; i < openSet.length; i++) {
-            if (openSet[i].fCost < currentNode.fCost || 
-                (openSet[i].fCost === currentNode.fCost && 
-                 openSet[i].hCost < currentNode.hCost)) {
-                currentNode = openSet[i];
-            }
-        }
-
-        // Remove current from open set
-        const currentIndex = openSet.indexOf(currentNode);
-        openSet.splice(currentIndex, 1);
-
-        // Add to closed set
-        closedSet.add(currentNode);
-
-        // Visualization update
-        if (currentNode !== startNode && currentNode !== goalNode) {
-            currentNode.element.classList.add('closed');
-        }
-
-        // Check if goal reached
-        if (currentNode === goalNode) {
-            reconstructPath(currentNode);
-            isSearching = false;
-            return;
-        }
-
-        // Process neighbors
-        const neighbors = getNeighbors(currentNode);
-
-        for (const neighbor of neighbors) {
-            if (closedSet.has(neighbor)) {
-                continue; // Skip already evaluated nodes
-            }
-
-            const tentativeGCost = currentNode.gCost + 
-                                 getMovementCost(currentNode, neighbor);
-
-            if (!openSet.includes(neighbor)) {
-                // New node discovered
-                openSet.push(neighbor);
-
-                // Visualization
-                if (neighbor !== goalNode) {
-                    neighbor.element.classList.add('open');
-                }
-            } else if (tentativeGCost >= neighbor.gCost) {
-                continue; // Not a better path
-            }
-
-            // Update node with better path
-            neighbor.parent = currentNode;
-            neighbor.gCost = tentativeGCost;
-            neighbor.hCost = manhattanDistance(neighbor, goalNode);
-            neighbor.fCost = neighbor.gCost + neighbor.hCost;
-        }
-
-        // Delay for visualization
-        await sleep(50);
-    }
-
-    // No path found
-    isSearching = false;
-    alert('No path found!');
-}
-```
-
-**Algorithm Breakdown**:
-
-1. **Initialization**:
-   - Open set starts with start node
-   - Closed set is empty
-   - Start node has g-cost of 0
-
-2. **Main Loop**:
-   - Continue while open set has nodes
-   - Select node with lowest f-cost
-   - Tie-break with h-cost (closer to goal)
-
-3. **Node Processing**:
-   - Move current from open to closed
-   - Check if goal reached
-   - Evaluate all neighbors
-
-4. **Neighbor Evaluation**:
-   - Skip if in closed set
-   - Calculate tentative g-cost
-   - Update if better path found
-   - Add to open set if new
-
-5. **Path Reconstruction**:
-   - Follow parent pointers from goal to start
-   - Visualize final path
-
-#### Path Reconstruction
-```javascript
-function reconstructPath(node) {
-    const path = [];
-    let current = node;
-
-    // Follow parent chain
-    while (current !== null) {
-        path.unshift(current);
-        current = current.parent;
-    }
-
-    // Visualize path
-    for (let i = 1; i < path.length - 1; i++) {
-        path[i].element.classList.add('path');
-    }
-
-    console.log(`Path found! Length: ${path.length} nodes`);
-    return path;
-}
-```
-**Implementation Notes**:
-- **Reverse Traversal**: Start from goal, follow parents to start
-- **Array Building**: `unshift()` maintains correct order
-- **Visualization**: Skip start/goal nodes for path coloring
-- **Return Value**: Complete path for further analysis
-
-#### Utility Functions
-```javascript
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-function resetPathfinding() {
-    // Clear all visual states
-    document.querySelectorAll('.cell').forEach(cell => {
-        cell.classList.remove('open', 'closed', 'path');
-    });
-
-    // Reset node properties
-    for (let y = 0; y < GRID_HEIGHT; y++) {
-        for (let x = 0; x < GRID_WIDTH; x++) {
-            const node = grid[y][x];
-            node.gCost = Infinity;
-            node.hCost = 0;
-            node.fCost = Infinity;
-            node.parent = null;
-        }
-    }
-}
-
-function clearGrid() {
-    for (let y = 0; y < GRID_HEIGHT; y++) {
-        for (let x = 0; x < GRID_WIDTH; x++) {
-            const node = grid[y][x];
-            node.isObstacle = false;
-            node.element.classList.remove('obstacle');
-        }
-    }
-}
-```
-**Utility Purpose**:
-- **sleep()**: Async delay for visualization timing
-- **resetPathfinding()**: Clean slate for new searches
-- **clearGrid()**: Remove all obstacles
-
-## Data Structure Analysis
-
-### Node Object Structure
-```javascript
-const node = {
-    x: 5,              // Grid x-coordinate
-    y: 3,              // Grid y-coordinate
-    isObstacle: false, // Walkability flag
-    gCost: 7,          // Distance from start
-    hCost: 4,          // Heuristic to goal
-    fCost: 11,         // Total cost (g + h)
-    parent: nodeRef,   // Previous node in path
-    element: domRef    // DOM element reference
-};
-```
-
-### Open Set Management
-**Current Implementation**: Array with linear search
-```javascript
-// Finding minimum f-cost: O(n)
-let currentNode = openSet[0];
-for (let i = 1; i < openSet.length; i++) {
-    if (openSet[i].fCost < currentNode.fCost) {
-        currentNode = openSet[i];
-    }
-}
-```
-
-**Optimization Opportunity**: Priority queue would be O(log n)
-
-### Closed Set Management
-**Current Implementation**: JavaScript Set
-```javascript
-const closedSet = new Set();
-closedSet.add(node);           // O(1)
-closedSet.has(node);           // O(1)
-```
-**Efficiency**: Optimal for membership testing
-
-## Performance Characteristics
-
-### Time Complexity
-- **Best Case**: O(b^d) where b is branching factor, d is depth
-- **Average Case**: Depends on heuristic quality
-- **Worst Case**: O(b^d) when heuristic provides no guidance
-
-### Space Complexity
-- **Open Set**: O(b^d) in worst case
-- **Closed Set**: O(b^d) nodes explored
-- **Grid Storage**: O(width × height)
-
-### Optimization Opportunities
-1. **Priority Queue**: Replace array-based open set
-2. **Coordinate Hashing**: More efficient node lookup
-3. **Memory Pooling**: Reduce garbage collection
-4. **SIMD Operations**: Vectorized heuristic calculations
-
-## Error Handling and Edge Cases
-
-### Input Validation
-```javascript
-function validateInput() {
-    if (!startNode) {
-        alert('Please set a start position (right-click)');
-        return false;
-    }
-
-    if (!goalNode) {
-        alert('Please set a goal position (Ctrl+click)');
-        return false;
-    }
-
-    if (startNode === goalNode) {
-        alert('Start and goal cannot be the same!');
-        return false;
-    }
-
-    return true;
-}
-```
-
-### Boundary Conditions
-- **Grid Bounds**: Checked in `getNeighbors()`
-- **Obstacle Collision**: Filtered during neighbor generation
-- **No Path Exists**: Detected when open set becomes empty
-
-### Memory Management
-- **DOM References**: Cleaned up during reset
-- **Event Listeners**: Properly attached and managed
-- **Large Grids**: Consider chunking for very large datasets
-
-## Testing and Debugging
-
-### Console Logging
-```javascript
-function debugNode(node) {
-    console.log(`Node (${node.x}, ${node.y}):`, {
-        gCost: node.gCost,
-        hCost: node.hCost,
-        fCost: node.fCost,
-        parent: node.parent ? `(${node.parent.x}, ${node.parent.y})` : null
-    });
-}
-```
-
-### Performance Monitoring
-```javascript
-function measurePerformance() {
-    const startTime = performance.now();
-
-    // Run pathfinding
-    findPath().then(() => {
-        const endTime = performance.now();
-        console.log(`Pathfinding took ${endTime - startTime} milliseconds`);
-    });
-}
-```
-
-### Unit Test Examples
-```javascript
-function testManhattanDistance() {
-    const nodeA = { x: 0, y: 0 };
-    const nodeB = { x: 3, y: 4 };
-    const expected = 7;
-    const actual = manhattanDistance(nodeA, nodeB);
-
-    console.assert(actual === expected, 
-        `Expected ${expected}, got ${actual}`);
-}
-
-function testPathReconstruction() {
-    // Create a simple 3-node path
-    const start = { x: 0, y: 0, parent: null };
-    const middle = { x: 1, y: 0, parent: start };
-    const goal = { x: 2, y: 0, parent: middle };
-
-    const path = reconstructPath(goal);
-
-    console.assert(path.length === 3, 
-        `Expected path length 3, got ${path.length}`);
-    console.assert(path[0] === start, 'First node should be start');
-    console.assert(path[2] === goal, 'Last node should be goal');
-}
-```
-
-## Code Quality and Best Practices
-
-### Naming Conventions
-- **Constants**: `UPPER_SNAKE_CASE`
-- **Variables**: `camelCase`
-- **Functions**: `camelCase` with descriptive verbs
-- **Classes**: `PascalCase` (if using classes)
-
-### Function Design
-- **Single Responsibility**: Each function has one clear purpose
-- **Pure Functions**: Heuristic calculations have no side effects
-- **Async Handling**: Proper use of async/await for visualization
-
-### Documentation Standards
-```javascript
-/**
- * Calculates the Manhattan distance between two nodes
- * @param {Object} nodeA - First node with x, y properties
- * @param {Object} nodeB - Second node with x, y properties
- * @returns {number} Manhattan distance between nodes
- */
-function manhattanDistance(nodeA, nodeB) {
-    return Math.abs(nodeA.x - nodeB.x) + Math.abs(nodeA.y - nodeB.y);
-}
-```
-
-### Error Prevention
-- **Type Checking**: Validate input parameters
-- **Null Checks**: Handle undefined/null values
-- **Bounds Checking**: Prevent array access errors
-- **State Validation**: Ensure valid algorithm state
-
----
-**Previous:** [Interactive Demo Guide](10-demo-guide.md)
-**Next:** [Testing and Validation](12-testing.md)
-
-**Interactive:** [Explore the code](demo.html)
+<p><!DOCTYPE html></p>
+<p><html lang="en"></p>
+<p><head></p>
+<p>    <meta charset="UTF-8"></p>
+<p>    <meta name="viewport" content="width=device-width, initial-scale=1.0"></p>
+<p>    <title>A* Pathfinding Visualizer</title></p>
+<p>    <style></p>
+<p>        /* CSS styling for the visualization */</p>
+<p>    </style></p>
+<p></head></p>
+<p>```</p>
+<b>Purpose</b>: Standard HTML5 document structure with responsive viewport.
+
+<p>#### Grid Styling</p>
+<p>```css</p>
+<p>.grid {</p>
+<p>    display: grid;</p>
+<p>    grid-template-columns: repeat(var(--grid-width), 20px);</p>
+<p>    grid-template-rows: repeat(var(--grid-height), 20px);</p>
+<p>    gap: 1px;</p>
+<p>    background-color: #333;</p>
+<p>    padding: 10px;</p>
+<p>    border-radius: 5px;</p>
+<p>}</p>
+<p>```</p>
+<b>Key Points</b>:
+<li>Uses CSS Grid for perfect cell alignment</li>
+<li>Dynamic sizing with CSS custom properties</li>
+<li>Visual separation with gaps and background</li>
+
+<p>#### Cell States</p>
+<p>```css</p>
+<p>.cell {</p>
+<p>    width: 20px;</p>
+<p>    height: 20px;</p>
+<p>    background-color: white;</p>
+<p>    border: 1px solid #ddd;</p>
+<p>    cursor: pointer;</p>
+<p>    transition: background-color 0.2s ease;</p>
+<p>}</p>
+
+<p>.cell.obstacle { background-color: #333; }</p>
+<p>.cell.start { background-color: #4CAF50; }</p>
+<p>.cell.goal { background-color: #f44336; }</p>
+<p>.cell.open { background-color: #FFC107; }</p>
+<p>.cell.closed { background-color: #FF9800; }</p>
+<p>.cell.path { background-color: #2196F3; }</p>
+<p>```</p>
+<b>Design Rationale</b>:
+<li>Distinct colors for each state</li>
+<li>Smooth transitions for visual feedback</li>
+<li>Accessible color choices</li>
+
+<p>### JavaScript Implementation (`visualization.js`)</p>
+
+<p>#### Global Variables</p>
+<p>```javascript</p>
+<p>const GRID_WIDTH = 30;</p>
+<p>const GRID_HEIGHT = 20;</p>
+<p>let grid = [];</p>
+<p>let startNode = null;</p>
+<p>let goalNode = null;</p>
+<p>let isSearching = false;</p>
+<p>```</p>
+<b>Analysis</b>:
+<li>Constants for grid dimensions (easy to modify)</li>
+<li>Global state management</li>
+<li>Search state tracking</li>
+
+<p>#### Grid Initialization</p>
+<p>```javascript</p>
+<p>function initializeGrid() {</p>
+<p>    grid = [];</p>
+<p>    for (let y = 0; y < GRID_HEIGHT; y++) {</p>
+<p>        grid[y] = [];</p>
+<p>        for (let x = 0; x < GRID_WIDTH; x++) {</p>
+<p>            grid[y][x] = {</p>
+<p>                x: x,</p>
+<p>                y: y,</p>
+<p>                isObstacle: false,</p>
+<p>                gCost: Infinity,</p>
+<p>                hCost: 0,</p>
+<p>                fCost: Infinity,</p>
+<p>                parent: null,</p>
+<p>                element: null</p>
+<p>            };</p>
+<p>        }</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
+<b>Deep Dive</b>:
+<li><b>2D Array Structure</b>: `grid[y][x]` follows mathematical convention</li>
+<li><b>Node Properties</b>:</li>
+<p>  - `x, y`: Coordinates for identification</p>
+<p>  - `isObstacle`: Boolean for walkability</p>
+<p>  - `gCost`: Distance from start (actual cost)</p>
+<p>  - `hCost`: Heuristic distance to goal (estimated cost)</p>
+<p>  - `fCost`: Total cost (g + h)</p>
+<p>  - `parent`: For path reconstruction</p>
+<p>  - `element`: DOM reference for visualization</p>
+
+<p>#### DOM Grid Creation</p>
+<p>```javascript</p>
+<p>function createGridDOM() {</p>
+<p>    const gridContainer = document.getElementById('grid');</p>
+<p>    gridContainer.innerHTML = '';</p>
+<p>    gridContainer.style.setProperty('--grid-width', GRID_WIDTH);</p>
+<p>    gridContainer.style.setProperty('--grid-height', GRID_HEIGHT);</p>
+    
+<p>    for (let y = 0; y < GRID_HEIGHT; y++) {</p>
+<p>        for (let x = 0; x < GRID_WIDTH; x++) {</p>
+<p>            const cell = document.createElement('div');</p>
+<p>            cell.className = 'cell';</p>
+<p>            cell.dataset.x = x;</p>
+<p>            cell.dataset.y = y;</p>
+            
+<p>            // Event listeners for interaction</p>
+<p>            cell.addEventListener('click', handleCellClick);</p>
+<p>            cell.addEventListener('contextmenu', handleRightClick);</p>
+            
+<p>            gridContainer.appendChild(cell);</p>
+<p>            grid[y][x].element = cell;</p>
+<p>        }</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
+<b>Implementation Details</b>:
+<li><b>CSS Custom Properties</b>: Dynamic grid sizing</li>
+<li><b>Data Attributes</b>: Store coordinates in DOM</li>
+<li><b>Event Delegation</b>: Efficient event handling</li>
+<li><b>DOM Reference</b>: Link between data and visualization</li>
+
+<p>#### Cell Interaction Handlers</p>
+<p>```javascript</p>
+<p>function handleCellClick(event) {</p>
+<p>    if (isSearching) return;</p>
+    
+<p>    const x = parseInt(event.target.dataset.x);</p>
+<p>    const y = parseInt(event.target.dataset.y);</p>
+<p>    const node = grid[y][x];</p>
+    
+<p>    if (event.ctrlKey || event.metaKey) {</p>
+<p>        // Set goal with Ctrl+Click</p>
+<p>        setGoal(x, y);</p>
+<p>    } else {</p>
+<p>        // Toggle obstacle with regular click</p>
+<p>        toggleObstacle(x, y);</p>
+<p>    }</p>
+<p>}</p>
+
+<p>function handleRightClick(event) {</p>
+<p>    event.preventDefault();</p>
+<p>    if (isSearching) return;</p>
+    
+<p>    const x = parseInt(event.target.dataset.x);</p>
+<p>    const y = parseInt(event.target.dataset.y);</p>
+<p>    setStart(x, y);</p>
+<p>}</p>
+<p>```</p>
+<b>User Experience Design</b>:
+<li><b>Modifier Keys</b>: Ctrl/Cmd for goal setting</li>
+<li><b>Right Click</b>: Intuitive start point setting</li>
+<li><b>State Checking</b>: Prevent interaction during search</li>
+<li><b>Event Prevention</b>: Stop context menu on right-click</li>
+
+<p>#### Heuristic Functions</p>
+<p>```javascript</p>
+<p>function manhattanDistance(nodeA, nodeB) {</p>
+<p>    return Math.abs(nodeA.x - nodeB.x) + Math.abs(nodeA.y - nodeB.y);</p>
+<p>}</p>
+
+<p>function euclideanDistance(nodeA, nodeB) {</p>
+<p>    const dx = nodeA.x - nodeB.x;</p>
+<p>    const dy = nodeA.y - nodeB.y;</p>
+<p>    return Math.sqrt(dx * dx + dy * dy);</p>
+<p>}</p>
+<p>```</p>
+<b>Mathematical Analysis</b>:
+<li><b>Manhattan</b>: `|x₁ - x₂| + |y₁ - y₂|`</li>
+<p>  - Grid-based movement (4-directional)</p>
+<p>  - Always admissible for grid pathfinding</p>
+<p>  - Faster computation (no square root)</p>
+
+<li><b>Euclidean</b>: `√[(x₁ - x₂)² + (y₁ - y₂)²]`</li>
+<p>  - Straight-line distance</p>
+<p>  - More accurate for diagonal movement</p>
+<p>  - Computationally more expensive</p>
+
+<p>#### Neighbor Generation</p>
+<p>```javascript</p>
+<p>function getNeighbors(node) {</p>
+<p>    const neighbors = [];</p>
+<p>    const directions = [</p>
+<p>        [-1, 0], [1, 0], [0, -1], [0, 1],  // Cardinal directions</p>
+<p>        [-1, -1], [-1, 1], [1, -1], [1, 1] // Diagonal directions</p>
+<p>    ];</p>
+    
+<p>    for (const [dx, dy] of directions) {</p>
+<p>        const newX = node.x + dx;</p>
+<p>        const newY = node.y + dy;</p>
+        
+<p>        // Bounds checking</p>
+<p>        if (newX >= 0 && newX < GRID_WIDTH && </p>
+<p>            newY >= 0 && newY < GRID_HEIGHT) {</p>
+            
+<p>            const neighbor = grid[newY][newX];</p>
+            
+<p>            // Skip obstacles</p>
+<p>            if (!neighbor.isObstacle) {</p>
+<p>                neighbors.push(neighbor);</p>
+<p>            }</p>
+<p>        }</p>
+<p>    }</p>
+    
+<p>    return neighbors;</p>
+<p>}</p>
+<p>```</p>
+<b>Algorithm Considerations</b>:
+<li><b>8-Directional Movement</b>: Includes diagonals</li>
+<li><b>Bounds Checking</b>: Prevents array access errors</li>
+<li><b>Obstacle Filtering</b>: Only returns walkable cells</li>
+<li><b>Coordinate System</b>: Consistent with grid structure</li>
+
+<p>#### Movement Cost Calculation</p>
+<p>```javascript</p>
+<p>function getMovementCost(nodeA, nodeB) {</p>
+<p>    const dx = Math.abs(nodeA.x - nodeB.x);</p>
+<p>    const dy = Math.abs(nodeA.y - nodeB.y);</p>
+    
+<p>    // Diagonal movement costs more</p>
+<p>    if (dx === 1 && dy === 1) {</p>
+<p>        return 1.414; // √2 ≈ 1.414</p>
+<p>    }</p>
+    
+<p>    return 1; // Cardinal movement</p>
+<p>}</p>
+<p>```</p>
+<b>Cost Rationale</b>:
+<li><b>Cardinal Moves</b>: Cost of 1 (unit distance)</li>
+<li><b>Diagonal Moves</b>: Cost of √2 ≈ 1.414 (actual distance)</li>
+<li><b>Realistic Pathfinding</b>: Prevents unrealistic diagonal shortcuts</li>
+
+<p>#### Core A* Algorithm</p>
+<p>```javascript</p>
+<p>async function findPath() {</p>
+<p>    if (!startNode || !goalNode || isSearching) {</p>
+<p>        return;</p>
+<p>    }</p>
+    
+<p>    isSearching = true;</p>
+<p>    resetPathfinding();</p>
+    
+<p>    // Initialize data structures</p>
+<p>    const openSet = [startNode];</p>
+<p>    const closedSet = new Set();</p>
+    
+<p>    // Initialize start node</p>
+<p>    startNode.gCost = 0;</p>
+<p>    startNode.hCost = manhattanDistance(startNode, goalNode);</p>
+<p>    startNode.fCost = startNode.gCost + startNode.hCost;</p>
+    
+<p>    while (openSet.length > 0) {</p>
+<p>        // Find node with lowest f-cost</p>
+<p>        let currentNode = openSet[0];</p>
+<p>        for (let i = 1; i < openSet.length; i++) {</p>
+<p>            if (openSet[i].fCost < currentNode.fCost || </p>
+<p>                (openSet[i].fCost === currentNode.fCost && </p>
+<p>                 openSet[i].hCost < currentNode.hCost)) {</p>
+<p>                currentNode = openSet[i];</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        // Remove current from open set</p>
+<p>        const currentIndex = openSet.indexOf(currentNode);</p>
+<p>        openSet.splice(currentIndex, 1);</p>
+        
+<p>        // Add to closed set</p>
+<p>        closedSet.add(currentNode);</p>
+        
+<p>        // Visualization update</p>
+<p>        if (currentNode !== startNode && currentNode !== goalNode) {</p>
+<p>            currentNode.element.classList.add('closed');</p>
+<p>        }</p>
+        
+<p>        // Check if goal reached</p>
+<p>        if (currentNode === goalNode) {</p>
+<p>            reconstructPath(currentNode);</p>
+<p>            isSearching = false;</p>
+<p>            return;</p>
+<p>        }</p>
+        
+<p>        // Process neighbors</p>
+<p>        const neighbors = getNeighbors(currentNode);</p>
+        
+<p>        for (const neighbor of neighbors) {</p>
+<p>            if (closedSet.has(neighbor)) {</p>
+<p>                continue; // Skip already evaluated nodes</p>
+<p>            }</p>
+            
+<p>            const tentativeGCost = currentNode.gCost + </p>
+<p>                                 getMovementCost(currentNode, neighbor);</p>
+            
+<p>            if (!openSet.includes(neighbor)) {</p>
+<p>                // New node discovered</p>
+<p>                openSet.push(neighbor);</p>
+                
+<p>                // Visualization</p>
+<p>                if (neighbor !== goalNode) {</p>
+<p>                    neighbor.element.classList.add('open');</p>
+<p>                }</p>
+<p>            } else if (tentativeGCost >= neighbor.gCost) {</p>
+<p>                continue; // Not a better path</p>
+<p>            }</p>
+            
+<p>            // Update node with better path</p>
+<p>            neighbor.parent = currentNode;</p>
+<p>            neighbor.gCost = tentativeGCost;</p>
+<p>            neighbor.hCost = manhattanDistance(neighbor, goalNode);</p>
+<p>            neighbor.fCost = neighbor.gCost + neighbor.hCost;</p>
+<p>        }</p>
+        
+<p>        // Delay for visualization</p>
+<p>        await sleep(50);</p>
+<p>    }</p>
+    
+<p>    // No path found</p>
+<p>    isSearching = false;</p>
+<p>    alert('No path found!');</p>
+<p>}</p>
+<p>```</p>
+
+<b>Algorithm Breakdown</b>:
+
+<p>1. <b>Initialization</b>:</p>
+<p>   - Open set starts with start node</p>
+<p>   - Closed set is empty</p>
+<p>   - Start node has g-cost of 0</p>
+
+<p>2. <b>Main Loop</b>:</p>
+<p>   - Continue while open set has nodes</p>
+<p>   - Select node with lowest f-cost</p>
+<p>   - Tie-break with h-cost (closer to goal)</p>
+
+<p>3. <b>Node Processing</b>:</p>
+<p>   - Move current from open to closed</p>
+<p>   - Check if goal reached</p>
+<p>   - Evaluate all neighbors</p>
+
+<p>4. <b>Neighbor Evaluation</b>:</p>
+<p>   - Skip if in closed set</p>
+<p>   - Calculate tentative g-cost</p>
+<p>   - Update if better path found</p>
+<p>   - Add to open set if new</p>
+
+<p>5. <b>Path Reconstruction</b>:</p>
+<p>   - Follow parent pointers from goal to start</p>
+<p>   - Visualize final path</p>
+
+<p>#### Path Reconstruction</p>
+<p>```javascript</p>
+<p>function reconstructPath(node) {</p>
+<p>    const path = [];</p>
+<p>    let current = node;</p>
+    
+<p>    // Follow parent chain</p>
+<p>    while (current !== null) {</p>
+<p>        path.unshift(current);</p>
+<p>        current = current.parent;</p>
+<p>    }</p>
+    
+<p>    // Visualize path</p>
+<p>    for (let i = 1; i < path.length - 1; i++) {</p>
+<p>        path[i].element.classList.add('path');</p>
+<p>    }</p>
+    
+<p>    console.log(`Path found! Length: ${path.length} nodes`);</p>
+<p>    return path;</p>
+<p>}</p>
+<p>```</p>
+<b>Implementation Notes</b>:
+<li><b>Reverse Traversal</b>: Start from goal, follow parents to start</li>
+<li><b>Array Building</b>: `unshift()` maintains correct order</li>
+<li><b>Visualization</b>: Skip start/goal nodes for path coloring</li>
+<li><b>Return Value</b>: Complete path for further analysis</li>
+
+<p>#### Utility Functions</p>
+<p>```javascript</p>
+<p>function sleep(ms) {</p>
+<p>    return new Promise(resolve => setTimeout(resolve, ms));</p>
+<p>}</p>
+
+<p>function resetPathfinding() {</p>
+<p>    // Clear all visual states</p>
+<p>    document.querySelectorAll('.cell').forEach(cell => {</p>
+<p>        cell.classList.remove('open', 'closed', 'path');</p>
+<p>    });</p>
+    
+<p>    // Reset node properties</p>
+<p>    for (let y = 0; y < GRID_HEIGHT; y++) {</p>
+<p>        for (let x = 0; x < GRID_WIDTH; x++) {</p>
+<p>            const node = grid[y][x];</p>
+<p>            node.gCost = Infinity;</p>
+<p>            node.hCost = 0;</p>
+<p>            node.fCost = Infinity;</p>
+<p>            node.parent = null;</p>
+<p>        }</p>
+<p>    }</p>
+<p>}</p>
+
+<p>function clearGrid() {</p>
+<p>    for (let y = 0; y < GRID_HEIGHT; y++) {</p>
+<p>        for (let x = 0; x < GRID_WIDTH; x++) {</p>
+<p>            const node = grid[y][x];</p>
+<p>            node.isObstacle = false;</p>
+<p>            node.element.classList.remove('obstacle');</p>
+<p>        }</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
+<b>Utility Purpose</b>:
+<li><b>sleep()</b>: Async delay for visualization timing</li>
+<li><b>resetPathfinding()</b>: Clean slate for new searches</li>
+<li><b>clearGrid()</b>: Remove all obstacles</li>
+
+<h2>Data Structure Analysis</h2>
+
+<p>### Node Object Structure</p>
+<p>```javascript</p>
+<p>const node = {</p>
+<p>    x: 5,              // Grid x-coordinate</p>
+<p>    y: 3,              // Grid y-coordinate</p>
+<p>    isObstacle: false, // Walkability flag</p>
+<p>    gCost: 7,          // Distance from start</p>
+<p>    hCost: 4,          // Heuristic to goal</p>
+<p>    fCost: 11,         // Total cost (g + h)</p>
+<p>    parent: nodeRef,   // Previous node in path</p>
+<p>    element: domRef    // DOM element reference</p>
+<p>};</p>
+<p>```</p>
+
+<p>### Open Set Management</p>
+<b>Current Implementation</b>: Array with linear search
+<p>```javascript</p>
+<p>// Finding minimum f-cost: O(n)</p>
+<p>let currentNode = openSet[0];</p>
+<p>for (let i = 1; i < openSet.length; i++) {</p>
+<p>    if (openSet[i].fCost < currentNode.fCost) {</p>
+<p>        currentNode = openSet[i];</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
+
+<b>Optimization Opportunity</b>: Priority queue would be O(log n)
+
+<p>### Closed Set Management</p>
+<b>Current Implementation</b>: JavaScript Set
+<p>```javascript</p>
+<p>const closedSet = new Set();</p>
+<p>closedSet.add(node);           // O(1)</p>
+<p>closedSet.has(node);           // O(1)</p>
+<p>```</p>
+<b>Efficiency</b>: Optimal for membership testing
+
+<h2>Performance Characteristics</h2>
+
+<p>### Time Complexity</p>
+<li><b>Best Case</b>: O(b^d) where b is branching factor, d is depth</li>
+<li><b>Average Case</b>: Depends on heuristic quality</li>
+<li><b>Worst Case</b>: O(b^d) when heuristic provides no guidance</li>
+
+<p>### Space Complexity</p>
+<li><b>Open Set</b>: O(b^d) in worst case</li>
+<li><b>Closed Set</b>: O(b^d) nodes explored</li>
+<li><b>Grid Storage</b>: O(width × height)</li>
+
+<p>### Optimization Opportunities</p>
+<p>1. <b>Priority Queue</b>: Replace array-based open set</p>
+<p>2. <b>Coordinate Hashing</b>: More efficient node lookup</p>
+<p>3. <b>Memory Pooling</b>: Reduce garbage collection</p>
+<p>4. <b>SIMD Operations</b>: Vectorized heuristic calculations</p>
+
+<h2>Error Handling and Edge Cases</h2>
+
+<p>### Input Validation</p>
+<p>```javascript</p>
+<p>function validateInput() {</p>
+<p>    if (!startNode) {</p>
+<p>        alert('Please set a start position (right-click)');</p>
+<p>        return false;</p>
+<p>    }</p>
+    
+<p>    if (!goalNode) {</p>
+<p>        alert('Please set a goal position (Ctrl+click)');</p>
+<p>        return false;</p>
+<p>    }</p>
+    
+<p>    if (startNode === goalNode) {</p>
+<p>        alert('Start and goal cannot be the same!');</p>
+<p>        return false;</p>
+<p>    }</p>
+    
+<p>    return true;</p>
+<p>}</p>
+<p>```</p>
+
+<p>### Boundary Conditions</p>
+<li><b>Grid Bounds</b>: Checked in `getNeighbors()`</li>
+<li><b>Obstacle Collision</b>: Filtered during neighbor generation</li>
+<li><b>No Path Exists</b>: Detected when open set becomes empty</li>
+
+<p>### Memory Management</p>
+<li><b>DOM References</b>: Cleaned up during reset</li>
+<li><b>Event Listeners</b>: Properly attached and managed</li>
+<li><b>Large Grids</b>: Consider chunking for very large datasets</li>
+
+<h2>Testing and Debugging</h2>
+
+<p>### Console Logging</p>
+<p>```javascript</p>
+<p>function debugNode(node) {</p>
+<p>    console.log(`Node (${node.x}, ${node.y}):`, {</p>
+<p>        gCost: node.gCost,</p>
+<p>        hCost: node.hCost,</p>
+<p>        fCost: node.fCost,</p>
+<p>        parent: node.parent ? `(${node.parent.x}, ${node.parent.y})` : null</p>
+<p>    });</p>
+<p>}</p>
+<p>```</p>
+
+<p>### Performance Monitoring</p>
+<p>```javascript</p>
+<p>function measurePerformance() {</p>
+<p>    const startTime = performance.now();</p>
+    
+<p>    // Run pathfinding</p>
+<p>    findPath().then(() => {</p>
+<p>        const endTime = performance.now();</p>
+<p>        console.log(`Pathfinding took ${endTime - startTime} milliseconds`);</p>
+<p>    });</p>
+<p>}</p>
+<p>```</p>
+
+<p>### Unit Test Examples</p>
+<p>```javascript</p>
+<p>function testManhattanDistance() {</p>
+<p>    const nodeA = { x: 0, y: 0 };</p>
+<p>    const nodeB = { x: 3, y: 4 };</p>
+<p>    const expected = 7;</p>
+<p>    const actual = manhattanDistance(nodeA, nodeB);</p>
+    
+<p>    console.assert(actual === expected, </p>
+<p>        `Expected ${expected}, got ${actual}`);</p>
+<p>}</p>
+
+<p>function testPathReconstruction() {</p>
+<p>    // Create a simple 3-node path</p>
+<p>    const start = { x: 0, y: 0, parent: null };</p>
+<p>    const middle = { x: 1, y: 0, parent: start };</p>
+<p>    const goal = { x: 2, y: 0, parent: middle };</p>
+    
+<p>    const path = reconstructPath(goal);</p>
+    
+<p>    console.assert(path.length === 3, </p>
+<p>        `Expected path length 3, got ${path.length}`);</p>
+<p>    console.assert(path[0] === start, 'First node should be start');</p>
+<p>    console.assert(path[2] === goal, 'Last node should be goal');</p>
+<p>}</p>
+<p>```</p>
+
+<h2>Code Quality and Best Practices</h2>
+
+<p>### Naming Conventions</p>
+<li><b>Constants</b>: `UPPER_SNAKE_CASE`</li>
+<li><b>Variables</b>: `camelCase`</li>
+<li><b>Functions</b>: `camelCase` with descriptive verbs</li>
+<li><b>Classes</b>: `PascalCase` (if using classes)</li>
+
+<p>### Function Design</p>
+<li><b>Single Responsibility</b>: Each function has one clear purpose</li>
+<li><b>Pure Functions</b>: Heuristic calculations have no side effects</li>
+<li><b>Async Handling</b>: Proper use of async/await for visualization</li>
+
+<p>### Documentation Standards</p>
+<p>```javascript</p>
+<p>/**</p>
+<p> * Calculates the Manhattan distance between two nodes</p>
+<p> * @param {Object} nodeA - First node with x, y properties</p>
+<p> * @param {Object} nodeB - Second node with x, y properties</p>
+<p> * @returns {number} Manhattan distance between nodes</p>
+<p> */</p>
+<p>function manhattanDistance(nodeA, nodeB) {</p>
+<p>    return Math.abs(nodeA.x - nodeB.x) + Math.abs(nodeA.y - nodeB.y);</p>
+<p>}</p>
+<p>```</p>
+
+<p>### Error Prevention</p>
+<li><b>Type Checking</b>: Validate input parameters</li>
+<li><b>Null Checks</b>: Handle undefined/null values</li>
+<li><b>Bounds Checking</b>: Prevent array access errors</li>
+<li><b>State Validation</b>: Ensure valid algorithm state</li>
+
+<p>---</p>
+<b>Previous:</b> <a href="10-demo-guide.md">Interactive Demo Guide</a>
+<b>Next:</b> <a href="12-testing.md">Testing and Validation</a>
+
+<b>Interactive:</b> <a href="demo.html">Explore the code</a>
     </div>
 </body>
 </html>

@@ -15,151 +15,195 @@
     </nav>
     <div class="container">
         <h1>Node Evaluation Process</h1>
+
 <h2>The Core Formula: f(n) = g(n) + h(n)</h2>
-<h3>Components Breakdown</h3>
-<ul>
-<li><strong>g(n)</strong>: Actual cost from start to node n</li>
-<li><strong>h(n)</strong>: Heuristic estimate from node n to goal</li>
-<li><strong>f(n)</strong>: Total estimated cost of path through n</li>
-</ul>
+
+<p>### Components Breakdown</p>
+<li><b>g(n)</b>: Actual cost from start to node n</li>
+<li><b>h(n)</b>: Heuristic estimate from node n to goal</li>
+<li><b>f(n)</b>: Total estimated cost of path through n</li>
+
 <h2>Step-by-Step Evaluation</h2>
-<h3>Example Setup</h3>
-<p><code>Grid with costs:
-┌─┬─┬─┬─┬─┐
-│ │ │ │G│ │  S = Start (0,2)
-├─┼─┼─┼─┼─┤  G = Goal (3,0)
-│ │ │█│ │ │  █ = Obstacle
-├─┼─┼─┼─┼─┤  Numbers = step order
-│S│1│2│3│ │
-└─┴─┴─┴─┴─┘</code></p>
-<h3>Step 1: Initialize Start Node</h3>
-<p><code>Node S (0,2):
-g(S) = 0           (distance from start)
-h(S) = 5           (Manhattan to goal: |3-0| + |0-2|)
-f(S) = 0 + 5 = 5   (total estimated cost)</code></p>
-<h3>Step 2: Evaluate Neighbors</h3>
-<h4>Node 1 (1,2)</h4>
-<p><code>g(1) = g(S) + 1 = 0 + 1 = 1    (cost to reach)
-h(1) = |3-1| + |0-2| = 4       (heuristic to goal)
-f(1) = 1 + 4 = 5               (total estimate)
-parent(1) = S                   (for path reconstruction)</code></p>
-<h4>Node Up (0,1)</h4>
-<p><code>g(up) = g(S) + 1 = 1
-h(up) = |3-0| + |0-1| = 4
-f(up) = 1 + 4 = 5
-parent(up) = S</code></p>
-<h4>Node Down (0,3) - Out of bounds, skip</h4>
-<h3>Step 3: Select Best Node</h3>
-<p><code>Open Set: {Node1(f=5), NodeUp(f=5)}
-Both have same f-cost, choose Node1 (arbitrary tie-breaking)
-Current = Node1
-Move Node1 from Open to Closed set</code></p>
-<h3>Step 4: Expand Node 1</h3>
-<h4>Node 2 (2,2)</h4>
-<p><code>g(2) = g(1) + 1 = 2
-h(2) = |3-2| + |0-2| = 3
-f(2) = 2 + 3 = 5
-parent(2) = Node1</code></p>
-<h4>Node (1,1)</h4>
-<p><code>g(1,1) = g(1) + 1 = 2
-h(1,1) = |3-1| + |0-1| = 3
-f(1,1) = 2 + 3 = 5
-parent(1,1) = Node1</code></p>
+
+<p>### Example Setup</p>
+<p>```</p>
+<p>Grid with costs:</p>
+<p>┌─┬─┬─┬─┬─┐</p>
+<p>│ │ │ │G│ │  S = Start (0,2)</p>
+<p>├─┼─┼─┼─┼─┤  G = Goal (3,0)</p>
+<p>│ │ │█│ │ │  █ = Obstacle</p>
+<p>├─┼─┼─┼─┼─┤  Numbers = step order</p>
+<p>│S│1│2│3│ │</p>
+<p>└─┴─┴─┴─┴─┘</p>
+<p>```</p>
+
+<p>### Step 1: Initialize Start Node</p>
+<p>```</p>
+<p>Node S (0,2):</p>
+<p>g(S) = 0           (distance from start)</p>
+<p>h(S) = 5           (Manhattan to goal: |3-0| + |0-2|)</p>
+<p>f(S) = 0 + 5 = 5   (total estimated cost)</p>
+<p>```</p>
+
+<p>### Step 2: Evaluate Neighbors</p>
+
+<p>#### Node 1 (1,2)</p>
+<p>```</p>
+<p>g(1) = g(S) + 1 = 0 + 1 = 1    (cost to reach)</p>
+<p>h(1) = |3-1| + |0-2| = 4       (heuristic to goal)</p>
+<p>f(1) = 1 + 4 = 5               (total estimate)</p>
+<p>parent(1) = S                   (for path reconstruction)</p>
+<p>```</p>
+
+<p>#### Node Up (0,1)</p>
+<p>```</p>
+<p>g(up) = g(S) + 1 = 1</p>
+<p>h(up) = |3-0| + |0-1| = 4</p>
+<p>f(up) = 1 + 4 = 5</p>
+<p>parent(up) = S</p>
+<p>```</p>
+
+<p>#### Node Down (0,3) - Out of bounds, skip</p>
+
+<p>### Step 3: Select Best Node</p>
+<p>```</p>
+<p>Open Set: {Node1(f=5), NodeUp(f=5)}</p>
+<p>Both have same f-cost, choose Node1 (arbitrary tie-breaking)</p>
+<p>Current = Node1</p>
+<p>Move Node1 from Open to Closed set</p>
+<p>```</p>
+
+<p>### Step 4: Expand Node 1</p>
+
+<p>#### Node 2 (2,2)</p>
+<p>```</p>
+<p>g(2) = g(1) + 1 = 2</p>
+<p>h(2) = |3-2| + |0-2| = 3</p>
+<p>f(2) = 2 + 3 = 5</p>
+<p>parent(2) = Node1</p>
+<p>```</p>
+
+<p>#### Node (1,1)</p>
+<p>```</p>
+<p>g(1,1) = g(1) + 1 = 2</p>
+<p>h(1,1) = |3-1| + |0-1| = 3</p>
+<p>f(1,1) = 2 + 3 = 5</p>
+<p>parent(1,1) = Node1</p>
+<p>```</p>
+
 <h2>Complete Evaluation Table</h2>
-<p>| Node | g(n) | h(n) | f(n) | Parent | Status |
-|------|------|------|------|--------|---------|
-| S(0,2) | 0 | 5 | 5 | null | Closed |
-| (1,2) | 1 | 4 | 5 | S | Closed |
-| (0,1) | 1 | 4 | 5 | S | Open |
-| (2,2) | 2 | 3 | 5 | (1,2) | Open |
-| (1,1) | 2 | 3 | 5 | (1,2) | Open |
-| (3,2) | 3 | 2 | 5 | (2,2) | Open |
-| (2,1) | 3 | 2 | 5 | (1,1) | Open |
-| (3,1) | 4 | 1 | 5 | (3,2) | Open |
-| (3,0) | 5 | 0 | 5 | (3,1) | <strong>GOAL</strong> |</p>
+
+<p>| Node | g(n) | h(n) | f(n) | Parent | Status |</p>
+<p>|------|------|------|------|--------|---------|</p>
+<p>| S(0,2) | 0 | 5 | 5 | null | Closed |</p>
+<p>| (1,2) | 1 | 4 | 5 | S | Closed |</p>
+<p>| (0,1) | 1 | 4 | 5 | S | Open |</p>
+<p>| (2,2) | 2 | 3 | 5 | (1,2) | Open |</p>
+<p>| (1,1) | 2 | 3 | 5 | (1,2) | Open |</p>
+<p>| (3,2) | 3 | 2 | 5 | (2,2) | Open |</p>
+<p>| (2,1) | 3 | 2 | 5 | (1,1) | Open |</p>
+<p>| (3,1) | 4 | 1 | 5 | (3,2) | Open |</p>
+<p>| (3,0) | 5 | 0 | 5 | (3,1) | <b>GOAL</b> |</p>
+
 <h2>Key Insights</h2>
-<h3>1. Consistent f-values</h3>
+
+<p>### 1. Consistent f-values</p>
 <p>Notice all nodes have f(n) = 5, indicating optimal heuristic!</p>
-<h3>2. Path Reconstruction</h3>
-<p><code>Goal(3,0) ← (3,1) ← (3,2) ← (2,2) ← (1,2) ← Start(0,2)
-Final path: S → 1 → 2 → 3 → G
-Total cost: 5 (matches our estimate!)</code></p>
-<h3>3. Tie-Breaking Strategies</h3>
-<p>When f-values are equal:
-- <strong>Prefer lower h-value</strong>: Closer to goal
-- <strong>Prefer higher g-value</strong>: Further from start
-- <strong>LIFO</strong>: Last In, First Out
-- <strong>Coordinate-based</strong>: Consistent ordering</p>
+
+<p>### 2. Path Reconstruction</p>
+<p>```</p>
+<p>Goal(3,0) ← (3,1) ← (3,2) ← (2,2) ← (1,2) ← Start(0,2)</p>
+<p>Final path: S → 1 → 2 → 3 → G</p>
+<p>Total cost: 5 (matches our estimate!)</p>
+<p>```</p>
+
+<p>### 3. Tie-Breaking Strategies</p>
+<p>When f-values are equal:</p>
+<li><b>Prefer lower h-value</b>: Closer to goal</li>
+<li><b>Prefer higher g-value</b>: Further from start</li>
+<li><b>LIFO</b>: Last In, First Out</li>
+<li><b>Coordinate-based</b>: Consistent ordering</li>
+
 <h2>Implementation Details</h2>
-<p>```javascript
-class Node {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-        this.gCost = Infinity;
-        this.hCost = 0;
-        this.parent = null;
-    }</p>
-<pre><code>get fCost() {
-    return this.gCost + this.hCost;
-}
 
-calculateHeuristic(goal) {
-    // Manhattan distance
-    this.hCost = Math.abs(this.x - goal.x) + Math.abs(this.y - goal.y);
-}
+<p>```javascript</p>
+<p>class Node {</p>
+<p>    constructor(x, y) {</p>
+<p>        this.x = x;</p>
+<p>        this.y = y;</p>
+<p>        this.gCost = Infinity;</p>
+<p>        this.hCost = 0;</p>
+<p>        this.parent = null;</p>
+<p>    }</p>
+    
+<p>    get fCost() {</p>
+<p>        return this.gCost + this.hCost;</p>
+<p>    }</p>
+    
+<p>    calculateHeuristic(goal) {</p>
+<p>        // Manhattan distance</p>
+<p>        this.hCost = Math.abs(this.x - goal.x) + Math.abs(this.y - goal.y);</p>
+<p>    }</p>
+    
+<p>    updateCosts(parent, goal) {</p>
+<p>        this.gCost = parent.gCost + this.getMoveCost(parent);</p>
+<p>        this.calculateHeuristic(goal);</p>
+<p>        this.parent = parent;</p>
+<p>    }</p>
+    
+<p>    getMoveCost(parent) {</p>
+<p>        // Diagonal movement costs √2, cardinal costs 1</p>
+<p>        const dx = Math.abs(this.x - parent.x);</p>
+<p>        const dy = Math.abs(this.y - parent.y);</p>
+<p>        return (dx === 1 && dy === 1) ? Math.sqrt(2) : 1;</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
 
-updateCosts(parent, goal) {
-    this.gCost = parent.gCost + this.getMoveCost(parent);
-    this.calculateHeuristic(goal);
-    this.parent = parent;
-}
-
-getMoveCost(parent) {
-    // Diagonal movement costs √2, cardinal costs 1
-    const dx = Math.abs(this.x - parent.x);
-    const dy = Math.abs(this.y - parent.y);
-    return (dx === 1 &amp;&amp; dy === 1) ? Math.sqrt(2) : 1;
-}
-</code></pre>
-<p>}
-```</p>
 <h2>Common Mistakes</h2>
-<h3>1. Forgetting to Update g-cost</h3>
-<p>```javascript
-// WRONG: Only checking if node is in closed set
-if (!closedSet.has(neighbor)) {
-    openSet.add(neighbor);
-}</p>
-<p>// CORRECT: Check if new path is better
-const tentativeG = current.gCost + moveCost;
-if (tentativeG &lt; neighbor.gCost) {
-    neighbor.updateCosts(current, goal);
-    openSet.add(neighbor);
-}
-```</p>
-<h3>2. Incorrect Heuristic Calculation</h3>
-<p>```javascript
-// WRONG: Using Euclidean for 4-directional movement
-h = Math.sqrt(dx<em>dx + dy</em>dy);</p>
-<p>// CORRECT: Using Manhattan for 4-directional
-h = Math.abs(dx) + Math.abs(dy);
-```</p>
-<h3>3. Not Handling Ties</h3>
-<p>```javascript
-// WRONG: Arbitrary selection
-let current = openSet.values().next().value;</p>
-<p>// BETTER: Consistent tie-breaking
-let current = Array.from(openSet).reduce((best, node) =&gt; {
-    if (node.fCost &lt; best.fCost) return node;
-    if (node.fCost === best.fCost &amp;&amp; node.hCost &lt; best.hCost) return node;
-    return best;
-});
-```</p>
-<hr />
-<p><strong>Previous:</strong> <a href="03-heuristic-mathematics.md">Heuristic Mathematics</a>
-<strong>Next:</strong> <a href="05-set-management.md">Open/Closed Set Management</a></p>
-<p><strong>Interactive:</strong> <a href="demo.html">Step through evaluation</a></p>
+
+<p>### 1. Forgetting to Update g-cost</p>
+<p>```javascript</p>
+<p>// WRONG: Only checking if node is in closed set</p>
+<p>if (!closedSet.has(neighbor)) {</p>
+<p>    openSet.add(neighbor);</p>
+<p>}</p>
+
+<p>// CORRECT: Check if new path is better</p>
+<p>const tentativeG = current.gCost + moveCost;</p>
+<p>if (tentativeG < neighbor.gCost) {</p>
+<p>    neighbor.updateCosts(current, goal);</p>
+<p>    openSet.add(neighbor);</p>
+<p>}</p>
+<p>```</p>
+
+<p>### 2. Incorrect Heuristic Calculation</p>
+<p>```javascript</p>
+<p>// WRONG: Using Euclidean for 4-directional movement</p>
+<p>h = Math.sqrt(dx*dx + dy*dy);</p>
+
+<p>// CORRECT: Using Manhattan for 4-directional</p>
+<p>h = Math.abs(dx) + Math.abs(dy);</p>
+<p>```</p>
+
+<p>### 3. Not Handling Ties</p>
+<p>```javascript</p>
+<p>// WRONG: Arbitrary selection</p>
+<p>let current = openSet.values().next().value;</p>
+
+<p>// BETTER: Consistent tie-breaking</p>
+<p>let current = Array.from(openSet).reduce((best, node) => {</p>
+<p>    if (node.fCost < best.fCost) return node;</p>
+<p>    if (node.fCost === best.fCost && node.hCost < best.hCost) return node;</p>
+<p>    return best;</p>
+<p>});</p>
+<p>```</p>
+
+<p>---</p>
+<b>Previous:</b> <a href="03-heuristic-mathematics.md">Heuristic Mathematics</a>
+<b>Next:</b> <a href="05-set-management.md">Open/Closed Set Management</a>
+
+<b>Interactive:</b> <a href="demo.html">Step through evaluation</a>
     </div>
 </body>
 </html>

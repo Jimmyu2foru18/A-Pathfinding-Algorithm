@@ -15,1020 +15,1040 @@
     </nav>
     <div class="container">
         <h1>Performance Analysis</h1>
+
 <h2>Performance Metrics Overview</h2>
-<h3>Key Performance Indicators (KPIs)</h3>
-<ol>
-<li><strong>Time Complexity</strong>: Algorithm execution time</li>
-<li><strong>Space Complexity</strong>: Memory usage patterns</li>
-<li><strong>Node Exploration</strong>: Efficiency of search</li>
-<li><strong>Path Optimality</strong>: Quality of found paths</li>
-<li><strong>Scalability</strong>: Performance with larger inputs</li>
-<li><strong>Real-time Performance</strong>: Frame rate impact</li>
-</ol>
-<h3>Measurement Framework</h3>
-<p>```javascript
-class PerformanceAnalyzer {
-    constructor() {
-        this.metrics = {
-            executionTime: [],
-            memoryUsage: [],
-            nodesExplored: [],
-            pathLength: [],
-            openSetSize: [],
-            closedSetSize: []
-        };
-        this.startTime = 0;
-        this.peakMemory = 0;
-    }</p>
-<pre><code>startMeasurement() {
-    this.startTime = performance.now();
-    this.peakMemory = this.getCurrentMemory();
-    this.nodesExploredCount = 0;
-    this.maxOpenSetSize = 0;
-}
 
-recordNodeExploration(openSetSize) {
-    this.nodesExploredCount++;
-    this.maxOpenSetSize = Math.max(this.maxOpenSetSize, openSetSize);
-
-    const currentMemory = this.getCurrentMemory();
-    this.peakMemory = Math.max(this.peakMemory, currentMemory);
-}
-
-endMeasurement(pathLength) {
-    const executionTime = performance.now() - this.startTime;
-
-    this.metrics.executionTime.push(executionTime);
-    this.metrics.memoryUsage.push(this.peakMemory);
-    this.metrics.nodesExplored.push(this.nodesExploredCount);
-    this.metrics.pathLength.push(pathLength || 0);
-    this.metrics.openSetSize.push(this.maxOpenSetSize);
-
-    return {
-        executionTime,
-        memoryUsage: this.peakMemory,
-        nodesExplored: this.nodesExploredCount,
-        pathLength: pathLength || 0,
-        maxOpenSetSize: this.maxOpenSetSize
-    };
-}
-
-getCurrentMemory() {
-    return performance.memory ? performance.memory.usedJSHeapSize : 0;
-}
-
-getStatistics() {
-    const stats = {};
-
-    for (const [metric, values] of Object.entries(this.metrics)) {
-        if (values.length === 0) continue;
-
-        stats[metric] = {
-            min: Math.min(...values),
-            max: Math.max(...values),
-            avg: values.reduce((a, b) =&gt; a + b, 0) / values.length,
-            median: this.calculateMedian(values),
-            stdDev: this.calculateStdDev(values)
-        };
-    }
-
-    return stats;
-}
-
-calculateMedian(values) {
-    const sorted = [...values].sort((a, b) =&gt; a - b);
-    const mid = Math.floor(sorted.length / 2);
-    return sorted.length % 2 === 0 
-        ? (sorted[mid - 1] + sorted[mid]) / 2 
-        : sorted[mid];
-}
-
-calculateStdDev(values) {
-    const avg = values.reduce((a, b) =&gt; a + b, 0) / values.length;
-    const squareDiffs = values.map(value =&gt; Math.pow(value - avg, 2));
-    const avgSquareDiff = squareDiffs.reduce((a, b) =&gt; a + b, 0) / values.length;
-    return Math.sqrt(avgSquareDiff);
-}
-</code></pre>
-<p>}
-```</p>
-<h2>Time Complexity Analysis</h2>
-<h3>Theoretical Complexity</h3>
-<p>```javascript
-/<em><em>
- * A</em> Time Complexity Analysis:
- * 
- * Best Case: O(b^d)
- * - b = branching factor (typically 8 for grid)
- * - d = depth of optimal solution
- * 
- * Average Case: O(b^d)
- * - Depends heavily on heuristic quality
- * - Good heuristic: closer to O(d)
- * - Poor heuristic: approaches O(b^d)
- * 
- * Worst Case: O(b^d)
- * - When heuristic provides no guidance
- * - Degenerates to Dijkstra's algorithm
- </em>/</p>
-<p>class ComplexityAnalyzer {
-    constructor() {
-        this.measurements = [];
-    }</p>
-<pre><code>analyzeTimeComplexity(gridSizes, iterations = 10) {
-    const results = [];
-
-    for (const size of gridSizes) {
-        const times = [];
-
-        for (let i = 0; i &lt; iterations; i++) {
-            const time = this.measureSingleRun(size);
-            times.push(time);
-        }
-
-        const avgTime = times.reduce((a, b) =&gt; a + b, 0) / times.length;
-        results.push({ size, avgTime, times });
-    }
-
-    return this.calculateGrowthRate(results);
-}
-
-measureSingleRun(gridSize) {
-    // Setup grid
-    this.setupGrid(gridSize);
-
-    const startTime = performance.now();
-    const path = this.runAStar();
-    const endTime = performance.now();
-
-    return endTime - startTime;
-}
-
-calculateGrowthRate(results) {
-    const growthRates = [];
-
-    for (let i = 1; i &lt; results.length; i++) {
-        const prev = results[i - 1];
-        const curr = results[i];
-
-        const sizeRatio = curr.size / prev.size;
-        const timeRatio = curr.avgTime / prev.avgTime;
-
-        growthRates.push({
-            sizeFrom: prev.size,
-            sizeTo: curr.size,
-            sizeRatio,
-            timeRatio,
-            complexity: Math.log(timeRatio) / Math.log(sizeRatio)
-        });
-    }
-
-    return {
-        results,
-        growthRates,
-        avgComplexity: growthRates.reduce((sum, gr) =&gt; sum + gr.complexity, 0) / growthRates.length
-    };
-}
-</code></pre>
-<p>}
-```</p>
-<h3>Empirical Time Measurements</h3>
-<p>```javascript
-class TimingBenchmark {
-    constructor() {
-        this.scenarios = {
-            'empty-grid': this.createEmptyGrid,
-            'sparse-obstacles': this.createSparseObstacles,
-            'dense-obstacles': this.createDenseObstacles,
-            'maze-like': this.createMaze,
-            'worst-case': this.createWorstCase
-        };
-    }</p>
-<pre><code>async runComprehensiveBenchmark() {
-    const results = {};
-
-    for (const [scenarioName, setupFunction] of Object.entries(this.scenarios)) {
-        console.log(`\n🔍 Testing scenario: ${scenarioName}`);
-        results[scenarioName] = await this.benchmarkScenario(setupFunction);
-    }
-
-    return this.analyzeResults(results);
-}
-
-async benchmarkScenario(setupFunction, iterations = 20) {
-    const measurements = [];
-
-    for (let i = 0; i &lt; iterations; i++) {
-        setupFunction.call(this);
-
-        const analyzer = new PerformanceAnalyzer();
-        analyzer.startMeasurement();
-
-        const path = await this.runInstrumentedAStar(analyzer);
-        const result = analyzer.endMeasurement(path ? path.length : 0);
-
-        measurements.push(result);
-
-        // Small delay to prevent browser freezing
-        await this.sleep(10);
-    }
-
-    return this.calculateScenarioStats(measurements);
-}
-
-async runInstrumentedAStar(analyzer) {
-    if (!startNode || !goalNode) return null;
-
-    const openSet = [startNode];
-    const closedSet = new Set();
-
-    startNode.gCost = 0;
-    startNode.hCost = manhattanDistance(startNode, goalNode);
-    startNode.fCost = startNode.gCost + startNode.hCost;
-
-    while (openSet.length &gt; 0) {
-        // Record performance metrics
-        analyzer.recordNodeExploration(openSet.length);
-
-        let currentNode = openSet[0];
-        for (let i = 1; i &lt; openSet.length; i++) {
-            if (openSet[i].fCost &lt; currentNode.fCost || 
-                (openSet[i].fCost === currentNode.fCost &amp;&amp; 
-                 openSet[i].hCost &lt; currentNode.hCost)) {
-                currentNode = openSet[i];
-            }
-        }
-
-        const currentIndex = openSet.indexOf(currentNode);
-        openSet.splice(currentIndex, 1);
-        closedSet.add(currentNode);
-
-        if (currentNode === goalNode) {
-            return this.reconstructPath(currentNode);
-        }
-
-        const neighbors = getNeighbors(currentNode);
-
-        for (const neighbor of neighbors) {
-            if (closedSet.has(neighbor)) continue;
-
-            const tentativeGCost = currentNode.gCost + 
-                                 getMovementCost(currentNode, neighbor);
-
-            if (!openSet.includes(neighbor)) {
-                openSet.push(neighbor);
-            } else if (tentativeGCost &gt;= neighbor.gCost) {
-                continue;
-            }
-
-            neighbor.parent = currentNode;
-            neighbor.gCost = tentativeGCost;
-            neighbor.hCost = manhattanDistance(neighbor, goalNode);
-            neighbor.fCost = neighbor.gCost + neighbor.hCost;
-        }
-    }
-
-    return null;
-}
-
-createEmptyGrid() {
-    initializeGrid();
-    startNode = grid[0][0];
-    goalNode = grid[GRID_HEIGHT - 1][GRID_WIDTH - 1];
-}
-
-createSparseObstacles() {
-    this.createEmptyGrid();
-    this.addRandomObstacles(0.1); // 10% obstacles
-}
-
-createDenseObstacles() {
-    this.createEmptyGrid();
-    this.addRandomObstacles(0.3); // 30% obstacles
-}
-
-createMaze() {
-    this.createEmptyGrid();
-    this.generateMaze();
-}
-
-createWorstCase() {
-    this.createEmptyGrid();
-    // Create scenario where heuristic is misleading
-    this.createMisleadingHeuristic();
-}
-
-addRandomObstacles(percentage) {
-    const totalCells = GRID_WIDTH * GRID_HEIGHT;
-    const obstacleCount = Math.floor(totalCells * percentage);
-
-    for (let i = 0; i &lt; obstacleCount; i++) {
-        let x, y;
-        do {
-            x = Math.floor(Math.random() * GRID_WIDTH);
-            y = Math.floor(Math.random() * GRID_HEIGHT);
-        } while (grid[y][x] === startNode || grid[y][x] === goalNode || grid[y][x].isObstacle);
-
-        grid[y][x].isObstacle = true;
-    }
-}
-
-generateMaze() {
-    // Simple maze generation using recursive backtracking
-    for (let y = 0; y &lt; GRID_HEIGHT; y++) {
-        for (let x = 0; x &lt; GRID_WIDTH; x++) {
-            if (x % 2 === 1 &amp;&amp; y % 2 === 1) {
-                grid[y][x].isObstacle = true;
-            }
-        }
-    }
-
-    // Add some random passages
-    for (let i = 0; i &lt; GRID_WIDTH * GRID_HEIGHT * 0.1; i++) {
-        const x = Math.floor(Math.random() * GRID_WIDTH);
-        const y = Math.floor(Math.random() * GRID_HEIGHT);
-        grid[y][x].isObstacle = false;
-    }
-}
-
-createMisleadingHeuristic() {
-    // Create a U-shaped obstacle that makes heuristic misleading
-    const centerX = Math.floor(GRID_WIDTH / 2);
-    const centerY = Math.floor(GRID_HEIGHT / 2);
-
-    // Create U-shape
-    for (let y = centerY - 5; y &lt;= centerY + 5; y++) {
-        if (y &gt;= 0 &amp;&amp; y &lt; GRID_HEIGHT) {
-            if (centerX - 3 &gt;= 0) grid[y][centerX - 3].isObstacle = true;
-            if (centerX + 3 &lt; GRID_WIDTH) grid[y][centerX + 3].isObstacle = true;
-        }
-    }
-
-    for (let x = centerX - 3; x &lt;= centerX + 3; x++) {
-        if (x &gt;= 0 &amp;&amp; x &lt; GRID_WIDTH &amp;&amp; centerY + 5 &lt; GRID_HEIGHT) {
-            grid[centerY + 5][x].isObstacle = true;
-        }
-    }
-
-    startNode = grid[centerY][centerX - 5];
-    goalNode = grid[centerY][centerX + 5];
-}
-
-calculateScenarioStats(measurements) {
-    const stats = {};
-    const metrics = ['executionTime', 'memoryUsage', 'nodesExplored', 'pathLength', 'maxOpenSetSize'];
-
-    for (const metric of metrics) {
-        const values = measurements.map(m =&gt; m[metric]).filter(v =&gt; v !== undefined);
-
-        if (values.length &gt; 0) {
-            stats[metric] = {
-                min: Math.min(...values),
-                max: Math.max(...values),
-                avg: values.reduce((a, b) =&gt; a + b, 0) / values.length,
-                median: this.calculateMedian(values),
-                p95: this.calculatePercentile(values, 95),
-                p99: this.calculatePercentile(values, 99)
-            };
-        }
-    }
-
-    return stats;
-}
-
-calculateMedian(values) {
-    const sorted = [...values].sort((a, b) =&gt; a - b);
-    const mid = Math.floor(sorted.length / 2);
-    return sorted.length % 2 === 0 
-        ? (sorted[mid - 1] + sorted[mid]) / 2 
-        : sorted[mid];
-}
-
-calculatePercentile(values, percentile) {
-    const sorted = [...values].sort((a, b) =&gt; a - b);
-    const index = Math.ceil((percentile / 100) * sorted.length) - 1;
-    return sorted[Math.max(0, index)];
-}
-
-sleep(ms) {
-    return new Promise(resolve =&gt; setTimeout(resolve, ms));
-}
-</code></pre>
-<p>}
-```</p>
-<h2>Space Complexity Analysis</h2>
-<h3>Memory Usage Patterns</h3>
-<p>```javascript
-class MemoryAnalyzer {
-    constructor() {
-        this.memorySnapshots = [];
-        this.gcEvents = [];
-    }</p>
-<pre><code>startMemoryProfiling() {
-    this.baselineMemory = this.getCurrentMemory();
-    this.memorySnapshots = [];
-
-    // Monitor memory every 100ms during pathfinding
-    this.memoryInterval = setInterval(() =&gt; {
-        this.memorySnapshots.push({
-            timestamp: performance.now(),
-            memory: this.getCurrentMemory()
-        });
-    }, 100);
-}
-
-stopMemoryProfiling() {
-    if (this.memoryInterval) {
-        clearInterval(this.memoryInterval);
-    }
-
-    return this.analyzeMemoryUsage();
-}
-
-getCurrentMemory() {
-    if (performance.memory) {
-        return {
-            used: performance.memory.usedJSHeapSize,
-            total: performance.memory.totalJSHeapSize,
-            limit: performance.memory.jsHeapSizeLimit
-        };
-    }
-    return { used: 0, total: 0, limit: 0 };
-}
-
-analyzeMemoryUsage() {
-    if (this.memorySnapshots.length === 0) {
-        return { error: 'No memory data collected' };
-    }
-
-    const usedMemory = this.memorySnapshots.map(s =&gt; s.memory.used);
-    const totalMemory = this.memorySnapshots.map(s =&gt; s.memory.total);
-
-    return {
-        baseline: this.baselineMemory,
-        peak: {
-            used: Math.max(...usedMemory),
-            total: Math.max(...totalMemory)
-        },
-        average: {
-            used: usedMemory.reduce((a, b) =&gt; a + b, 0) / usedMemory.length,
-            total: totalMemory.reduce((a, b) =&gt; a + b, 0) / totalMemory.length
-        },
-        growth: {
-            used: Math.max(...usedMemory) - this.baselineMemory.used,
-            total: Math.max(...totalMemory) - this.baselineMemory.total
-        },
-        snapshots: this.memorySnapshots
-    };
-}
-
-estimateDataStructureMemory(gridSize) {
-    const nodeSize = 8 * 4; // 8 properties × 4 bytes each (rough estimate)
-    const gridMemory = gridSize * gridSize * nodeSize;
-
-    // Estimate open/closed set memory
-    const avgOpenSetSize = Math.sqrt(gridSize * gridSize) * 2; // Rough estimate
-    const avgClosedSetSize = Math.sqrt(gridSize * gridSize) * 4; // Rough estimate
-
-    const openSetMemory = avgOpenSetSize * 8; // Pointer size
-    const closedSetMemory = avgClosedSetSize * 8; // Set overhead
-
-    return {
-        grid: gridMemory,
-        openSet: openSetMemory,
-        closedSet: closedSetMemory,
-        total: gridMemory + openSetMemory + closedSetMemory,
-        breakdown: {
-            gridPercentage: (gridMemory / (gridMemory + openSetMemory + closedSetMemory)) * 100,
-            openSetPercentage: (openSetMemory / (gridMemory + openSetMemory + closedSetMemory)) * 100,
-            closedSetPercentage: (closedSetMemory / (gridMemory + openSetMemory + closedSetMemory)) * 100
-        }
-    };
-}
-</code></pre>
-<p>}
-```</p>
-<h2>Heuristic Performance Analysis</h2>
-<h3>Heuristic Quality Metrics</h3>
-<p>```javascript
-class HeuristicAnalyzer {
-    constructor() {
-        this.heuristics = {
-            manhattan: manhattanDistance,
-            euclidean: euclideanDistance,
-            chebyshev: this.chebyshevDistance,
-            octile: this.octileDistance
-        };
-    }</p>
-<pre><code>chebyshevDistance(nodeA, nodeB) {
-    return Math.max(
-        Math.abs(nodeA.x - nodeB.x),
-        Math.abs(nodeA.y - nodeB.y)
-    );
-}
-
-octileDistance(nodeA, nodeB) {
-    const dx = Math.abs(nodeA.x - nodeB.x);
-    const dy = Math.abs(nodeA.y - nodeB.y);
-    return Math.max(dx, dy) + (Math.sqrt(2) - 1) * Math.min(dx, dy);
-}
-
-async compareHeuristics(testScenarios) {
-    const results = {};
-
-    for (const [heuristicName, heuristicFunc] of Object.entries(this.heuristics)) {
-        console.log(`\n🧮 Testing heuristic: ${heuristicName}`);
-        results[heuristicName] = await this.testHeuristic(heuristicFunc, testScenarios);
-    }
-
-    return this.analyzeHeuristicComparison(results);
-}
-
-async testHeuristic(heuristicFunc, testScenarios) {
-    const results = [];
-
-    // Temporarily replace the global heuristic function
-    const originalHeuristic = manhattanDistance;
-    window.manhattanDistance = heuristicFunc;
-
-    try {
-        for (const scenario of testScenarios) {
-            scenario.setup();
-
-            const analyzer = new PerformanceAnalyzer();
-            analyzer.startMeasurement();
-
-            const path = await this.runPathfinding(analyzer);
-            const result = analyzer.endMeasurement(path ? path.length : 0);
-
-            results.push({
-                scenario: scenario.name,
-                ...result,
-                pathFound: path !== null,
-                pathOptimal: path ? this.isPathOptimal(path, scenario) : false
-            });
-        }
-    } finally {
-        // Restore original heuristic
-        window.manhattanDistance = originalHeuristic;
-    }
-
-    return results;
-}
-
-analyzeHeuristicComparison(results) {
-    const comparison = {};
-
-    for (const [heuristicName, heuristicResults] of Object.entries(results)) {
-        const avgTime = heuristicResults.reduce((sum, r) =&gt; sum + r.executionTime, 0) / heuristicResults.length;
-        const avgNodes = heuristicResults.reduce((sum, r) =&gt; sum + r.nodesExplored, 0) / heuristicResults.length;
-        const avgPathLength = heuristicResults.reduce((sum, r) =&gt; sum + r.pathLength, 0) / heuristicResults.length;
-        const successRate = heuristicResults.filter(r =&gt; r.pathFound).length / heuristicResults.length;
-        const optimalityRate = heuristicResults.filter(r =&gt; r.pathOptimal).length / heuristicResults.length;
-
-        comparison[heuristicName] = {
-            avgExecutionTime: avgTime,
-            avgNodesExplored: avgNodes,
-            avgPathLength: avgPathLength,
-            successRate: successRate * 100,
-            optimalityRate: optimalityRate * 100,
-            efficiency: avgNodes &gt; 0 ? avgPathLength / avgNodes : 0
-        };
-    }
-
-    return {
-        detailed: results,
-        summary: comparison,
-        recommendations: this.generateHeuristicRecommendations(comparison)
-    };
-}
-
-generateHeuristicRecommendations(comparison) {
-    const recommendations = [];
-
-    // Find best performing heuristics
-    const byTime = Object.entries(comparison).sort((a, b) =&gt; a[1].avgExecutionTime - b[1].avgExecutionTime);
-    const byNodes = Object.entries(comparison).sort((a, b) =&gt; a[1].avgNodesExplored - b[1].avgNodesExplored);
-    const byOptimality = Object.entries(comparison).sort((a, b) =&gt; b[1].optimalityRate - a[1].optimalityRate);
-
-    recommendations.push(`Fastest execution: ${byTime[0][0]} (${byTime[0][1].avgExecutionTime.toFixed(2)}ms avg)`);
-    recommendations.push(`Fewest nodes explored: ${byNodes[0][0]} (${byNodes[0][1].avgNodesExplored.toFixed(1)} nodes avg)`);
-    recommendations.push(`Best optimality: ${byOptimality[0][0]} (${byOptimality[0][1].optimalityRate.toFixed(1)}% optimal)`);
-
-    return recommendations;
-}
-
-isPathOptimal(path, scenario) {
-    // Simple optimality check - compare with known optimal length
-    if (scenario.optimalLength) {
-        return path.length === scenario.optimalLength;
-    }
-
-    // For simple scenarios, calculate theoretical minimum
-    const start = path[0];
-    const goal = path[path.length - 1];
-    const theoreticalMin = Math.max(
-        Math.abs(goal.x - start.x),
-        Math.abs(goal.y - start.y)
-    ) + 1; // +1 because path includes start node
-
-    return path.length &lt;= theoreticalMin * 1.1; // Allow 10% tolerance
-}
-</code></pre>
-<p>}
-```</p>
-<h2>Real-time Performance Monitoring</h2>
-<h3>Frame Rate Impact Analysis</h3>
-<p>```javascript
-class RealTimeMonitor {
-    constructor() {
-        this.frameRates = [];
-        this.isMonitoring = false;
-        this.animationId = null;
-    }</p>
-<pre><code>startFrameRateMonitoring() {
-    this.frameRates = [];
-    this.isMonitoring = true;
-    this.lastFrameTime = performance.now();
-
-    const measureFrame = (currentTime) =&gt; {
-        if (this.isMonitoring) {
-            const deltaTime = currentTime - this.lastFrameTime;
-            const fps = 1000 / deltaTime;
-            this.frameRates.push(fps);
-            this.lastFrameTime = currentTime;
-
-            this.animationId = requestAnimationFrame(measureFrame);
-        }
-    };
-
-    this.animationId = requestAnimationFrame(measureFrame);
-}
-
-stopFrameRateMonitoring() {
-    this.isMonitoring = false;
-    if (this.animationId) {
-        cancelAnimationFrame(this.animationId);
-    }
-
-    return this.analyzeFrameRates();
-}
-
-analyzeFrameRates() {
-    if (this.frameRates.length === 0) {
-        return { error: 'No frame rate data collected' };
-    }
-
-    const validFrameRates = this.frameRates.filter(fps =&gt; fps &gt; 0 &amp;&amp; fps &lt; 1000);
-
-    return {
-        avgFPS: validFrameRates.reduce((a, b) =&gt; a + b, 0) / validFrameRates.length,
-        minFPS: Math.min(...validFrameRates),
-        maxFPS: Math.max(...validFrameRates),
-        frameDrops: validFrameRates.filter(fps =&gt; fps &lt; 30).length,
-        smoothness: (validFrameRates.filter(fps =&gt; fps &gt;= 60).length / validFrameRates.length) * 100,
-        samples: validFrameRates.length
-    };
-}
-
-async measureVisualizationImpact() {
-    // Test with visualization
-    this.startFrameRateMonitoring();
-    await this.runPathfindingWithVisualization();
-    const withVisualization = this.stopFrameRateMonitoring();
-
-    await this.sleep(1000); // Rest period
-
-    // Test without visualization
-    this.startFrameRateMonitoring();
-    await this.runPathfindingWithoutVisualization();
-    const withoutVisualization = this.stopFrameRateMonitoring();
-
-    return {
-        withVisualization,
-        withoutVisualization,
-        impact: {
-            fpsReduction: withoutVisualization.avgFPS - withVisualization.avgFPS,
-            smoothnessReduction: withoutVisualization.smoothness - withVisualization.smoothness
-        }
-    };
-}
-
-sleep(ms) {
-    return new Promise(resolve =&gt; setTimeout(resolve, ms));
-}
-</code></pre>
-<p>}
-```</p>
-<h2>Performance Optimization Recommendations</h2>
-<h3>Bottleneck Identification</h3>
-<p>```javascript
-class BottleneckAnalyzer {
-    constructor() {
-        this.profiler = {
-            heuristicTime: 0,
-            neighborGeneration: 0,
-            openSetOperations: 0,
-            pathReconstruction: 0,
-            visualization: 0
-        };
-    }</p>
-<pre><code>profilePathfinding() {
-    // Instrument key functions
-    this.instrumentFunction('manhattanDistance', 'heuristicTime');
-    this.instrumentFunction('getNeighbors', 'neighborGeneration');
-    this.instrumentFunction('reconstructPath', 'pathReconstruction');
-
-    return this.profiler;
-}
-
-instrumentFunction(functionName, profileKey) {
-    const originalFunction = window[functionName];
-    const profiler = this.profiler;
-
-    window[functionName] = function(...args) {
-        const startTime = performance.now();
-        const result = originalFunction.apply(this, args);
-        const endTime = performance.now();
-
-        profiler[profileKey] += endTime - startTime;
-        return result;
-    };
-}
-
-generateOptimizationReport() {
-    const total = Object.values(this.profiler).reduce((a, b) =&gt; a + b, 0);
-    const breakdown = {};
-
-    for (const [operation, time] of Object.entries(this.profiler)) {
-        breakdown[operation] = {
-            time: time.toFixed(2),
-            percentage: ((time / total) * 100).toFixed(1)
-        };
-    }
-
-    const recommendations = this.generateRecommendations(breakdown);
-
-    return {
-        totalTime: total.toFixed(2),
-        breakdown,
-        recommendations
-    };
-}
-
-generateRecommendations(breakdown) {
-    const recommendations = [];
-
-    // Identify major bottlenecks
-    for (const [operation, data] of Object.entries(breakdown)) {
-        const percentage = parseFloat(data.percentage);
-
-        if (percentage &gt; 30) {
-            recommendations.push({
-                priority: 'HIGH',
-                operation,
-                issue: `${operation} takes ${percentage}% of execution time`,
-                suggestions: this.getOptimizationSuggestions(operation)
-            });
-        } else if (percentage &gt; 15) {
-            recommendations.push({
-                priority: 'MEDIUM',
-                operation,
-                issue: `${operation} takes ${percentage}% of execution time`,
-                suggestions: this.getOptimizationSuggestions(operation)
-            });
-        }
-    }
-
-    return recommendations;
-}
-
-getOptimizationSuggestions(operation) {
-    const suggestions = {
-        heuristicTime: [
-            'Cache heuristic calculations',
-            'Use faster distance approximations',
-            'Pre-compute distance tables for small grids'
-        ],
-        neighborGeneration: [
-            'Pre-compute neighbor relationships',
-            'Use bit manipulation for bounds checking',
-            'Cache neighbor arrays'
-        ],
-        openSetOperations: [
-            'Replace array with priority queue (binary heap)',
-            'Use Fibonacci heap for better decrease-key performance',
-            'Implement bucket-based priority queue'
-        ],
-        pathReconstruction: [
-            'Use iterative instead of recursive approach',
-            'Pre-allocate path array',
-            'Store path during search instead of reconstructing'
-        ],
-        visualization: [
-            'Batch DOM updates',
-            'Use requestAnimationFrame for smooth animation',
-            'Implement virtual scrolling for large grids'
-        ]
-    };
-
-    return suggestions[operation] || ['No specific suggestions available'];
-}
-</code></pre>
-<p>}
-```</p>
-<h2>Performance Testing Suite</h2>
-<h3>Comprehensive Performance Test</h3>
-<p>```javascript
-class PerformanceTestSuite {
-    constructor() {
-        this.testResults = {};
-    }</p>
-<pre><code>async runFullPerformanceAnalysis() {
-    console.log('🚀 Starting Comprehensive Performance Analysis\n');
-
-    // 1. Time complexity analysis
-    console.log('📊 Analyzing time complexity...');
-    const complexityAnalyzer = new ComplexityAnalyzer();
-    this.testResults.timeComplexity = complexityAnalyzer.analyzeTimeComplexity([10, 20, 30, 40, 50]);
-
-    // 2. Memory usage analysis
-    console.log('💾 Analyzing memory usage...');
-    const memoryAnalyzer = new MemoryAnalyzer();
-    this.testResults.memoryUsage = await this.runMemoryTests(memoryAnalyzer);
-
-    // 3. Heuristic comparison
-    console.log('🧮 Comparing heuristic functions...');
-    const heuristicAnalyzer = new HeuristicAnalyzer();
-    this.testResults.heuristicComparison = await heuristicAnalyzer.compareHeuristics(this.getTestScenarios());
-
-    // 4. Real-time performance
-    console.log('⏱️ Measuring real-time performance...');
-    const realTimeMonitor = new RealTimeMonitor();
-    this.testResults.realTimePerformance = await realTimeMonitor.measureVisualizationImpact();
-
-    // 5. Bottleneck analysis
-    console.log('🔍 Identifying bottlenecks...');
-    const bottleneckAnalyzer = new BottleneckAnalyzer();
-    bottleneckAnalyzer.profilePathfinding();
-    this.testResults.bottleneckAnalysis = bottleneckAnalyzer.generateOptimizationReport();
-
-    // 6. Generate comprehensive report
-    return this.generateComprehensiveReport();
-}
-
-async runMemoryTests(memoryAnalyzer) {
-    const results = {};
-
-    // Test different grid sizes
-    for (const size of [20, 50, 100]) {
-        memoryAnalyzer.startMemoryProfiling();
-
-        // Setup and run pathfinding
-        this.setupGrid(size);
-        await this.runPathfinding();
-
-        results[`grid_${size}x${size}`] = memoryAnalyzer.stopMemoryProfiling();
-
-        // Add theoretical estimates
-        results[`grid_${size}x${size}`].theoretical = memoryAnalyzer.estimateDataStructureMemory(size);
-    }
-
-    return results;
-}
-
-getTestScenarios() {
-    return [
-        {
-            name: 'empty_grid',
-            setup: () =&gt; {
-                initializeGrid();
-                startNode = grid[0][0];
-                goalNode = grid[GRID_HEIGHT - 1][GRID_WIDTH - 1];
-            },
-            optimalLength: Math.max(GRID_WIDTH, GRID_HEIGHT)
-        },
-        {
-            name: 'sparse_obstacles',
-            setup: () =&gt; {
-                initializeGrid();
-                this.addRandomObstacles(0.1);
-                startNode = grid[0][0];
-                goalNode = grid[GRID_HEIGHT - 1][GRID_WIDTH - 1];
-            }
-        },
-        {
-            name: 'dense_obstacles',
-            setup: () =&gt; {
-                initializeGrid();
-                this.addRandomObstacles(0.3);
-                startNode = grid[0][0];
-                goalNode = grid[GRID_HEIGHT - 1][GRID_WIDTH - 1];
-            }
-        }
-    ];
-}
-
-generateComprehensiveReport() {
-    const report = {
-        timestamp: new Date().toISOString(),
-        summary: this.generateExecutiveSummary(),
-        detailed: this.testResults,
-        recommendations: this.generateActionableRecommendations()
-    };
-
-    // Display results
-    console.log('\n📋 Performance Analysis Complete!');
-    console.log('\n📈 Executive Summary:');
-    console.table(report.summary);
-
-    console.log('\n🎯 Top Recommendations:');
-    report.recommendations.forEach((rec, index) =&gt; {
-        console.log(`${index + 1}. [${rec.priority}] ${rec.description}`);
-    });
-
-    return report;
-}
-
-generateExecutiveSummary() {
-    return {
-        'Average Execution Time': `${this.getAverageExecutionTime()}ms`,
-        'Memory Efficiency': this.getMemoryEfficiencyRating(),
-        'Best Heuristic': this.getBestHeuristic(),
-        'Frame Rate Impact': `${this.getFrameRateImpact()}%`,
-        'Primary Bottleneck': this.getPrimaryBottleneck()
-    };
-}
-
-generateActionableRecommendations() {
-    const recommendations = [];
-
-    // Analyze results and generate specific recommendations
-    if (this.testResults.bottleneckAnalysis) {
-        recommendations.push(...this.testResults.bottleneckAnalysis.recommendations);
-    }
-
-    if (this.testResults.heuristicComparison) {
-        recommendations.push(...this.testResults.heuristicComparison.recommendations.map(rec =&gt; ({
-            priority: 'MEDIUM',
-            description: rec
-        })));
-    }
-
-    return recommendations.sort((a, b) =&gt; {
-        const priorityOrder = { 'HIGH': 3, 'MEDIUM': 2, 'LOW': 1 };
-        return priorityOrder[b.priority] - priorityOrder[a.priority];
-    });
-}
-
-// Helper methods for summary generation
-getAverageExecutionTime() {
-    // Implementation depends on collected data
-    return '42.5'; // Placeholder
-}
-
-getMemoryEfficiencyRating() {
-    return 'Good'; // Placeholder
-}
-
-getBestHeuristic() {
-    return 'Manhattan'; // Placeholder
-}
-
-getFrameRateImpact() {
-    return '15'; // Placeholder
-}
-
-getPrimaryBottleneck() {
-    return 'Open Set Operations'; // Placeholder
-}
-</code></pre>
+<p>### Key Performance Indicators (KPIs)</p>
+<p>1. <b>Time Complexity</b>: Algorithm execution time</p>
+<p>2. <b>Space Complexity</b>: Memory usage patterns</p>
+<p>3. <b>Node Exploration</b>: Efficiency of search</p>
+<p>4. <b>Path Optimality</b>: Quality of found paths</p>
+<p>5. <b>Scalability</b>: Performance with larger inputs</p>
+<p>6. <b>Real-time Performance</b>: Frame rate impact</p>
+
+<p>### Measurement Framework</p>
+<p>```javascript</p>
+<p>class PerformanceAnalyzer {</p>
+<p>    constructor() {</p>
+<p>        this.metrics = {</p>
+<p>            executionTime: [],</p>
+<p>            memoryUsage: [],</p>
+<p>            nodesExplored: [],</p>
+<p>            pathLength: [],</p>
+<p>            openSetSize: [],</p>
+<p>            closedSetSize: []</p>
+<p>        };</p>
+<p>        this.startTime = 0;</p>
+<p>        this.peakMemory = 0;</p>
+<p>    }</p>
+    
+<p>    startMeasurement() {</p>
+<p>        this.startTime = performance.now();</p>
+<p>        this.peakMemory = this.getCurrentMemory();</p>
+<p>        this.nodesExploredCount = 0;</p>
+<p>        this.maxOpenSetSize = 0;</p>
+<p>    }</p>
+    
+<p>    recordNodeExploration(openSetSize) {</p>
+<p>        this.nodesExploredCount++;</p>
+<p>        this.maxOpenSetSize = Math.max(this.maxOpenSetSize, openSetSize);</p>
+        
+<p>        const currentMemory = this.getCurrentMemory();</p>
+<p>        this.peakMemory = Math.max(this.peakMemory, currentMemory);</p>
+<p>    }</p>
+    
+<p>    endMeasurement(pathLength) {</p>
+<p>        const executionTime = performance.now() - this.startTime;</p>
+        
+<p>        this.metrics.executionTime.push(executionTime);</p>
+<p>        this.metrics.memoryUsage.push(this.peakMemory);</p>
+<p>        this.metrics.nodesExplored.push(this.nodesExploredCount);</p>
+<p>        this.metrics.pathLength.push(pathLength || 0);</p>
+<p>        this.metrics.openSetSize.push(this.maxOpenSetSize);</p>
+        
+<p>        return {</p>
+<p>            executionTime,</p>
+<p>            memoryUsage: this.peakMemory,</p>
+<p>            nodesExplored: this.nodesExploredCount,</p>
+<p>            pathLength: pathLength || 0,</p>
+<p>            maxOpenSetSize: this.maxOpenSetSize</p>
+<p>        };</p>
+<p>    }</p>
+    
+<p>    getCurrentMemory() {</p>
+<p>        return performance.memory ? performance.memory.usedJSHeapSize : 0;</p>
+<p>    }</p>
+    
+<p>    getStatistics() {</p>
+<p>        const stats = {};</p>
+        
+<p>        for (const [metric, values] of Object.entries(this.metrics)) {</p>
+<p>            if (values.length === 0) continue;</p>
+            
+<p>            stats[metric] = {</p>
+<p>                min: Math.min(...values),</p>
+<p>                max: Math.max(...values),</p>
+<p>                avg: values.reduce((a, b) => a + b, 0) / values.length,</p>
+<p>                median: this.calculateMedian(values),</p>
+<p>                stdDev: this.calculateStdDev(values)</p>
+<p>            };</p>
+<p>        }</p>
+        
+<p>        return stats;</p>
+<p>    }</p>
+    
+<p>    calculateMedian(values) {</p>
+<p>        const sorted = [...values].sort((a, b) => a - b);</p>
+<p>        const mid = Math.floor(sorted.length / 2);</p>
+<p>        return sorted.length % 2 === 0 </p>
+<p>            ? (sorted[mid - 1] + sorted[mid]) / 2 </p>
+<p>            : sorted[mid];</p>
+<p>    }</p>
+    
+<p>    calculateStdDev(values) {</p>
+<p>        const avg = values.reduce((a, b) => a + b, 0) / values.length;</p>
+<p>        const squareDiffs = values.map(value => Math.pow(value - avg, 2));</p>
+<p>        const avgSquareDiff = squareDiffs.reduce((a, b) => a + b, 0) / values.length;</p>
+<p>        return Math.sqrt(avgSquareDiff);</p>
+<p>    }</p>
 <p>}</p>
-<p>// Auto-run performance analysis
-window.addEventListener('load', () =&gt; {
-    const perfButton = document.createElement('button');
-    perfButton.textContent = 'Run Performance Analysis';
-    perfButton.onclick = async () =&gt; {
-        const suite = new PerformanceTestSuite();
-        await suite.runFullPerformanceAnalysis();
-    };
-    perfButton.style.cssText = <code>position: fixed;
-        top: 50px;
-        right: 10px;
-        z-index: 1000;
-        padding: 10px;
-        background: #FF9800;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;</code>;
-    document.body.appendChild(perfButton);
-});
-```</p>
-<hr />
-<p><strong>Previous:</strong> <a href="12-testing.md">Testing and Validation</a>
-<strong>Next:</strong> <a href="14-advanced-topics.md">Advanced Topics</a></p>
-<p><strong>Interactive:</strong> <a href="demo.html">Analyze performance</a></p>
+<p>```</p>
+
+<h2>Time Complexity Analysis</h2>
+
+<p>### Theoretical Complexity</p>
+<p>```javascript</p>
+<p>/**</p>
+<p> * A* Time Complexity Analysis:</p>
+<p> * </p>
+<p> * Best Case: O(b^d)</p>
+<p> * - b = branching factor (typically 8 for grid)</p>
+<p> * - d = depth of optimal solution</p>
+<p> * </p>
+<p> * Average Case: O(b^d)</p>
+<p> * - Depends heavily on heuristic quality</p>
+<p> * - Good heuristic: closer to O(d)</p>
+<p> * - Poor heuristic: approaches O(b^d)</p>
+<p> * </p>
+<p> * Worst Case: O(b^d)</p>
+<p> * - When heuristic provides no guidance</p>
+<p> * - Degenerates to Dijkstra's algorithm</p>
+<p> */</p>
+
+<p>class ComplexityAnalyzer {</p>
+<p>    constructor() {</p>
+<p>        this.measurements = [];</p>
+<p>    }</p>
+    
+<p>    analyzeTimeComplexity(gridSizes, iterations = 10) {</p>
+<p>        const results = [];</p>
+        
+<p>        for (const size of gridSizes) {</p>
+<p>            const times = [];</p>
+            
+<p>            for (let i = 0; i < iterations; i++) {</p>
+<p>                const time = this.measureSingleRun(size);</p>
+<p>                times.push(time);</p>
+<p>            }</p>
+            
+<p>            const avgTime = times.reduce((a, b) => a + b, 0) / times.length;</p>
+<p>            results.push({ size, avgTime, times });</p>
+<p>        }</p>
+        
+<p>        return this.calculateGrowthRate(results);</p>
+<p>    }</p>
+    
+<p>    measureSingleRun(gridSize) {</p>
+<p>        // Setup grid</p>
+<p>        this.setupGrid(gridSize);</p>
+        
+<p>        const startTime = performance.now();</p>
+<p>        const path = this.runAStar();</p>
+<p>        const endTime = performance.now();</p>
+        
+<p>        return endTime - startTime;</p>
+<p>    }</p>
+    
+<p>    calculateGrowthRate(results) {</p>
+<p>        const growthRates = [];</p>
+        
+<p>        for (let i = 1; i < results.length; i++) {</p>
+<p>            const prev = results[i - 1];</p>
+<p>            const curr = results[i];</p>
+            
+<p>            const sizeRatio = curr.size / prev.size;</p>
+<p>            const timeRatio = curr.avgTime / prev.avgTime;</p>
+            
+<p>            growthRates.push({</p>
+<p>                sizeFrom: prev.size,</p>
+<p>                sizeTo: curr.size,</p>
+<p>                sizeRatio,</p>
+<p>                timeRatio,</p>
+<p>                complexity: Math.log(timeRatio) / Math.log(sizeRatio)</p>
+<p>            });</p>
+<p>        }</p>
+        
+<p>        return {</p>
+<p>            results,</p>
+<p>            growthRates,</p>
+<p>            avgComplexity: growthRates.reduce((sum, gr) => sum + gr.complexity, 0) / growthRates.length</p>
+<p>        };</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
+
+<p>### Empirical Time Measurements</p>
+<p>```javascript</p>
+<p>class TimingBenchmark {</p>
+<p>    constructor() {</p>
+<p>        this.scenarios = {</p>
+<p>            'empty-grid': this.createEmptyGrid,</p>
+<p>            'sparse-obstacles': this.createSparseObstacles,</p>
+<p>            'dense-obstacles': this.createDenseObstacles,</p>
+<p>            'maze-like': this.createMaze,</p>
+<p>            'worst-case': this.createWorstCase</p>
+<p>        };</p>
+<p>    }</p>
+    
+<p>    async runComprehensiveBenchmark() {</p>
+<p>        const results = {};</p>
+        
+<p>        for (const [scenarioName, setupFunction] of Object.entries(this.scenarios)) {</p>
+<p>            console.log(`\n🔍 Testing scenario: ${scenarioName}`);</p>
+<p>            results[scenarioName] = await this.benchmarkScenario(setupFunction);</p>
+<p>        }</p>
+        
+<p>        return this.analyzeResults(results);</p>
+<p>    }</p>
+    
+<p>    async benchmarkScenario(setupFunction, iterations = 20) {</p>
+<p>        const measurements = [];</p>
+        
+<p>        for (let i = 0; i < iterations; i++) {</p>
+<p>            setupFunction.call(this);</p>
+            
+<p>            const analyzer = new PerformanceAnalyzer();</p>
+<p>            analyzer.startMeasurement();</p>
+            
+<p>            const path = await this.runInstrumentedAStar(analyzer);</p>
+<p>            const result = analyzer.endMeasurement(path ? path.length : 0);</p>
+            
+<p>            measurements.push(result);</p>
+            
+<p>            // Small delay to prevent browser freezing</p>
+<p>            await this.sleep(10);</p>
+<p>        }</p>
+        
+<p>        return this.calculateScenarioStats(measurements);</p>
+<p>    }</p>
+    
+<p>    async runInstrumentedAStar(analyzer) {</p>
+<p>        if (!startNode || !goalNode) return null;</p>
+        
+<p>        const openSet = [startNode];</p>
+<p>        const closedSet = new Set();</p>
+        
+<p>        startNode.gCost = 0;</p>
+<p>        startNode.hCost = manhattanDistance(startNode, goalNode);</p>
+<p>        startNode.fCost = startNode.gCost + startNode.hCost;</p>
+        
+<p>        while (openSet.length > 0) {</p>
+<p>            // Record performance metrics</p>
+<p>            analyzer.recordNodeExploration(openSet.length);</p>
+            
+<p>            let currentNode = openSet[0];</p>
+<p>            for (let i = 1; i < openSet.length; i++) {</p>
+<p>                if (openSet[i].fCost < currentNode.fCost || </p>
+<p>                    (openSet[i].fCost === currentNode.fCost && </p>
+<p>                     openSet[i].hCost < currentNode.hCost)) {</p>
+<p>                    currentNode = openSet[i];</p>
+<p>                }</p>
+<p>            }</p>
+            
+<p>            const currentIndex = openSet.indexOf(currentNode);</p>
+<p>            openSet.splice(currentIndex, 1);</p>
+<p>            closedSet.add(currentNode);</p>
+            
+<p>            if (currentNode === goalNode) {</p>
+<p>                return this.reconstructPath(currentNode);</p>
+<p>            }</p>
+            
+<p>            const neighbors = getNeighbors(currentNode);</p>
+            
+<p>            for (const neighbor of neighbors) {</p>
+<p>                if (closedSet.has(neighbor)) continue;</p>
+                
+<p>                const tentativeGCost = currentNode.gCost + </p>
+<p>                                     getMovementCost(currentNode, neighbor);</p>
+                
+<p>                if (!openSet.includes(neighbor)) {</p>
+<p>                    openSet.push(neighbor);</p>
+<p>                } else if (tentativeGCost >= neighbor.gCost) {</p>
+<p>                    continue;</p>
+<p>                }</p>
+                
+<p>                neighbor.parent = currentNode;</p>
+<p>                neighbor.gCost = tentativeGCost;</p>
+<p>                neighbor.hCost = manhattanDistance(neighbor, goalNode);</p>
+<p>                neighbor.fCost = neighbor.gCost + neighbor.hCost;</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        return null;</p>
+<p>    }</p>
+    
+<p>    createEmptyGrid() {</p>
+<p>        initializeGrid();</p>
+<p>        startNode = grid[0][0];</p>
+<p>        goalNode = grid[GRID_HEIGHT - 1][GRID_WIDTH - 1];</p>
+<p>    }</p>
+    
+<p>    createSparseObstacles() {</p>
+<p>        this.createEmptyGrid();</p>
+<p>        this.addRandomObstacles(0.1); // 10% obstacles</p>
+<p>    }</p>
+    
+<p>    createDenseObstacles() {</p>
+<p>        this.createEmptyGrid();</p>
+<p>        this.addRandomObstacles(0.3); // 30% obstacles</p>
+<p>    }</p>
+    
+<p>    createMaze() {</p>
+<p>        this.createEmptyGrid();</p>
+<p>        this.generateMaze();</p>
+<p>    }</p>
+    
+<p>    createWorstCase() {</p>
+<p>        this.createEmptyGrid();</p>
+<p>        // Create scenario where heuristic is misleading</p>
+<p>        this.createMisleadingHeuristic();</p>
+<p>    }</p>
+    
+<p>    addRandomObstacles(percentage) {</p>
+<p>        const totalCells = GRID_WIDTH * GRID_HEIGHT;</p>
+<p>        const obstacleCount = Math.floor(totalCells * percentage);</p>
+        
+<p>        for (let i = 0; i < obstacleCount; i++) {</p>
+<p>            let x, y;</p>
+<p>            do {</p>
+<p>                x = Math.floor(Math.random() * GRID_WIDTH);</p>
+<p>                y = Math.floor(Math.random() * GRID_HEIGHT);</p>
+<p>            } while (grid[y][x] === startNode || grid[y][x] === goalNode || grid[y][x].isObstacle);</p>
+            
+<p>            grid[y][x].isObstacle = true;</p>
+<p>        }</p>
+<p>    }</p>
+    
+<p>    generateMaze() {</p>
+<p>        // Simple maze generation using recursive backtracking</p>
+<p>        for (let y = 0; y < GRID_HEIGHT; y++) {</p>
+<p>            for (let x = 0; x < GRID_WIDTH; x++) {</p>
+<p>                if (x % 2 === 1 && y % 2 === 1) {</p>
+<p>                    grid[y][x].isObstacle = true;</p>
+<p>                }</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        // Add some random passages</p>
+<p>        for (let i = 0; i < GRID_WIDTH * GRID_HEIGHT * 0.1; i++) {</p>
+<p>            const x = Math.floor(Math.random() * GRID_WIDTH);</p>
+<p>            const y = Math.floor(Math.random() * GRID_HEIGHT);</p>
+<p>            grid[y][x].isObstacle = false;</p>
+<p>        }</p>
+<p>    }</p>
+    
+<p>    createMisleadingHeuristic() {</p>
+<p>        // Create a U-shaped obstacle that makes heuristic misleading</p>
+<p>        const centerX = Math.floor(GRID_WIDTH / 2);</p>
+<p>        const centerY = Math.floor(GRID_HEIGHT / 2);</p>
+        
+<p>        // Create U-shape</p>
+<p>        for (let y = centerY - 5; y <= centerY + 5; y++) {</p>
+<p>            if (y >= 0 && y < GRID_HEIGHT) {</p>
+<p>                if (centerX - 3 >= 0) grid[y][centerX - 3].isObstacle = true;</p>
+<p>                if (centerX + 3 < GRID_WIDTH) grid[y][centerX + 3].isObstacle = true;</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        for (let x = centerX - 3; x <= centerX + 3; x++) {</p>
+<p>            if (x >= 0 && x < GRID_WIDTH && centerY + 5 < GRID_HEIGHT) {</p>
+<p>                grid[centerY + 5][x].isObstacle = true;</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        startNode = grid[centerY][centerX - 5];</p>
+<p>        goalNode = grid[centerY][centerX + 5];</p>
+<p>    }</p>
+    
+<p>    calculateScenarioStats(measurements) {</p>
+<p>        const stats = {};</p>
+<p>        const metrics = ['executionTime', 'memoryUsage', 'nodesExplored', 'pathLength', 'maxOpenSetSize'];</p>
+        
+<p>        for (const metric of metrics) {</p>
+<p>            const values = measurements.map(m => m[metric]).filter(v => v !== undefined);</p>
+            
+<p>            if (values.length > 0) {</p>
+<p>                stats[metric] = {</p>
+<p>                    min: Math.min(...values),</p>
+<p>                    max: Math.max(...values),</p>
+<p>                    avg: values.reduce((a, b) => a + b, 0) / values.length,</p>
+<p>                    median: this.calculateMedian(values),</p>
+<p>                    p95: this.calculatePercentile(values, 95),</p>
+<p>                    p99: this.calculatePercentile(values, 99)</p>
+<p>                };</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        return stats;</p>
+<p>    }</p>
+    
+<p>    calculateMedian(values) {</p>
+<p>        const sorted = [...values].sort((a, b) => a - b);</p>
+<p>        const mid = Math.floor(sorted.length / 2);</p>
+<p>        return sorted.length % 2 === 0 </p>
+<p>            ? (sorted[mid - 1] + sorted[mid]) / 2 </p>
+<p>            : sorted[mid];</p>
+<p>    }</p>
+    
+<p>    calculatePercentile(values, percentile) {</p>
+<p>        const sorted = [...values].sort((a, b) => a - b);</p>
+<p>        const index = Math.ceil((percentile / 100) * sorted.length) - 1;</p>
+<p>        return sorted[Math.max(0, index)];</p>
+<p>    }</p>
+    
+<p>    sleep(ms) {</p>
+<p>        return new Promise(resolve => setTimeout(resolve, ms));</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
+
+<h2>Space Complexity Analysis</h2>
+
+<p>### Memory Usage Patterns</p>
+<p>```javascript</p>
+<p>class MemoryAnalyzer {</p>
+<p>    constructor() {</p>
+<p>        this.memorySnapshots = [];</p>
+<p>        this.gcEvents = [];</p>
+<p>    }</p>
+    
+<p>    startMemoryProfiling() {</p>
+<p>        this.baselineMemory = this.getCurrentMemory();</p>
+<p>        this.memorySnapshots = [];</p>
+        
+<p>        // Monitor memory every 100ms during pathfinding</p>
+<p>        this.memoryInterval = setInterval(() => {</p>
+<p>            this.memorySnapshots.push({</p>
+<p>                timestamp: performance.now(),</p>
+<p>                memory: this.getCurrentMemory()</p>
+<p>            });</p>
+<p>        }, 100);</p>
+<p>    }</p>
+    
+<p>    stopMemoryProfiling() {</p>
+<p>        if (this.memoryInterval) {</p>
+<p>            clearInterval(this.memoryInterval);</p>
+<p>        }</p>
+        
+<p>        return this.analyzeMemoryUsage();</p>
+<p>    }</p>
+    
+<p>    getCurrentMemory() {</p>
+<p>        if (performance.memory) {</p>
+<p>            return {</p>
+<p>                used: performance.memory.usedJSHeapSize,</p>
+<p>                total: performance.memory.totalJSHeapSize,</p>
+<p>                limit: performance.memory.jsHeapSizeLimit</p>
+<p>            };</p>
+<p>        }</p>
+<p>        return { used: 0, total: 0, limit: 0 };</p>
+<p>    }</p>
+    
+<p>    analyzeMemoryUsage() {</p>
+<p>        if (this.memorySnapshots.length === 0) {</p>
+<p>            return { error: 'No memory data collected' };</p>
+<p>        }</p>
+        
+<p>        const usedMemory = this.memorySnapshots.map(s => s.memory.used);</p>
+<p>        const totalMemory = this.memorySnapshots.map(s => s.memory.total);</p>
+        
+<p>        return {</p>
+<p>            baseline: this.baselineMemory,</p>
+<p>            peak: {</p>
+<p>                used: Math.max(...usedMemory),</p>
+<p>                total: Math.max(...totalMemory)</p>
+<p>            },</p>
+<p>            average: {</p>
+<p>                used: usedMemory.reduce((a, b) => a + b, 0) / usedMemory.length,</p>
+<p>                total: totalMemory.reduce((a, b) => a + b, 0) / totalMemory.length</p>
+<p>            },</p>
+<p>            growth: {</p>
+<p>                used: Math.max(...usedMemory) - this.baselineMemory.used,</p>
+<p>                total: Math.max(...totalMemory) - this.baselineMemory.total</p>
+<p>            },</p>
+<p>            snapshots: this.memorySnapshots</p>
+<p>        };</p>
+<p>    }</p>
+    
+<p>    estimateDataStructureMemory(gridSize) {</p>
+<p>        const nodeSize = 8 * 4; // 8 properties × 4 bytes each (rough estimate)</p>
+<p>        const gridMemory = gridSize * gridSize * nodeSize;</p>
+        
+<p>        // Estimate open/closed set memory</p>
+<p>        const avgOpenSetSize = Math.sqrt(gridSize * gridSize) * 2; // Rough estimate</p>
+<p>        const avgClosedSetSize = Math.sqrt(gridSize * gridSize) * 4; // Rough estimate</p>
+        
+<p>        const openSetMemory = avgOpenSetSize * 8; // Pointer size</p>
+<p>        const closedSetMemory = avgClosedSetSize * 8; // Set overhead</p>
+        
+<p>        return {</p>
+<p>            grid: gridMemory,</p>
+<p>            openSet: openSetMemory,</p>
+<p>            closedSet: closedSetMemory,</p>
+<p>            total: gridMemory + openSetMemory + closedSetMemory,</p>
+<p>            breakdown: {</p>
+<p>                gridPercentage: (gridMemory / (gridMemory + openSetMemory + closedSetMemory)) * 100,</p>
+<p>                openSetPercentage: (openSetMemory / (gridMemory + openSetMemory + closedSetMemory)) * 100,</p>
+<p>                closedSetPercentage: (closedSetMemory / (gridMemory + openSetMemory + closedSetMemory)) * 100</p>
+<p>            }</p>
+<p>        };</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
+
+<h2>Heuristic Performance Analysis</h2>
+
+<p>### Heuristic Quality Metrics</p>
+<p>```javascript</p>
+<p>class HeuristicAnalyzer {</p>
+<p>    constructor() {</p>
+<p>        this.heuristics = {</p>
+<p>            manhattan: manhattanDistance,</p>
+<p>            euclidean: euclideanDistance,</p>
+<p>            chebyshev: this.chebyshevDistance,</p>
+<p>            octile: this.octileDistance</p>
+<p>        };</p>
+<p>    }</p>
+    
+<p>    chebyshevDistance(nodeA, nodeB) {</p>
+<p>        return Math.max(</p>
+<p>            Math.abs(nodeA.x - nodeB.x),</p>
+<p>            Math.abs(nodeA.y - nodeB.y)</p>
+<p>        );</p>
+<p>    }</p>
+    
+<p>    octileDistance(nodeA, nodeB) {</p>
+<p>        const dx = Math.abs(nodeA.x - nodeB.x);</p>
+<p>        const dy = Math.abs(nodeA.y - nodeB.y);</p>
+<p>        return Math.max(dx, dy) + (Math.sqrt(2) - 1) * Math.min(dx, dy);</p>
+<p>    }</p>
+    
+<p>    async compareHeuristics(testScenarios) {</p>
+<p>        const results = {};</p>
+        
+<p>        for (const [heuristicName, heuristicFunc] of Object.entries(this.heuristics)) {</p>
+<p>            console.log(`\n🧮 Testing heuristic: ${heuristicName}`);</p>
+<p>            results[heuristicName] = await this.testHeuristic(heuristicFunc, testScenarios);</p>
+<p>        }</p>
+        
+<p>        return this.analyzeHeuristicComparison(results);</p>
+<p>    }</p>
+    
+<p>    async testHeuristic(heuristicFunc, testScenarios) {</p>
+<p>        const results = [];</p>
+        
+<p>        // Temporarily replace the global heuristic function</p>
+<p>        const originalHeuristic = manhattanDistance;</p>
+<p>        window.manhattanDistance = heuristicFunc;</p>
+        
+<p>        try {</p>
+<p>            for (const scenario of testScenarios) {</p>
+<p>                scenario.setup();</p>
+                
+<p>                const analyzer = new PerformanceAnalyzer();</p>
+<p>                analyzer.startMeasurement();</p>
+                
+<p>                const path = await this.runPathfinding(analyzer);</p>
+<p>                const result = analyzer.endMeasurement(path ? path.length : 0);</p>
+                
+<p>                results.push({</p>
+<p>                    scenario: scenario.name,</p>
+<p>                    ...result,</p>
+<p>                    pathFound: path !== null,</p>
+<p>                    pathOptimal: path ? this.isPathOptimal(path, scenario) : false</p>
+<p>                });</p>
+<p>            }</p>
+<p>        } finally {</p>
+<p>            // Restore original heuristic</p>
+<p>            window.manhattanDistance = originalHeuristic;</p>
+<p>        }</p>
+        
+<p>        return results;</p>
+<p>    }</p>
+    
+<p>    analyzeHeuristicComparison(results) {</p>
+<p>        const comparison = {};</p>
+        
+<p>        for (const [heuristicName, heuristicResults] of Object.entries(results)) {</p>
+<p>            const avgTime = heuristicResults.reduce((sum, r) => sum + r.executionTime, 0) / heuristicResults.length;</p>
+<p>            const avgNodes = heuristicResults.reduce((sum, r) => sum + r.nodesExplored, 0) / heuristicResults.length;</p>
+<p>            const avgPathLength = heuristicResults.reduce((sum, r) => sum + r.pathLength, 0) / heuristicResults.length;</p>
+<p>            const successRate = heuristicResults.filter(r => r.pathFound).length / heuristicResults.length;</p>
+<p>            const optimalityRate = heuristicResults.filter(r => r.pathOptimal).length / heuristicResults.length;</p>
+            
+<p>            comparison[heuristicName] = {</p>
+<p>                avgExecutionTime: avgTime,</p>
+<p>                avgNodesExplored: avgNodes,</p>
+<p>                avgPathLength: avgPathLength,</p>
+<p>                successRate: successRate * 100,</p>
+<p>                optimalityRate: optimalityRate * 100,</p>
+<p>                efficiency: avgNodes > 0 ? avgPathLength / avgNodes : 0</p>
+<p>            };</p>
+<p>        }</p>
+        
+<p>        return {</p>
+<p>            detailed: results,</p>
+<p>            summary: comparison,</p>
+<p>            recommendations: this.generateHeuristicRecommendations(comparison)</p>
+<p>        };</p>
+<p>    }</p>
+    
+<p>    generateHeuristicRecommendations(comparison) {</p>
+<p>        const recommendations = [];</p>
+        
+<p>        // Find best performing heuristics</p>
+<p>        const byTime = Object.entries(comparison).sort((a, b) => a[1].avgExecutionTime - b[1].avgExecutionTime);</p>
+<p>        const byNodes = Object.entries(comparison).sort((a, b) => a[1].avgNodesExplored - b[1].avgNodesExplored);</p>
+<p>        const byOptimality = Object.entries(comparison).sort((a, b) => b[1].optimalityRate - a[1].optimalityRate);</p>
+        
+<p>        recommendations.push(`Fastest execution: ${byTime[0][0]} (${byTime[0][1].avgExecutionTime.toFixed(2)}ms avg)`);</p>
+<p>        recommendations.push(`Fewest nodes explored: ${byNodes[0][0]} (${byNodes[0][1].avgNodesExplored.toFixed(1)} nodes avg)`);</p>
+<p>        recommendations.push(`Best optimality: ${byOptimality[0][0]} (${byOptimality[0][1].optimalityRate.toFixed(1)}% optimal)`);</p>
+        
+<p>        return recommendations;</p>
+<p>    }</p>
+    
+<p>    isPathOptimal(path, scenario) {</p>
+<p>        // Simple optimality check - compare with known optimal length</p>
+<p>        if (scenario.optimalLength) {</p>
+<p>            return path.length === scenario.optimalLength;</p>
+<p>        }</p>
+        
+<p>        // For simple scenarios, calculate theoretical minimum</p>
+<p>        const start = path[0];</p>
+<p>        const goal = path[path.length - 1];</p>
+<p>        const theoreticalMin = Math.max(</p>
+<p>            Math.abs(goal.x - start.x),</p>
+<p>            Math.abs(goal.y - start.y)</p>
+<p>        ) + 1; // +1 because path includes start node</p>
+        
+<p>        return path.length <= theoreticalMin * 1.1; // Allow 10% tolerance</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
+
+<h2>Real-time Performance Monitoring</h2>
+
+<p>### Frame Rate Impact Analysis</p>
+<p>```javascript</p>
+<p>class RealTimeMonitor {</p>
+<p>    constructor() {</p>
+<p>        this.frameRates = [];</p>
+<p>        this.isMonitoring = false;</p>
+<p>        this.animationId = null;</p>
+<p>    }</p>
+    
+<p>    startFrameRateMonitoring() {</p>
+<p>        this.frameRates = [];</p>
+<p>        this.isMonitoring = true;</p>
+<p>        this.lastFrameTime = performance.now();</p>
+        
+<p>        const measureFrame = (currentTime) => {</p>
+<p>            if (this.isMonitoring) {</p>
+<p>                const deltaTime = currentTime - this.lastFrameTime;</p>
+<p>                const fps = 1000 / deltaTime;</p>
+<p>                this.frameRates.push(fps);</p>
+<p>                this.lastFrameTime = currentTime;</p>
+                
+<p>                this.animationId = requestAnimationFrame(measureFrame);</p>
+<p>            }</p>
+<p>        };</p>
+        
+<p>        this.animationId = requestAnimationFrame(measureFrame);</p>
+<p>    }</p>
+    
+<p>    stopFrameRateMonitoring() {</p>
+<p>        this.isMonitoring = false;</p>
+<p>        if (this.animationId) {</p>
+<p>            cancelAnimationFrame(this.animationId);</p>
+<p>        }</p>
+        
+<p>        return this.analyzeFrameRates();</p>
+<p>    }</p>
+    
+<p>    analyzeFrameRates() {</p>
+<p>        if (this.frameRates.length === 0) {</p>
+<p>            return { error: 'No frame rate data collected' };</p>
+<p>        }</p>
+        
+<p>        const validFrameRates = this.frameRates.filter(fps => fps > 0 && fps < 1000);</p>
+        
+<p>        return {</p>
+<p>            avgFPS: validFrameRates.reduce((a, b) => a + b, 0) / validFrameRates.length,</p>
+<p>            minFPS: Math.min(...validFrameRates),</p>
+<p>            maxFPS: Math.max(...validFrameRates),</p>
+<p>            frameDrops: validFrameRates.filter(fps => fps < 30).length,</p>
+<p>            smoothness: (validFrameRates.filter(fps => fps >= 60).length / validFrameRates.length) * 100,</p>
+<p>            samples: validFrameRates.length</p>
+<p>        };</p>
+<p>    }</p>
+    
+<p>    async measureVisualizationImpact() {</p>
+<p>        // Test with visualization</p>
+<p>        this.startFrameRateMonitoring();</p>
+<p>        await this.runPathfindingWithVisualization();</p>
+<p>        const withVisualization = this.stopFrameRateMonitoring();</p>
+        
+<p>        await this.sleep(1000); // Rest period</p>
+        
+<p>        // Test without visualization</p>
+<p>        this.startFrameRateMonitoring();</p>
+<p>        await this.runPathfindingWithoutVisualization();</p>
+<p>        const withoutVisualization = this.stopFrameRateMonitoring();</p>
+        
+<p>        return {</p>
+<p>            withVisualization,</p>
+<p>            withoutVisualization,</p>
+<p>            impact: {</p>
+<p>                fpsReduction: withoutVisualization.avgFPS - withVisualization.avgFPS,</p>
+<p>                smoothnessReduction: withoutVisualization.smoothness - withVisualization.smoothness</p>
+<p>            }</p>
+<p>        };</p>
+<p>    }</p>
+    
+<p>    sleep(ms) {</p>
+<p>        return new Promise(resolve => setTimeout(resolve, ms));</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
+
+<h2>Performance Optimization Recommendations</h2>
+
+<p>### Bottleneck Identification</p>
+<p>```javascript</p>
+<p>class BottleneckAnalyzer {</p>
+<p>    constructor() {</p>
+<p>        this.profiler = {</p>
+<p>            heuristicTime: 0,</p>
+<p>            neighborGeneration: 0,</p>
+<p>            openSetOperations: 0,</p>
+<p>            pathReconstruction: 0,</p>
+<p>            visualization: 0</p>
+<p>        };</p>
+<p>    }</p>
+    
+<p>    profilePathfinding() {</p>
+<p>        // Instrument key functions</p>
+<p>        this.instrumentFunction('manhattanDistance', 'heuristicTime');</p>
+<p>        this.instrumentFunction('getNeighbors', 'neighborGeneration');</p>
+<p>        this.instrumentFunction('reconstructPath', 'pathReconstruction');</p>
+        
+<p>        return this.profiler;</p>
+<p>    }</p>
+    
+<p>    instrumentFunction(functionName, profileKey) {</p>
+<p>        const originalFunction = window[functionName];</p>
+<p>        const profiler = this.profiler;</p>
+        
+<p>        window[functionName] = function(...args) {</p>
+<p>            const startTime = performance.now();</p>
+<p>            const result = originalFunction.apply(this, args);</p>
+<p>            const endTime = performance.now();</p>
+            
+<p>            profiler[profileKey] += endTime - startTime;</p>
+<p>            return result;</p>
+<p>        };</p>
+<p>    }</p>
+    
+<p>    generateOptimizationReport() {</p>
+<p>        const total = Object.values(this.profiler).reduce((a, b) => a + b, 0);</p>
+<p>        const breakdown = {};</p>
+        
+<p>        for (const [operation, time] of Object.entries(this.profiler)) {</p>
+<p>            breakdown[operation] = {</p>
+<p>                time: time.toFixed(2),</p>
+<p>                percentage: ((time / total) * 100).toFixed(1)</p>
+<p>            };</p>
+<p>        }</p>
+        
+<p>        const recommendations = this.generateRecommendations(breakdown);</p>
+        
+<p>        return {</p>
+<p>            totalTime: total.toFixed(2),</p>
+<p>            breakdown,</p>
+<p>            recommendations</p>
+<p>        };</p>
+<p>    }</p>
+    
+<p>    generateRecommendations(breakdown) {</p>
+<p>        const recommendations = [];</p>
+        
+<p>        // Identify major bottlenecks</p>
+<p>        for (const [operation, data] of Object.entries(breakdown)) {</p>
+<p>            const percentage = parseFloat(data.percentage);</p>
+            
+<p>            if (percentage > 30) {</p>
+<p>                recommendations.push({</p>
+<p>                    priority: 'HIGH',</p>
+<p>                    operation,</p>
+<p>                    issue: `${operation} takes ${percentage}% of execution time`,</p>
+<p>                    suggestions: this.getOptimizationSuggestions(operation)</p>
+<p>                });</p>
+<p>            } else if (percentage > 15) {</p>
+<p>                recommendations.push({</p>
+<p>                    priority: 'MEDIUM',</p>
+<p>                    operation,</p>
+<p>                    issue: `${operation} takes ${percentage}% of execution time`,</p>
+<p>                    suggestions: this.getOptimizationSuggestions(operation)</p>
+<p>                });</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        return recommendations;</p>
+<p>    }</p>
+    
+<p>    getOptimizationSuggestions(operation) {</p>
+<p>        const suggestions = {</p>
+<p>            heuristicTime: [</p>
+<p>                'Cache heuristic calculations',</p>
+<p>                'Use faster distance approximations',</p>
+<p>                'Pre-compute distance tables for small grids'</p>
+<p>            ],</p>
+<p>            neighborGeneration: [</p>
+<p>                'Pre-compute neighbor relationships',</p>
+<p>                'Use bit manipulation for bounds checking',</p>
+<p>                'Cache neighbor arrays'</p>
+<p>            ],</p>
+<p>            openSetOperations: [</p>
+<p>                'Replace array with priority queue (binary heap)',</p>
+<p>                'Use Fibonacci heap for better decrease-key performance',</p>
+<p>                'Implement bucket-based priority queue'</p>
+<p>            ],</p>
+<p>            pathReconstruction: [</p>
+<p>                'Use iterative instead of recursive approach',</p>
+<p>                'Pre-allocate path array',</p>
+<p>                'Store path during search instead of reconstructing'</p>
+<p>            ],</p>
+<p>            visualization: [</p>
+<p>                'Batch DOM updates',</p>
+<p>                'Use requestAnimationFrame for smooth animation',</p>
+<p>                'Implement virtual scrolling for large grids'</p>
+<p>            ]</p>
+<p>        };</p>
+        
+<p>        return suggestions[operation] || ['No specific suggestions available'];</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
+
+<h2>Performance Testing Suite</h2>
+
+<p>### Comprehensive Performance Test</p>
+<p>```javascript</p>
+<p>class PerformanceTestSuite {</p>
+<p>    constructor() {</p>
+<p>        this.testResults = {};</p>
+<p>    }</p>
+    
+<p>    async runFullPerformanceAnalysis() {</p>
+<p>        console.log('🚀 Starting Comprehensive Performance Analysis\n');</p>
+        
+<p>        // 1. Time complexity analysis</p>
+<p>        console.log('📊 Analyzing time complexity...');</p>
+<p>        const complexityAnalyzer = new ComplexityAnalyzer();</p>
+<p>        this.testResults.timeComplexity = complexityAnalyzer.analyzeTimeComplexity([10, 20, 30, 40, 50]);</p>
+        
+<p>        // 2. Memory usage analysis</p>
+<p>        console.log('💾 Analyzing memory usage...');</p>
+<p>        const memoryAnalyzer = new MemoryAnalyzer();</p>
+<p>        this.testResults.memoryUsage = await this.runMemoryTests(memoryAnalyzer);</p>
+        
+<p>        // 3. Heuristic comparison</p>
+<p>        console.log('🧮 Comparing heuristic functions...');</p>
+<p>        const heuristicAnalyzer = new HeuristicAnalyzer();</p>
+<p>        this.testResults.heuristicComparison = await heuristicAnalyzer.compareHeuristics(this.getTestScenarios());</p>
+        
+<p>        // 4. Real-time performance</p>
+<p>        console.log('⏱️ Measuring real-time performance...');</p>
+<p>        const realTimeMonitor = new RealTimeMonitor();</p>
+<p>        this.testResults.realTimePerformance = await realTimeMonitor.measureVisualizationImpact();</p>
+        
+<p>        // 5. Bottleneck analysis</p>
+<p>        console.log('🔍 Identifying bottlenecks...');</p>
+<p>        const bottleneckAnalyzer = new BottleneckAnalyzer();</p>
+<p>        bottleneckAnalyzer.profilePathfinding();</p>
+<p>        this.testResults.bottleneckAnalysis = bottleneckAnalyzer.generateOptimizationReport();</p>
+        
+<p>        // 6. Generate comprehensive report</p>
+<p>        return this.generateComprehensiveReport();</p>
+<p>    }</p>
+    
+<p>    async runMemoryTests(memoryAnalyzer) {</p>
+<p>        const results = {};</p>
+        
+<p>        // Test different grid sizes</p>
+<p>        for (const size of [20, 50, 100]) {</p>
+<p>            memoryAnalyzer.startMemoryProfiling();</p>
+            
+<p>            // Setup and run pathfinding</p>
+<p>            this.setupGrid(size);</p>
+<p>            await this.runPathfinding();</p>
+            
+<p>            results[`grid_${size}x${size}`] = memoryAnalyzer.stopMemoryProfiling();</p>
+            
+<p>            // Add theoretical estimates</p>
+<p>            results[`grid_${size}x${size}`].theoretical = memoryAnalyzer.estimateDataStructureMemory(size);</p>
+<p>        }</p>
+        
+<p>        return results;</p>
+<p>    }</p>
+    
+<p>    getTestScenarios() {</p>
+<p>        return [</p>
+<p>            {</p>
+<p>                name: 'empty_grid',</p>
+<p>                setup: () => {</p>
+<p>                    initializeGrid();</p>
+<p>                    startNode = grid[0][0];</p>
+<p>                    goalNode = grid[GRID_HEIGHT - 1][GRID_WIDTH - 1];</p>
+<p>                },</p>
+<p>                optimalLength: Math.max(GRID_WIDTH, GRID_HEIGHT)</p>
+<p>            },</p>
+<p>            {</p>
+<p>                name: 'sparse_obstacles',</p>
+<p>                setup: () => {</p>
+<p>                    initializeGrid();</p>
+<p>                    this.addRandomObstacles(0.1);</p>
+<p>                    startNode = grid[0][0];</p>
+<p>                    goalNode = grid[GRID_HEIGHT - 1][GRID_WIDTH - 1];</p>
+<p>                }</p>
+<p>            },</p>
+<p>            {</p>
+<p>                name: 'dense_obstacles',</p>
+<p>                setup: () => {</p>
+<p>                    initializeGrid();</p>
+<p>                    this.addRandomObstacles(0.3);</p>
+<p>                    startNode = grid[0][0];</p>
+<p>                    goalNode = grid[GRID_HEIGHT - 1][GRID_WIDTH - 1];</p>
+<p>                }</p>
+<p>            }</p>
+<p>        ];</p>
+<p>    }</p>
+    
+<p>    generateComprehensiveReport() {</p>
+<p>        const report = {</p>
+<p>            timestamp: new Date().toISOString(),</p>
+<p>            summary: this.generateExecutiveSummary(),</p>
+<p>            detailed: this.testResults,</p>
+<p>            recommendations: this.generateActionableRecommendations()</p>
+<p>        };</p>
+        
+<p>        // Display results</p>
+<p>        console.log('\n📋 Performance Analysis Complete!');</p>
+<p>        console.log('\n📈 Executive Summary:');</p>
+<p>        console.table(report.summary);</p>
+        
+<p>        console.log('\n🎯 Top Recommendations:');</p>
+<p>        report.recommendations.forEach((rec, index) => {</p>
+<p>            console.log(`${index + 1}. [${rec.priority}] ${rec.description}`);</p>
+<p>        });</p>
+        
+<p>        return report;</p>
+<p>    }</p>
+    
+<p>    generateExecutiveSummary() {</p>
+<p>        return {</p>
+<p>            'Average Execution Time': `${this.getAverageExecutionTime()}ms`,</p>
+<p>            'Memory Efficiency': this.getMemoryEfficiencyRating(),</p>
+<p>            'Best Heuristic': this.getBestHeuristic(),</p>
+<p>            'Frame Rate Impact': `${this.getFrameRateImpact()}%`,</p>
+<p>            'Primary Bottleneck': this.getPrimaryBottleneck()</p>
+<p>        };</p>
+<p>    }</p>
+    
+<p>    generateActionableRecommendations() {</p>
+<p>        const recommendations = [];</p>
+        
+<p>        // Analyze results and generate specific recommendations</p>
+<p>        if (this.testResults.bottleneckAnalysis) {</p>
+<p>            recommendations.push(...this.testResults.bottleneckAnalysis.recommendations);</p>
+<p>        }</p>
+        
+<p>        if (this.testResults.heuristicComparison) {</p>
+<p>            recommendations.push(...this.testResults.heuristicComparison.recommendations.map(rec => ({</p>
+<p>                priority: 'MEDIUM',</p>
+<p>                description: rec</p>
+<p>            })));</p>
+<p>        }</p>
+        
+<p>        return recommendations.sort((a, b) => {</p>
+<p>            const priorityOrder = { 'HIGH': 3, 'MEDIUM': 2, 'LOW': 1 };</p>
+<p>            return priorityOrder[b.priority] - priorityOrder[a.priority];</p>
+<p>        });</p>
+<p>    }</p>
+    
+<p>    // Helper methods for summary generation</p>
+<p>    getAverageExecutionTime() {</p>
+<p>        // Implementation depends on collected data</p>
+<p>        return '42.5'; // Placeholder</p>
+<p>    }</p>
+    
+<p>    getMemoryEfficiencyRating() {</p>
+<p>        return 'Good'; // Placeholder</p>
+<p>    }</p>
+    
+<p>    getBestHeuristic() {</p>
+<p>        return 'Manhattan'; // Placeholder</p>
+<p>    }</p>
+    
+<p>    getFrameRateImpact() {</p>
+<p>        return '15'; // Placeholder</p>
+<p>    }</p>
+    
+<p>    getPrimaryBottleneck() {</p>
+<p>        return 'Open Set Operations'; // Placeholder</p>
+<p>    }</p>
+<p>}</p>
+
+<p>// Auto-run performance analysis</p>
+<p>window.addEventListener('load', () => {</p>
+<p>    const perfButton = document.createElement('button');</p>
+<p>    perfButton.textContent = 'Run Performance Analysis';</p>
+<p>    perfButton.onclick = async () => {</p>
+<p>        const suite = new PerformanceTestSuite();</p>
+<p>        await suite.runFullPerformanceAnalysis();</p>
+<p>    };</p>
+<p>    perfButton.style.cssText = `</p>
+<p>        position: fixed;</p>
+<p>        top: 50px;</p>
+<p>        right: 10px;</p>
+<p>        z-index: 1000;</p>
+<p>        padding: 10px;</p>
+<p>        background: #FF9800;</p>
+<p>        color: white;</p>
+<p>        border: none;</p>
+<p>        border-radius: 5px;</p>
+<p>        cursor: pointer;</p>
+<p>    `;</p>
+<p>    document.body.appendChild(perfButton);</p>
+<p>});</p>
+<p>```</p>
+
+<p>---</p>
+<b>Previous:</b> <a href="12-testing.md">Testing and Validation</a>
+<b>Next:</b> <a href="14-advanced-topics.md">Advanced Topics</a>
+
+<b>Interactive:</b> <a href="demo.html">Analyze performance</a>
     </div>
 </body>
 </html>

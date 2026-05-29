@@ -15,762 +15,825 @@
     </nav>
     <div class="container">
         <h1>Testing and Validation</h1>
+
 <h2>Testing Strategy Overview</h2>
-<h3>Testing Pyramid</h3>
-<p><code>/\     E2E Tests
-       /  \    (Integration)
-      /____\   
-     /      \  Unit Tests
-    /        \ (Algorithm Logic)
-   /__________\
-  Manual Testing
-  (Visual Validation)</code></p>
-<h3>Test Categories</h3>
-<ol>
-<li><strong>Unit Tests</strong>: Individual function validation</li>
-<li><strong>Integration Tests</strong>: Component interaction</li>
-<li><strong>Performance Tests</strong>: Speed and memory usage</li>
-<li><strong>Visual Tests</strong>: UI and animation correctness</li>
-<li><strong>Edge Case Tests</strong>: Boundary conditions</li>
-<li><strong>Regression Tests</strong>: Prevent breaking changes</li>
-</ol>
+
+<p>### Testing Pyramid</p>
+<p>```</p>
+<p>        /\     E2E Tests</p>
+<p>       /  \    (Integration)</p>
+<p>      /____\   </p>
+<p>     /      \  Unit Tests</p>
+<p>    /        \ (Algorithm Logic)</p>
+<p>   /__________\</p>
+<p>  Manual Testing</p>
+<p>  (Visual Validation)</p>
+<p>```</p>
+
+<p>### Test Categories</p>
+<p>1. <b>Unit Tests</b>: Individual function validation</p>
+<p>2. <b>Integration Tests</b>: Component interaction</p>
+<p>3. <b>Performance Tests</b>: Speed and memory usage</p>
+<p>4. <b>Visual Tests</b>: UI and animation correctness</p>
+<p>5. <b>Edge Case Tests</b>: Boundary conditions</p>
+<p>6. <b>Regression Tests</b>: Prevent breaking changes</p>
+
 <h2>Unit Testing Framework</h2>
-<h3>Simple Test Runner</h3>
-<p>```javascript
-class TestRunner {
-    constructor() {
-        this.tests = [];
-        this.results = {
-            passed: 0,
-            failed: 0,
-            total: 0
-        };
-    }</p>
-<pre><code>test(name, testFunction) {
-    this.tests.push({ name, testFunction });
-}
 
-async runAll() {
-    console.log('🧪 Running A* Algorithm Tests\n');
-
-    for (const test of this.tests) {
-        try {
-            await test.testFunction();
-            console.log(`✅ ${test.name}`);
-            this.results.passed++;
-        } catch (error) {
-            console.log(`❌ ${test.name}: ${error.message}`);
-            this.results.failed++;
-        }
-        this.results.total++;
-    }
-
-    this.printSummary();
-}
-
-printSummary() {
-    console.log('\n📊 Test Results:');
-    console.log(`Total: ${this.results.total}`);
-    console.log(`Passed: ${this.results.passed}`);
-    console.log(`Failed: ${this.results.failed}`);
-    console.log(`Success Rate: ${(this.results.passed / this.results.total * 100).toFixed(1)}%`);
-}
-</code></pre>
+<p>### Simple Test Runner</p>
+<p>```javascript</p>
+<p>class TestRunner {</p>
+<p>    constructor() {</p>
+<p>        this.tests = [];</p>
+<p>        this.results = {</p>
+<p>            passed: 0,</p>
+<p>            failed: 0,</p>
+<p>            total: 0</p>
+<p>        };</p>
+<p>    }</p>
+    
+<p>    test(name, testFunction) {</p>
+<p>        this.tests.push({ name, testFunction });</p>
+<p>    }</p>
+    
+<p>    async runAll() {</p>
+<p>        console.log('🧪 Running A* Algorithm Tests\n');</p>
+        
+<p>        for (const test of this.tests) {</p>
+<p>            try {</p>
+<p>                await test.testFunction();</p>
+<p>                console.log(`✅ ${test.name}`);</p>
+<p>                this.results.passed++;</p>
+<p>            } catch (error) {</p>
+<p>                console.log(`❌ ${test.name}: ${error.message}`);</p>
+<p>                this.results.failed++;</p>
+<p>            }</p>
+<p>            this.results.total++;</p>
+<p>        }</p>
+        
+<p>        this.printSummary();</p>
+<p>    }</p>
+    
+<p>    printSummary() {</p>
+<p>        console.log('\n📊 Test Results:');</p>
+<p>        console.log(`Total: ${this.results.total}`);</p>
+<p>        console.log(`Passed: ${this.results.passed}`);</p>
+<p>        console.log(`Failed: ${this.results.failed}`);</p>
+<p>        console.log(`Success Rate: ${(this.results.passed / this.results.total * 100).toFixed(1)}%`);</p>
+<p>    }</p>
 <p>}</p>
-<p>// Assertion helpers
-function assertEqual(actual, expected, message = '') {
-    if (actual !== expected) {
-        throw new Error(<code>${message} Expected: ${expected}, Actual: ${actual}</code>);
-    }
-}</p>
-<p>function assertArrayEqual(actual, expected, message = '') {
-    if (JSON.stringify(actual) !== JSON.stringify(expected)) {
-        throw new Error(<code>${message} Expected: ${JSON.stringify(expected)}, Actual: ${JSON.stringify(actual)}</code>);
-    }
-}</p>
-<p>function assertApproximatelyEqual(actual, expected, tolerance = 0.001, message = '') {
-    if (Math.abs(actual - expected) &gt; tolerance) {
-        throw new Error(<code>${message} Expected: ~${expected}, Actual: ${actual}</code>);
-    }
-}</p>
-<p>function assertTrue(condition, message = '') {
-    if (!condition) {
-        throw new Error(<code>${message} Expected condition to be true</code>);
-    }
-}</p>
-<p>function assertFalse(condition, message = '') {
-    if (condition) {
-        throw new Error(<code>${message} Expected condition to be false</code>);
-    }
-}
-```</p>
+
+<p>// Assertion helpers</p>
+<p>function assertEqual(actual, expected, message = '') {</p>
+<p>    if (actual !== expected) {</p>
+<p>        throw new Error(`${message} Expected: ${expected}, Actual: ${actual}`);</p>
+<p>    }</p>
+<p>}</p>
+
+<p>function assertArrayEqual(actual, expected, message = '') {</p>
+<p>    if (JSON.stringify(actual) !== JSON.stringify(expected)) {</p>
+<p>        throw new Error(`${message} Expected: ${JSON.stringify(expected)}, Actual: ${JSON.stringify(actual)}`);</p>
+<p>    }</p>
+<p>}</p>
+
+<p>function assertApproximatelyEqual(actual, expected, tolerance = 0.001, message = '') {</p>
+<p>    if (Math.abs(actual - expected) > tolerance) {</p>
+<p>        throw new Error(`${message} Expected: ~${expected}, Actual: ${actual}`);</p>
+<p>    }</p>
+<p>}</p>
+
+<p>function assertTrue(condition, message = '') {</p>
+<p>    if (!condition) {</p>
+<p>        throw new Error(`${message} Expected condition to be true`);</p>
+<p>    }</p>
+<p>}</p>
+
+<p>function assertFalse(condition, message = '') {</p>
+<p>    if (condition) {</p>
+<p>        throw new Error(`${message} Expected condition to be false`);</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
+
 <h2>Heuristic Function Tests</h2>
-<h3>Manhattan Distance Tests</h3>
-<p>```javascript
-const runner = new TestRunner();</p>
-<p>runner.test('Manhattan Distance - Same Point', () =&gt; {
-    const nodeA = { x: 5, y: 3 };
-    const nodeB = { x: 5, y: 3 };
-    const result = manhattanDistance(nodeA, nodeB);
-    assertEqual(result, 0, 'Distance to same point should be 0');
-});</p>
-<p>runner.test('Manhattan Distance - Horizontal', () =&gt; {
-    const nodeA = { x: 0, y: 0 };
-    const nodeB = { x: 5, y: 0 };
-    const result = manhattanDistance(nodeA, nodeB);
-    assertEqual(result, 5, 'Horizontal distance should be 5');
-});</p>
-<p>runner.test('Manhattan Distance - Vertical', () =&gt; {
-    const nodeA = { x: 0, y: 0 };
-    const nodeB = { x: 0, y: 3 };
-    const result = manhattanDistance(nodeA, nodeB);
-    assertEqual(result, 3, 'Vertical distance should be 3');
-});</p>
-<p>runner.test('Manhattan Distance - Diagonal', () =&gt; {
-    const nodeA = { x: 0, y: 0 };
-    const nodeB = { x: 3, y: 4 };
-    const result = manhattanDistance(nodeA, nodeB);
-    assertEqual(result, 7, 'Manhattan distance should be 7');
-});</p>
-<p>runner.test('Manhattan Distance - Negative Coordinates', () =&gt; {
-    const nodeA = { x: -2, y: -1 };
-    const nodeB = { x: 1, y: 2 };
-    const result = manhattanDistance(nodeA, nodeB);
-    assertEqual(result, 6, 'Should handle negative coordinates');
-});
-```</p>
-<h3>Euclidean Distance Tests</h3>
-<p>```javascript
-runner.test('Euclidean Distance - Same Point', () =&gt; {
-    const nodeA = { x: 5, y: 3 };
-    const nodeB = { x: 5, y: 3 };
-    const result = euclideanDistance(nodeA, nodeB);
-    assertEqual(result, 0, 'Distance to same point should be 0');
-});</p>
-<p>runner.test('Euclidean Distance - 3-4-5 Triangle', () =&gt; {
-    const nodeA = { x: 0, y: 0 };
-    const nodeB = { x: 3, y: 4 };
-    const result = euclideanDistance(nodeA, nodeB);
-    assertEqual(result, 5, 'Should calculate 3-4-5 triangle correctly');
-});</p>
-<p>runner.test('Euclidean Distance - Unit Diagonal', () =&gt; {
-    const nodeA = { x: 0, y: 0 };
-    const nodeB = { x: 1, y: 1 };
-    const result = euclideanDistance(nodeA, nodeB);
-    assertApproximatelyEqual(result, Math.sqrt(2), 0.001, 'Unit diagonal should be √2');
-});</p>
-<p>runner.test('Euclidean vs Manhattan - Comparison', () =&gt; {
-    const nodeA = { x: 0, y: 0 };
-    const nodeB = { x: 3, y: 4 };</p>
-<pre><code>const euclidean = euclideanDistance(nodeA, nodeB);
-const manhattan = manhattanDistance(nodeA, nodeB);
 
-assertTrue(euclidean &lt;= manhattan, 'Euclidean should be ≤ Manhattan distance');
-</code></pre>
-<p>});
-```</p>
+<p>### Manhattan Distance Tests</p>
+<p>```javascript</p>
+<p>const runner = new TestRunner();</p>
+
+<p>runner.test('Manhattan Distance - Same Point', () => {</p>
+<p>    const nodeA = { x: 5, y: 3 };</p>
+<p>    const nodeB = { x: 5, y: 3 };</p>
+<p>    const result = manhattanDistance(nodeA, nodeB);</p>
+<p>    assertEqual(result, 0, 'Distance to same point should be 0');</p>
+<p>});</p>
+
+<p>runner.test('Manhattan Distance - Horizontal', () => {</p>
+<p>    const nodeA = { x: 0, y: 0 };</p>
+<p>    const nodeB = { x: 5, y: 0 };</p>
+<p>    const result = manhattanDistance(nodeA, nodeB);</p>
+<p>    assertEqual(result, 5, 'Horizontal distance should be 5');</p>
+<p>});</p>
+
+<p>runner.test('Manhattan Distance - Vertical', () => {</p>
+<p>    const nodeA = { x: 0, y: 0 };</p>
+<p>    const nodeB = { x: 0, y: 3 };</p>
+<p>    const result = manhattanDistance(nodeA, nodeB);</p>
+<p>    assertEqual(result, 3, 'Vertical distance should be 3');</p>
+<p>});</p>
+
+<p>runner.test('Manhattan Distance - Diagonal', () => {</p>
+<p>    const nodeA = { x: 0, y: 0 };</p>
+<p>    const nodeB = { x: 3, y: 4 };</p>
+<p>    const result = manhattanDistance(nodeA, nodeB);</p>
+<p>    assertEqual(result, 7, 'Manhattan distance should be 7');</p>
+<p>});</p>
+
+<p>runner.test('Manhattan Distance - Negative Coordinates', () => {</p>
+<p>    const nodeA = { x: -2, y: -1 };</p>
+<p>    const nodeB = { x: 1, y: 2 };</p>
+<p>    const result = manhattanDistance(nodeA, nodeB);</p>
+<p>    assertEqual(result, 6, 'Should handle negative coordinates');</p>
+<p>});</p>
+<p>```</p>
+
+<p>### Euclidean Distance Tests</p>
+<p>```javascript</p>
+<p>runner.test('Euclidean Distance - Same Point', () => {</p>
+<p>    const nodeA = { x: 5, y: 3 };</p>
+<p>    const nodeB = { x: 5, y: 3 };</p>
+<p>    const result = euclideanDistance(nodeA, nodeB);</p>
+<p>    assertEqual(result, 0, 'Distance to same point should be 0');</p>
+<p>});</p>
+
+<p>runner.test('Euclidean Distance - 3-4-5 Triangle', () => {</p>
+<p>    const nodeA = { x: 0, y: 0 };</p>
+<p>    const nodeB = { x: 3, y: 4 };</p>
+<p>    const result = euclideanDistance(nodeA, nodeB);</p>
+<p>    assertEqual(result, 5, 'Should calculate 3-4-5 triangle correctly');</p>
+<p>});</p>
+
+<p>runner.test('Euclidean Distance - Unit Diagonal', () => {</p>
+<p>    const nodeA = { x: 0, y: 0 };</p>
+<p>    const nodeB = { x: 1, y: 1 };</p>
+<p>    const result = euclideanDistance(nodeA, nodeB);</p>
+<p>    assertApproximatelyEqual(result, Math.sqrt(2), 0.001, 'Unit diagonal should be √2');</p>
+<p>});</p>
+
+<p>runner.test('Euclidean vs Manhattan - Comparison', () => {</p>
+<p>    const nodeA = { x: 0, y: 0 };</p>
+<p>    const nodeB = { x: 3, y: 4 };</p>
+    
+<p>    const euclidean = euclideanDistance(nodeA, nodeB);</p>
+<p>    const manhattan = manhattanDistance(nodeA, nodeB);</p>
+    
+<p>    assertTrue(euclidean <= manhattan, 'Euclidean should be ≤ Manhattan distance');</p>
+<p>});</p>
+<p>```</p>
+
 <h2>Movement Cost Tests</h2>
-<p>```javascript
-runner.test('Movement Cost - Cardinal Direction', () =&gt; {
-    const nodeA = { x: 5, y: 5 };
-    const nodeB = { x: 6, y: 5 }; // Right
-    const cost = getMovementCost(nodeA, nodeB);
-    assertEqual(cost, 1, 'Cardinal movement should cost 1');
-});</p>
-<p>runner.test('Movement Cost - Diagonal Direction', () =&gt; {
-    const nodeA = { x: 5, y: 5 };
-    const nodeB = { x: 6, y: 6 }; // Diagonal
-    const cost = getMovementCost(nodeA, nodeB);
-    assertApproximatelyEqual(cost, 1.414, 0.001, 'Diagonal movement should cost √2');
-});</p>
-<p>runner.test('Movement Cost - Invalid Movement', () =&gt; {
-    const nodeA = { x: 0, y: 0 };
-    const nodeB = { x: 2, y: 1 }; // Knight's move
-    const cost = getMovementCost(nodeA, nodeB);
-    // Should handle gracefully or throw error
-    assertTrue(cost &gt; 0, 'Should return positive cost or handle error');
-});
-```</p>
+
+<p>```javascript</p>
+<p>runner.test('Movement Cost - Cardinal Direction', () => {</p>
+<p>    const nodeA = { x: 5, y: 5 };</p>
+<p>    const nodeB = { x: 6, y: 5 }; // Right</p>
+<p>    const cost = getMovementCost(nodeA, nodeB);</p>
+<p>    assertEqual(cost, 1, 'Cardinal movement should cost 1');</p>
+<p>});</p>
+
+<p>runner.test('Movement Cost - Diagonal Direction', () => {</p>
+<p>    const nodeA = { x: 5, y: 5 };</p>
+<p>    const nodeB = { x: 6, y: 6 }; // Diagonal</p>
+<p>    const cost = getMovementCost(nodeA, nodeB);</p>
+<p>    assertApproximatelyEqual(cost, 1.414, 0.001, 'Diagonal movement should cost √2');</p>
+<p>});</p>
+
+<p>runner.test('Movement Cost - Invalid Movement', () => {</p>
+<p>    const nodeA = { x: 0, y: 0 };</p>
+<p>    const nodeB = { x: 2, y: 1 }; // Knight's move</p>
+<p>    const cost = getMovementCost(nodeA, nodeB);</p>
+<p>    // Should handle gracefully or throw error</p>
+<p>    assertTrue(cost > 0, 'Should return positive cost or handle error');</p>
+<p>});</p>
+<p>```</p>
+
 <h2>Grid and Neighbor Tests</h2>
-<p>```javascript
-runner.test('Grid Initialization', () =&gt; {
-    initializeGrid();</p>
-<pre><code>assertEqual(grid.length, GRID_HEIGHT, 'Grid should have correct height');
-assertEqual(grid[0].length, GRID_WIDTH, 'Grid should have correct width');
 
-// Check a sample node
-const node = grid[5][10];
-assertEqual(node.x, 10, 'Node should have correct x coordinate');
-assertEqual(node.y, 5, 'Node should have correct y coordinate');
-assertEqual(node.gCost, Infinity, 'Initial g-cost should be Infinity');
-assertFalse(node.isObstacle, 'Initial nodes should not be obstacles');
-</code></pre>
+<p>```javascript</p>
+<p>runner.test('Grid Initialization', () => {</p>
+<p>    initializeGrid();</p>
+    
+<p>    assertEqual(grid.length, GRID_HEIGHT, 'Grid should have correct height');</p>
+<p>    assertEqual(grid[0].length, GRID_WIDTH, 'Grid should have correct width');</p>
+    
+<p>    // Check a sample node</p>
+<p>    const node = grid[5][10];</p>
+<p>    assertEqual(node.x, 10, 'Node should have correct x coordinate');</p>
+<p>    assertEqual(node.y, 5, 'Node should have correct y coordinate');</p>
+<p>    assertEqual(node.gCost, Infinity, 'Initial g-cost should be Infinity');</p>
+<p>    assertFalse(node.isObstacle, 'Initial nodes should not be obstacles');</p>
 <p>});</p>
-<p>runner.test('Get Neighbors - Center Node', () =&gt; {
-    initializeGrid();
-    const centerNode = grid[10][15]; // Middle of grid
-    const neighbors = getNeighbors(centerNode);</p>
-<pre><code>assertEqual(neighbors.length, 8, 'Center node should have 8 neighbors');
 
-// Check that all neighbors are valid
-for (const neighbor of neighbors) {
-    assertTrue(neighbor.x &gt;= 0 &amp;&amp; neighbor.x &lt; GRID_WIDTH, 'Neighbor x in bounds');
-    assertTrue(neighbor.y &gt;= 0 &amp;&amp; neighbor.y &lt; GRID_HEIGHT, 'Neighbor y in bounds');
-    assertFalse(neighbor.isObstacle, 'Neighbor should not be obstacle');
-}
-</code></pre>
+<p>runner.test('Get Neighbors - Center Node', () => {</p>
+<p>    initializeGrid();</p>
+<p>    const centerNode = grid[10][15]; // Middle of grid</p>
+<p>    const neighbors = getNeighbors(centerNode);</p>
+    
+<p>    assertEqual(neighbors.length, 8, 'Center node should have 8 neighbors');</p>
+    
+<p>    // Check that all neighbors are valid</p>
+<p>    for (const neighbor of neighbors) {</p>
+<p>        assertTrue(neighbor.x >= 0 && neighbor.x < GRID_WIDTH, 'Neighbor x in bounds');</p>
+<p>        assertTrue(neighbor.y >= 0 && neighbor.y < GRID_HEIGHT, 'Neighbor y in bounds');</p>
+<p>        assertFalse(neighbor.isObstacle, 'Neighbor should not be obstacle');</p>
+<p>    }</p>
 <p>});</p>
-<p>runner.test('Get Neighbors - Corner Node', () =&gt; {
-    initializeGrid();
-    const cornerNode = grid[0][0]; // Top-left corner
-    const neighbors = getNeighbors(cornerNode);</p>
-<pre><code>assertEqual(neighbors.length, 3, 'Corner node should have 3 neighbors');
 
-// Verify specific neighbors
-const expectedPositions = [
-    { x: 1, y: 0 }, // Right
-    { x: 0, y: 1 }, // Down
-    { x: 1, y: 1 }  // Diagonal
-];
-
-for (const expected of expectedPositions) {
-    const found = neighbors.find(n =&gt; n.x === expected.x &amp;&amp; n.y === expected.y);
-    assertTrue(found !== undefined, `Should find neighbor at (${expected.x}, ${expected.y})`);
-}
-</code></pre>
+<p>runner.test('Get Neighbors - Corner Node', () => {</p>
+<p>    initializeGrid();</p>
+<p>    const cornerNode = grid[0][0]; // Top-left corner</p>
+<p>    const neighbors = getNeighbors(cornerNode);</p>
+    
+<p>    assertEqual(neighbors.length, 3, 'Corner node should have 3 neighbors');</p>
+    
+<p>    // Verify specific neighbors</p>
+<p>    const expectedPositions = [</p>
+<p>        { x: 1, y: 0 }, // Right</p>
+<p>        { x: 0, y: 1 }, // Down</p>
+<p>        { x: 1, y: 1 }  // Diagonal</p>
+<p>    ];</p>
+    
+<p>    for (const expected of expectedPositions) {</p>
+<p>        const found = neighbors.find(n => n.x === expected.x && n.y === expected.y);</p>
+<p>        assertTrue(found !== undefined, `Should find neighbor at (${expected.x}, ${expected.y})`);</p>
+<p>    }</p>
 <p>});</p>
-<p>runner.test('Get Neighbors - With Obstacles', () =&gt; {
-    initializeGrid();
-    const centerNode = grid[10][15];</p>
-<pre><code>// Add obstacles around center
-grid[9][15].isObstacle = true;  // North
-grid[11][15].isObstacle = true; // South
 
-const neighbors = getNeighbors(centerNode);
-assertEqual(neighbors.length, 6, 'Should have 6 neighbors with 2 obstacles');
+<p>runner.test('Get Neighbors - With Obstacles', () => {</p>
+<p>    initializeGrid();</p>
+<p>    const centerNode = grid[10][15];</p>
+    
+<p>    // Add obstacles around center</p>
+<p>    grid[9][15].isObstacle = true;  // North</p>
+<p>    grid[11][15].isObstacle = true; // South</p>
+    
+<p>    const neighbors = getNeighbors(centerNode);</p>
+<p>    assertEqual(neighbors.length, 6, 'Should have 6 neighbors with 2 obstacles');</p>
+    
+<p>    // Verify no obstacles in neighbors</p>
+<p>    for (const neighbor of neighbors) {</p>
+<p>        assertFalse(neighbor.isObstacle, 'Returned neighbors should not be obstacles');</p>
+<p>    }</p>
+<p>});</p>
+<p>```</p>
 
-// Verify no obstacles in neighbors
-for (const neighbor of neighbors) {
-    assertFalse(neighbor.isObstacle, 'Returned neighbors should not be obstacles');
-}
-</code></pre>
-<p>});
-```</p>
 <h2>Path Reconstruction Tests</h2>
-<p>```javascript
-runner.test('Path Reconstruction - Simple Path', () =&gt; {
-    // Create a simple 3-node path
-    const start = { x: 0, y: 0, parent: null };
-    const middle = { x: 1, y: 0, parent: start };
-    const goal = { x: 2, y: 0, parent: middle };</p>
-<pre><code>const path = reconstructPath(goal);
 
-assertEqual(path.length, 3, 'Path should have 3 nodes');
-assertEqual(path[0], start, 'First node should be start');
-assertEqual(path[1], middle, 'Middle node should be correct');
-assertEqual(path[2], goal, 'Last node should be goal');
-</code></pre>
+<p>```javascript</p>
+<p>runner.test('Path Reconstruction - Simple Path', () => {</p>
+<p>    // Create a simple 3-node path</p>
+<p>    const start = { x: 0, y: 0, parent: null };</p>
+<p>    const middle = { x: 1, y: 0, parent: start };</p>
+<p>    const goal = { x: 2, y: 0, parent: middle };</p>
+    
+<p>    const path = reconstructPath(goal);</p>
+    
+<p>    assertEqual(path.length, 3, 'Path should have 3 nodes');</p>
+<p>    assertEqual(path[0], start, 'First node should be start');</p>
+<p>    assertEqual(path[1], middle, 'Middle node should be correct');</p>
+<p>    assertEqual(path[2], goal, 'Last node should be goal');</p>
 <p>});</p>
-<p>runner.test('Path Reconstruction - Single Node', () =&gt; {
-    const singleNode = { x: 5, y: 5, parent: null };
-    const path = reconstructPath(singleNode);</p>
-<pre><code>assertEqual(path.length, 1, 'Single node path should have length 1');
-assertEqual(path[0], singleNode, 'Should return the single node');
-</code></pre>
-<p>});</p>
-<p>runner.test('Path Reconstruction - Zigzag Path', () =&gt; {
-    // Create a zigzag path
-    const nodes = [];
-    for (let i = 0; i &lt; 5; i++) {
-        nodes.push({
-            x: i,
-            y: i % 2,
-            parent: i &gt; 0 ? nodes[i - 1] : null
-        });
-    }</p>
-<pre><code>const path = reconstructPath(nodes[4]);
-assertEqual(path.length, 5, 'Zigzag path should have 5 nodes');
 
-// Verify path order
-for (let i = 0; i &lt; 5; i++) {
-    assertEqual(path[i], nodes[i], `Node ${i} should be in correct position`);
-}
-</code></pre>
-<p>});
-```</p>
+<p>runner.test('Path Reconstruction - Single Node', () => {</p>
+<p>    const singleNode = { x: 5, y: 5, parent: null };</p>
+<p>    const path = reconstructPath(singleNode);</p>
+    
+<p>    assertEqual(path.length, 1, 'Single node path should have length 1');</p>
+<p>    assertEqual(path[0], singleNode, 'Should return the single node');</p>
+<p>});</p>
+
+<p>runner.test('Path Reconstruction - Zigzag Path', () => {</p>
+<p>    // Create a zigzag path</p>
+<p>    const nodes = [];</p>
+<p>    for (let i = 0; i < 5; i++) {</p>
+<p>        nodes.push({</p>
+<p>            x: i,</p>
+<p>            y: i % 2,</p>
+<p>            parent: i > 0 ? nodes[i - 1] : null</p>
+<p>        });</p>
+<p>    }</p>
+    
+<p>    const path = reconstructPath(nodes[4]);</p>
+<p>    assertEqual(path.length, 5, 'Zigzag path should have 5 nodes');</p>
+    
+<p>    // Verify path order</p>
+<p>    for (let i = 0; i < 5; i++) {</p>
+<p>        assertEqual(path[i], nodes[i], `Node ${i} should be in correct position`);</p>
+<p>    }</p>
+<p>});</p>
+<p>```</p>
+
 <h2>Algorithm Integration Tests</h2>
-<p>```javascript
-runner.test('A* - Straight Line Path', async () =&gt; {
-    initializeGrid();</p>
-<pre><code>// Set start and goal in straight line
-startNode = grid[5][5];
-goalNode = grid[5][10];
 
-const path = await findPathForTesting();
-
-assertTrue(path !== null, 'Should find a path');
-assertEqual(path[0], startNode, 'Path should start at start node');
-assertEqual(path[path.length - 1], goalNode, 'Path should end at goal node');
-assertEqual(path.length, 6, 'Straight line should have 6 nodes');
-</code></pre>
+<p>```javascript</p>
+<p>runner.test('A* - Straight Line Path', async () => {</p>
+<p>    initializeGrid();</p>
+    
+<p>    // Set start and goal in straight line</p>
+<p>    startNode = grid[5][5];</p>
+<p>    goalNode = grid[5][10];</p>
+    
+<p>    const path = await findPathForTesting();</p>
+    
+<p>    assertTrue(path !== null, 'Should find a path');</p>
+<p>    assertEqual(path[0], startNode, 'Path should start at start node');</p>
+<p>    assertEqual(path[path.length - 1], goalNode, 'Path should end at goal node');</p>
+<p>    assertEqual(path.length, 6, 'Straight line should have 6 nodes');</p>
 <p>});</p>
-<p>runner.test('A* - Path Around Obstacle', async () =&gt; {
-    initializeGrid();</p>
-<pre><code>// Create a wall
-for (let y = 3; y &lt;= 7; y++) {
-    grid[y][5].isObstacle = true;
-}
 
-startNode = grid[5][3];
-goalNode = grid[5][7];
-
-const path = await findPathForTesting();
-
-assertTrue(path !== null, 'Should find path around obstacle');
-assertTrue(path.length &gt; 5, 'Path should be longer than direct route');
-
-// Verify path doesn't go through obstacles
-for (const node of path) {
-    assertFalse(node.isObstacle, 'Path should not contain obstacles');
-}
-</code></pre>
+<p>runner.test('A* - Path Around Obstacle', async () => {</p>
+<p>    initializeGrid();</p>
+    
+<p>    // Create a wall</p>
+<p>    for (let y = 3; y <= 7; y++) {</p>
+<p>        grid[y][5].isObstacle = true;</p>
+<p>    }</p>
+    
+<p>    startNode = grid[5][3];</p>
+<p>    goalNode = grid[5][7];</p>
+    
+<p>    const path = await findPathForTesting();</p>
+    
+<p>    assertTrue(path !== null, 'Should find path around obstacle');</p>
+<p>    assertTrue(path.length > 5, 'Path should be longer than direct route');</p>
+    
+<p>    // Verify path doesn't go through obstacles</p>
+<p>    for (const node of path) {</p>
+<p>        assertFalse(node.isObstacle, 'Path should not contain obstacles');</p>
+<p>    }</p>
 <p>});</p>
-<p>runner.test('A* - No Path Available', async () =&gt; {
-    initializeGrid();</p>
-<pre><code>// Surround goal with obstacles
-const goalX = 10, goalY = 10;
-for (let dy = -1; dy &lt;= 1; dy++) {
-    for (let dx = -1; dx &lt;= 1; dx++) {
-        if (dx === 0 &amp;&amp; dy === 0) continue; // Skip goal itself
-        grid[goalY + dy][goalX + dx].isObstacle = true;
-    }
-}
 
-startNode = grid[5][5];
-goalNode = grid[goalY][goalX];
-
-const path = await findPathForTesting();
-
-assertEqual(path, null, 'Should return null when no path exists');
-</code></pre>
+<p>runner.test('A* - No Path Available', async () => {</p>
+<p>    initializeGrid();</p>
+    
+<p>    // Surround goal with obstacles</p>
+<p>    const goalX = 10, goalY = 10;</p>
+<p>    for (let dy = -1; dy <= 1; dy++) {</p>
+<p>        for (let dx = -1; dx <= 1; dx++) {</p>
+<p>            if (dx === 0 && dy === 0) continue; // Skip goal itself</p>
+<p>            grid[goalY + dy][goalX + dx].isObstacle = true;</p>
+<p>        }</p>
+<p>    }</p>
+    
+<p>    startNode = grid[5][5];</p>
+<p>    goalNode = grid[goalY][goalX];</p>
+    
+<p>    const path = await findPathForTesting();</p>
+    
+<p>    assertEqual(path, null, 'Should return null when no path exists');</p>
 <p>});</p>
-<p>// Helper function for testing without visualization
-async function findPathForTesting() {
-    if (!startNode || !goalNode) {
-        return null;
-    }</p>
-<pre><code>const openSet = [startNode];
-const closedSet = new Set();
 
-startNode.gCost = 0;
-startNode.hCost = manhattanDistance(startNode, goalNode);
-startNode.fCost = startNode.gCost + startNode.hCost;
+<p>// Helper function for testing without visualization</p>
+<p>async function findPathForTesting() {</p>
+<p>    if (!startNode || !goalNode) {</p>
+<p>        return null;</p>
+<p>    }</p>
+    
+<p>    const openSet = [startNode];</p>
+<p>    const closedSet = new Set();</p>
+    
+<p>    startNode.gCost = 0;</p>
+<p>    startNode.hCost = manhattanDistance(startNode, goalNode);</p>
+<p>    startNode.fCost = startNode.gCost + startNode.hCost;</p>
+    
+<p>    while (openSet.length > 0) {</p>
+<p>        let currentNode = openSet[0];</p>
+<p>        for (let i = 1; i < openSet.length; i++) {</p>
+<p>            if (openSet[i].fCost < currentNode.fCost || </p>
+<p>                (openSet[i].fCost === currentNode.fCost && </p>
+<p>                 openSet[i].hCost < currentNode.hCost)) {</p>
+<p>                currentNode = openSet[i];</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        const currentIndex = openSet.indexOf(currentNode);</p>
+<p>        openSet.splice(currentIndex, 1);</p>
+<p>        closedSet.add(currentNode);</p>
+        
+<p>        if (currentNode === goalNode) {</p>
+<p>            return reconstructPath(currentNode);</p>
+<p>        }</p>
+        
+<p>        const neighbors = getNeighbors(currentNode);</p>
+        
+<p>        for (const neighbor of neighbors) {</p>
+<p>            if (closedSet.has(neighbor)) continue;</p>
+            
+<p>            const tentativeGCost = currentNode.gCost + </p>
+<p>                                 getMovementCost(currentNode, neighbor);</p>
+            
+<p>            if (!openSet.includes(neighbor)) {</p>
+<p>                openSet.push(neighbor);</p>
+<p>            } else if (tentativeGCost >= neighbor.gCost) {</p>
+<p>                continue;</p>
+<p>            }</p>
+            
+<p>            neighbor.parent = currentNode;</p>
+<p>            neighbor.gCost = tentativeGCost;</p>
+<p>            neighbor.hCost = manhattanDistance(neighbor, goalNode);</p>
+<p>            neighbor.fCost = neighbor.gCost + neighbor.hCost;</p>
+<p>        }</p>
+<p>    }</p>
+    
+<p>    return null;</p>
+<p>}</p>
+<p>```</p>
 
-while (openSet.length &gt; 0) {
-    let currentNode = openSet[0];
-    for (let i = 1; i &lt; openSet.length; i++) {
-        if (openSet[i].fCost &lt; currentNode.fCost || 
-            (openSet[i].fCost === currentNode.fCost &amp;&amp; 
-             openSet[i].hCost &lt; currentNode.hCost)) {
-            currentNode = openSet[i];
-        }
-    }
-
-    const currentIndex = openSet.indexOf(currentNode);
-    openSet.splice(currentIndex, 1);
-    closedSet.add(currentNode);
-
-    if (currentNode === goalNode) {
-        return reconstructPath(currentNode);
-    }
-
-    const neighbors = getNeighbors(currentNode);
-
-    for (const neighbor of neighbors) {
-        if (closedSet.has(neighbor)) continue;
-
-        const tentativeGCost = currentNode.gCost + 
-                             getMovementCost(currentNode, neighbor);
-
-        if (!openSet.includes(neighbor)) {
-            openSet.push(neighbor);
-        } else if (tentativeGCost &gt;= neighbor.gCost) {
-            continue;
-        }
-
-        neighbor.parent = currentNode;
-        neighbor.gCost = tentativeGCost;
-        neighbor.hCost = manhattanDistance(neighbor, goalNode);
-        neighbor.fCost = neighbor.gCost + neighbor.hCost;
-    }
-}
-
-return null;
-</code></pre>
-<p>}
-```</p>
 <h2>Performance Tests</h2>
-<p>```javascript
-class PerformanceTest {
-    constructor() {
-        this.results = [];
-    }</p>
-<pre><code>async benchmarkPathfinding(gridSize, obstaclePercent, iterations = 10) {
-    const results = [];
 
-    for (let i = 0; i &lt; iterations; i++) {
-        // Setup test grid
-        this.setupTestGrid(gridSize, obstaclePercent);
+<p>```javascript</p>
+<p>class PerformanceTest {</p>
+<p>    constructor() {</p>
+<p>        this.results = [];</p>
+<p>    }</p>
+    
+<p>    async benchmarkPathfinding(gridSize, obstaclePercent, iterations = 10) {</p>
+<p>        const results = [];</p>
+        
+<p>        for (let i = 0; i < iterations; i++) {</p>
+<p>            // Setup test grid</p>
+<p>            this.setupTestGrid(gridSize, obstaclePercent);</p>
+            
+<p>            const startTime = performance.now();</p>
+<p>            const path = await findPathForTesting();</p>
+<p>            const endTime = performance.now();</p>
+            
+<p>            results.push({</p>
+<p>                time: endTime - startTime,</p>
+<p>                pathLength: path ? path.length : 0,</p>
+<p>                pathFound: path !== null</p>
+<p>            });</p>
+<p>        }</p>
+        
+<p>        return this.analyzeResults(results, gridSize, obstaclePercent);</p>
+<p>    }</p>
+    
+<p>    setupTestGrid(size, obstaclePercent) {</p>
+<p>        // Temporarily modify grid size</p>
+<p>        const originalWidth = GRID_WIDTH;</p>
+<p>        const originalHeight = GRID_HEIGHT;</p>
+        
+<p>        GRID_WIDTH = size;</p>
+<p>        GRID_HEIGHT = size;</p>
+        
+<p>        initializeGrid();</p>
+        
+<p>        // Add random obstacles</p>
+<p>        const totalCells = size * size;</p>
+<p>        const obstacleCount = Math.floor(totalCells * obstaclePercent / 100);</p>
+        
+<p>        for (let i = 0; i < obstacleCount; i++) {</p>
+<p>            const x = Math.floor(Math.random() * size);</p>
+<p>            const y = Math.floor(Math.random() * size);</p>
+<p>            grid[y][x].isObstacle = true;</p>
+<p>        }</p>
+        
+<p>        // Set start and goal</p>
+<p>        startNode = grid[0][0];</p>
+<p>        goalNode = grid[size - 1][size - 1];</p>
+        
+<p>        // Ensure start and goal are not obstacles</p>
+<p>        startNode.isObstacle = false;</p>
+<p>        goalNode.isObstacle = false;</p>
+<p>    }</p>
+    
+<p>    analyzeResults(results, gridSize, obstaclePercent) {</p>
+<p>        const validResults = results.filter(r => r.pathFound);</p>
+        
+<p>        if (validResults.length === 0) {</p>
+<p>            return {</p>
+<p>                gridSize,</p>
+<p>                obstaclePercent,</p>
+<p>                avgTime: null,</p>
+<p>                avgPathLength: null,</p>
+<p>                successRate: 0</p>
+<p>            };</p>
+<p>        }</p>
+        
+<p>        const avgTime = validResults.reduce((sum, r) => sum + r.time, 0) / validResults.length;</p>
+<p>        const avgPathLength = validResults.reduce((sum, r) => sum + r.pathLength, 0) / validResults.length;</p>
+<p>        const successRate = (validResults.length / results.length) * 100;</p>
+        
+<p>        return {</p>
+<p>            gridSize,</p>
+<p>            obstaclePercent,</p>
+<p>            avgTime: avgTime.toFixed(2),</p>
+<p>            avgPathLength: avgPathLength.toFixed(1),</p>
+<p>            successRate: successRate.toFixed(1)</p>
+<p>        };</p>
+<p>    }</p>
+    
+<p>    async runPerformanceSuite() {</p>
+<p>        console.log('🚀 Running Performance Tests\n');</p>
+        
+<p>        const testCases = [</p>
+<p>            { size: 20, obstacles: 10 },</p>
+<p>            { size: 20, obstacles: 30 },</p>
+<p>            { size: 50, obstacles: 10 },</p>
+<p>            { size: 50, obstacles: 30 },</p>
+<p>            { size: 100, obstacles: 10 },</p>
+<p>            { size: 100, obstacles: 30 }</p>
+<p>        ];</p>
+        
+<p>        for (const testCase of testCases) {</p>
+<p>            const result = await this.benchmarkPathfinding(testCase.size, testCase.obstacles);</p>
+<p>            console.log(`Grid: ${result.gridSize}x${result.gridSize}, Obstacles: ${result.obstaclePercent}%`);</p>
+<p>            console.log(`  Avg Time: ${result.avgTime}ms`);</p>
+<p>            console.log(`  Avg Path Length: ${result.avgPathLength}`);</p>
+<p>            console.log(`  Success Rate: ${result.successRate}%\n`);</p>
+<p>        }</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
 
-        const startTime = performance.now();
-        const path = await findPathForTesting();
-        const endTime = performance.now();
-
-        results.push({
-            time: endTime - startTime,
-            pathLength: path ? path.length : 0,
-            pathFound: path !== null
-        });
-    }
-
-    return this.analyzeResults(results, gridSize, obstaclePercent);
-}
-
-setupTestGrid(size, obstaclePercent) {
-    // Temporarily modify grid size
-    const originalWidth = GRID_WIDTH;
-    const originalHeight = GRID_HEIGHT;
-
-    GRID_WIDTH = size;
-    GRID_HEIGHT = size;
-
-    initializeGrid();
-
-    // Add random obstacles
-    const totalCells = size * size;
-    const obstacleCount = Math.floor(totalCells * obstaclePercent / 100);
-
-    for (let i = 0; i &lt; obstacleCount; i++) {
-        const x = Math.floor(Math.random() * size);
-        const y = Math.floor(Math.random() * size);
-        grid[y][x].isObstacle = true;
-    }
-
-    // Set start and goal
-    startNode = grid[0][0];
-    goalNode = grid[size - 1][size - 1];
-
-    // Ensure start and goal are not obstacles
-    startNode.isObstacle = false;
-    goalNode.isObstacle = false;
-}
-
-analyzeResults(results, gridSize, obstaclePercent) {
-    const validResults = results.filter(r =&gt; r.pathFound);
-
-    if (validResults.length === 0) {
-        return {
-            gridSize,
-            obstaclePercent,
-            avgTime: null,
-            avgPathLength: null,
-            successRate: 0
-        };
-    }
-
-    const avgTime = validResults.reduce((sum, r) =&gt; sum + r.time, 0) / validResults.length;
-    const avgPathLength = validResults.reduce((sum, r) =&gt; sum + r.pathLength, 0) / validResults.length;
-    const successRate = (validResults.length / results.length) * 100;
-
-    return {
-        gridSize,
-        obstaclePercent,
-        avgTime: avgTime.toFixed(2),
-        avgPathLength: avgPathLength.toFixed(1),
-        successRate: successRate.toFixed(1)
-    };
-}
-
-async runPerformanceSuite() {
-    console.log('🚀 Running Performance Tests\n');
-
-    const testCases = [
-        { size: 20, obstacles: 10 },
-        { size: 20, obstacles: 30 },
-        { size: 50, obstacles: 10 },
-        { size: 50, obstacles: 30 },
-        { size: 100, obstacles: 10 },
-        { size: 100, obstacles: 30 }
-    ];
-
-    for (const testCase of testCases) {
-        const result = await this.benchmarkPathfinding(testCase.size, testCase.obstacles);
-        console.log(`Grid: ${result.gridSize}x${result.gridSize}, Obstacles: ${result.obstaclePercent}%`);
-        console.log(`  Avg Time: ${result.avgTime}ms`);
-        console.log(`  Avg Path Length: ${result.avgPathLength}`);
-        console.log(`  Success Rate: ${result.successRate}%\n`);
-    }
-}
-</code></pre>
-<p>}
-```</p>
 <h2>Memory Leak Tests</h2>
-<p>```javascript
-runner.test('Memory Leak - Repeated Pathfinding', async () =&gt; {
-    const initialMemory = performance.memory ? performance.memory.usedJSHeapSize : 0;</p>
-<pre><code>// Run pathfinding many times
-for (let i = 0; i &lt; 100; i++) {
-    initializeGrid();
-    startNode = grid[0][0];
-    goalNode = grid[GRID_HEIGHT - 1][GRID_WIDTH - 1];
-    await findPathForTesting();
 
-    // Force garbage collection if available
-    if (window.gc) {
-        window.gc();
-    }
-}
+<p>```javascript</p>
+<p>runner.test('Memory Leak - Repeated Pathfinding', async () => {</p>
+<p>    const initialMemory = performance.memory ? performance.memory.usedJSHeapSize : 0;</p>
+    
+<p>    // Run pathfinding many times</p>
+<p>    for (let i = 0; i < 100; i++) {</p>
+<p>        initializeGrid();</p>
+<p>        startNode = grid[0][0];</p>
+<p>        goalNode = grid[GRID_HEIGHT - 1][GRID_WIDTH - 1];</p>
+<p>        await findPathForTesting();</p>
+        
+<p>        // Force garbage collection if available</p>
+<p>        if (window.gc) {</p>
+<p>            window.gc();</p>
+<p>        }</p>
+<p>    }</p>
+    
+<p>    const finalMemory = performance.memory ? performance.memory.usedJSHeapSize : 0;</p>
+<p>    const memoryIncrease = finalMemory - initialMemory;</p>
+    
+<p>    // Allow for some memory increase, but not excessive</p>
+<p>    assertTrue(memoryIncrease < 10 * 1024 * 1024, // 10MB threshold</p>
+<p>        `Memory increase should be reasonable: ${memoryIncrease} bytes`);</p>
+<p>});</p>
+<p>```</p>
 
-const finalMemory = performance.memory ? performance.memory.usedJSHeapSize : 0;
-const memoryIncrease = finalMemory - initialMemory;
-
-// Allow for some memory increase, but not excessive
-assertTrue(memoryIncrease &lt; 10 * 1024 * 1024, // 10MB threshold
-    `Memory increase should be reasonable: ${memoryIncrease} bytes`);
-</code></pre>
-<p>});
-```</p>
 <h2>Visual Validation Tests</h2>
-<p>```javascript
-class VisualTest {
-    constructor() {
-        this.canvas = document.createElement('canvas');
-        this.ctx = this.canvas.getContext('2d');
-    }</p>
-<pre><code>captureGridState() {
-    const state = [];
-    for (let y = 0; y &lt; GRID_HEIGHT; y++) {
-        state[y] = [];
-        for (let x = 0; x &lt; GRID_WIDTH; x++) {
-            const node = grid[y][x];
-            state[y][x] = {
-                isObstacle: node.isObstacle,
-                isStart: node === startNode,
-                isGoal: node === goalNode,
-                classes: node.element ? Array.from(node.element.classList) : []
-            };
-        }
-    }
-    return state;
-}
 
-validatePathVisualization(path) {
-    if (!path) return true;
+<p>```javascript</p>
+<p>class VisualTest {</p>
+<p>    constructor() {</p>
+<p>        this.canvas = document.createElement('canvas');</p>
+<p>        this.ctx = this.canvas.getContext('2d');</p>
+<p>    }</p>
+    
+<p>    captureGridState() {</p>
+<p>        const state = [];</p>
+<p>        for (let y = 0; y < GRID_HEIGHT; y++) {</p>
+<p>            state[y] = [];</p>
+<p>            for (let x = 0; x < GRID_WIDTH; x++) {</p>
+<p>                const node = grid[y][x];</p>
+<p>                state[y][x] = {</p>
+<p>                    isObstacle: node.isObstacle,</p>
+<p>                    isStart: node === startNode,</p>
+<p>                    isGoal: node === goalNode,</p>
+<p>                    classes: node.element ? Array.from(node.element.classList) : []</p>
+<p>                };</p>
+<p>            }</p>
+<p>        }</p>
+<p>        return state;</p>
+<p>    }</p>
+    
+<p>    validatePathVisualization(path) {</p>
+<p>        if (!path) return true;</p>
+        
+<p>        for (let i = 1; i < path.length - 1; i++) {</p>
+<p>            const node = path[i];</p>
+<p>            const hasPathClass = node.element && node.element.classList.contains('path');</p>
+            
+<p>            if (!hasPathClass) {</p>
+<p>                throw new Error(`Path node at (${node.x}, ${node.y}) missing 'path' class`);</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        return true;</p>
+<p>    }</p>
+    
+<p>    validateSearchVisualization() {</p>
+<p>        let openCount = 0;</p>
+<p>        let closedCount = 0;</p>
+        
+<p>        for (let y = 0; y < GRID_HEIGHT; y++) {</p>
+<p>            for (let x = 0; x < GRID_WIDTH; x++) {</p>
+<p>                const node = grid[y][x];</p>
+<p>                if (node.element) {</p>
+<p>                    if (node.element.classList.contains('open')) openCount++;</p>
+<p>                    if (node.element.classList.contains('closed')) closedCount++;</p>
+<p>                }</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        console.log(`Visual validation: ${openCount} open, ${closedCount} closed cells`);</p>
+<p>        return { openCount, closedCount };</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
 
-    for (let i = 1; i &lt; path.length - 1; i++) {
-        const node = path[i];
-        const hasPathClass = node.element &amp;&amp; node.element.classList.contains('path');
-
-        if (!hasPathClass) {
-            throw new Error(`Path node at (${node.x}, ${node.y}) missing 'path' class`);
-        }
-    }
-
-    return true;
-}
-
-validateSearchVisualization() {
-    let openCount = 0;
-    let closedCount = 0;
-
-    for (let y = 0; y &lt; GRID_HEIGHT; y++) {
-        for (let x = 0; x &lt; GRID_WIDTH; x++) {
-            const node = grid[y][x];
-            if (node.element) {
-                if (node.element.classList.contains('open')) openCount++;
-                if (node.element.classList.contains('closed')) closedCount++;
-            }
-        }
-    }
-
-    console.log(`Visual validation: ${openCount} open, ${closedCount} closed cells`);
-    return { openCount, closedCount };
-}
-</code></pre>
-<p>}
-```</p>
 <h2>Test Execution and Reporting</h2>
-<p>```javascript
-// Main test execution
-async function runAllTests() {
-    console.clear();
-    console.log('🧪 A* Algorithm Test Suite\n');</p>
-<pre><code>// Unit tests
-await runner.runAll();
 
-// Performance tests
-const perfTest = new PerformanceTest();
-await perfTest.runPerformanceSuite();
-
-// Generate test report
-generateTestReport();
-</code></pre>
+<p>```javascript</p>
+<p>// Main test execution</p>
+<p>async function runAllTests() {</p>
+<p>    console.clear();</p>
+<p>    console.log('🧪 A* Algorithm Test Suite\n');</p>
+    
+<p>    // Unit tests</p>
+<p>    await runner.runAll();</p>
+    
+<p>    // Performance tests</p>
+<p>    const perfTest = new PerformanceTest();</p>
+<p>    await perfTest.runPerformanceSuite();</p>
+    
+<p>    // Generate test report</p>
+<p>    generateTestReport();</p>
 <p>}</p>
-<p>function generateTestReport() {
-    const report = {
-        timestamp: new Date().toISOString(),
-        unitTests: runner.results,
-        browser: navigator.userAgent,
-        performance: performance.memory ? {
-            usedJSHeapSize: performance.memory.usedJSHeapSize,
-            totalJSHeapSize: performance.memory.totalJSHeapSize,
-            jsHeapSizeLimit: performance.memory.jsHeapSizeLimit
-        } : null
-    };</p>
-<pre><code>console.log('📋 Test Report Generated:', report);
 
-// Save to localStorage for persistence
-localStorage.setItem('astar-test-report', JSON.stringify(report));
-</code></pre>
+<p>function generateTestReport() {</p>
+<p>    const report = {</p>
+<p>        timestamp: new Date().toISOString(),</p>
+<p>        unitTests: runner.results,</p>
+<p>        browser: navigator.userAgent,</p>
+<p>        performance: performance.memory ? {</p>
+<p>            usedJSHeapSize: performance.memory.usedJSHeapSize,</p>
+<p>            totalJSHeapSize: performance.memory.totalJSHeapSize,</p>
+<p>            jsHeapSizeLimit: performance.memory.jsHeapSizeLimit</p>
+<p>        } : null</p>
+<p>    };</p>
+    
+<p>    console.log('📋 Test Report Generated:', report);</p>
+    
+<p>    // Save to localStorage for persistence</p>
+<p>    localStorage.setItem('astar-test-report', JSON.stringify(report));</p>
 <p>}</p>
-<p>// Automated testing on page load
-window.addEventListener('load', () =&gt; {
-    // Add test button to UI
-    const testButton = document.createElement('button');
-    testButton.textContent = 'Run Tests';
-    testButton.onclick = runAllTests;
-    testButton.style.cssText = <code>position: fixed;
-        top: 10px;
-        right: 10px;
-        z-index: 1000;
-        padding: 10px;
-        background: #4CAF50;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;</code>;
-    document.body.appendChild(testButton);
-});
-```</p>
+
+<p>// Automated testing on page load</p>
+<p>window.addEventListener('load', () => {</p>
+<p>    // Add test button to UI</p>
+<p>    const testButton = document.createElement('button');</p>
+<p>    testButton.textContent = 'Run Tests';</p>
+<p>    testButton.onclick = runAllTests;</p>
+<p>    testButton.style.cssText = `</p>
+<p>        position: fixed;</p>
+<p>        top: 10px;</p>
+<p>        right: 10px;</p>
+<p>        z-index: 1000;</p>
+<p>        padding: 10px;</p>
+<p>        background: #4CAF50;</p>
+<p>        color: white;</p>
+<p>        border: none;</p>
+<p>        border-radius: 5px;</p>
+<p>        cursor: pointer;</p>
+<p>    `;</p>
+<p>    document.body.appendChild(testButton);</p>
+<p>});</p>
+<p>```</p>
+
 <h2>Continuous Integration Setup</h2>
-<h3>GitHub Actions Workflow</h3>
+
+<p>### GitHub Actions Workflow</p>
 <p>```yaml</p>
 <h1>.github/workflows/test.yml</h1>
 <p>name: A* Algorithm Tests</p>
-<p>on:
-  push:
-    branches: [ main, develop ]
-  pull_request:
-    branches: [ main ]</p>
-<p>jobs:
-  test:
-    runs-on: ubuntu-latest</p>
-<pre><code>steps:
-- uses: actions/checkout@v2
 
-- name: Setup Node.js
-  uses: actions/setup-node@v2
-  with:
-    node-version: '16'
+<p>on:</p>
+<p>  push:</p>
+<p>    branches: [ main, develop ]</p>
+<p>  pull_request:</p>
+<p>    branches: [ main ]</p>
 
-- name: Install dependencies
-  run: npm install puppeteer
-
-- name: Run tests
-  run: node test-runner.js
-
-- name: Upload test results
-  uses: actions/upload-artifact@v2
-  with:
-    name: test-results
-    path: test-results.json
-</code></pre>
+<p>jobs:</p>
+<p>  test:</p>
+<p>    runs-on: ubuntu-latest</p>
+    
+<p>    steps:</p>
+<p>    - uses: actions/checkout@v2</p>
+    
+<p>    - name: Setup Node.js</p>
+<p>      uses: actions/setup-node@v2</p>
+<p>      with:</p>
+<p>        node-version: '16'</p>
+    
+<p>    - name: Install dependencies</p>
+<p>      run: npm install puppeteer</p>
+    
+<p>    - name: Run tests</p>
+<p>      run: node test-runner.js</p>
+    
+<p>    - name: Upload test results</p>
+<p>      uses: actions/upload-artifact@v2</p>
+<p>      with:</p>
+<p>        name: test-results</p>
+<p>        path: test-results.json</p>
 <p>```</p>
-<h3>Automated Browser Testing</h3>
-<p>```javascript
-// test-runner.js (Node.js)
-const puppeteer = require('puppeteer');
-const fs = require('fs');</p>
-<p>async function runBrowserTests() {
-    const browser = await puppeteer.launch();
-    const page = await browser.newPage();</p>
-<pre><code>// Enable console logging
-page.on('console', msg =&gt; console.log('PAGE LOG:', msg.text()));
 
-// Load the demo page
-await page.goto(`file://${__dirname}/demo.html`);
+<p>### Automated Browser Testing</p>
+<p>```javascript</p>
+<p>// test-runner.js (Node.js)</p>
+<p>const puppeteer = require('puppeteer');</p>
+<p>const fs = require('fs');</p>
 
-// Wait for page to load
-await page.waitForSelector('#grid');
-
-// Run tests
-const results = await page.evaluate(() =&gt; {
-    return new Promise((resolve) =&gt; {
-        runAllTests().then(() =&gt; {
-            resolve({
-                unitTests: runner.results,
-                timestamp: new Date().toISOString()
-            });
-        });
-    });
-});
-
-// Save results
-fs.writeFileSync('test-results.json', JSON.stringify(results, null, 2));
-
-await browser.close();
-
-// Exit with error code if tests failed
-if (results.unitTests.failed &gt; 0) {
-    process.exit(1);
-}
-</code></pre>
+<p>async function runBrowserTests() {</p>
+<p>    const browser = await puppeteer.launch();</p>
+<p>    const page = await browser.newPage();</p>
+    
+<p>    // Enable console logging</p>
+<p>    page.on('console', msg => console.log('PAGE LOG:', msg.text()));</p>
+    
+<p>    // Load the demo page</p>
+<p>    await page.goto(`file://${__dirname}/demo.html`);</p>
+    
+<p>    // Wait for page to load</p>
+<p>    await page.waitForSelector('#grid');</p>
+    
+<p>    // Run tests</p>
+<p>    const results = await page.evaluate(() => {</p>
+<p>        return new Promise((resolve) => {</p>
+<p>            runAllTests().then(() => {</p>
+<p>                resolve({</p>
+<p>                    unitTests: runner.results,</p>
+<p>                    timestamp: new Date().toISOString()</p>
+<p>                });</p>
+<p>            });</p>
+<p>        });</p>
+<p>    });</p>
+    
+<p>    // Save results</p>
+<p>    fs.writeFileSync('test-results.json', JSON.stringify(results, null, 2));</p>
+    
+<p>    await browser.close();</p>
+    
+<p>    // Exit with error code if tests failed</p>
+<p>    if (results.unitTests.failed > 0) {</p>
+<p>        process.exit(1);</p>
+<p>    }</p>
 <p>}</p>
-<p>runBrowserTests().catch(console.error);
-```</p>
+
+<p>runBrowserTests().catch(console.error);</p>
+<p>```</p>
+
 <h2>Test Coverage Analysis</h2>
-<h3>Coverage Tracking</h3>
-<p>```javascript
-class CoverageTracker {
-    constructor() {
-        this.coverage = {
-            functions: new Set(),
-            branches: new Set(),
-            lines: new Set()
-        };
-    }</p>
-<pre><code>trackFunction(name) {
-    this.coverage.functions.add(name);
-}
 
-trackBranch(id) {
-    this.coverage.branches.add(id);
-}
-
-trackLine(file, line) {
-    this.coverage.lines.add(`${file}:${line}`);
-}
-
-getReport() {
-    return {
-        functions: this.coverage.functions.size,
-        branches: this.coverage.branches.size,
-        lines: this.coverage.lines.size
-    };
-}
-</code></pre>
+<p>### Coverage Tracking</p>
+<p>```javascript</p>
+<p>class CoverageTracker {</p>
+<p>    constructor() {</p>
+<p>        this.coverage = {</p>
+<p>            functions: new Set(),</p>
+<p>            branches: new Set(),</p>
+<p>            lines: new Set()</p>
+<p>        };</p>
+<p>    }</p>
+    
+<p>    trackFunction(name) {</p>
+<p>        this.coverage.functions.add(name);</p>
+<p>    }</p>
+    
+<p>    trackBranch(id) {</p>
+<p>        this.coverage.branches.add(id);</p>
+<p>    }</p>
+    
+<p>    trackLine(file, line) {</p>
+<p>        this.coverage.lines.add(`${file}:${line}`);</p>
+<p>    }</p>
+    
+<p>    getReport() {</p>
+<p>        return {</p>
+<p>            functions: this.coverage.functions.size,</p>
+<p>            branches: this.coverage.branches.size,</p>
+<p>            lines: this.coverage.lines.size</p>
+<p>        };</p>
+<p>    }</p>
 <p>}</p>
-<p>// Instrument functions for coverage
-const originalManhattanDistance = manhattanDistance;
-manhattanDistance = function(...args) {
-    coverageTracker.trackFunction('manhattanDistance');
-    return originalManhattanDistance.apply(this, args);
-};
-```</p>
-<hr />
-<p><strong>Previous:</strong> <a href="11-code-walkthrough.md">Code Walkthrough</a>
-<strong>Next:</strong> <a href="13-performance.md">Performance Analysis</a></p>
-<p><strong>Interactive:</strong> <a href="demo.html">Run tests</a></p>
+
+<p>// Instrument functions for coverage</p>
+<p>const originalManhattanDistance = manhattanDistance;</p>
+<p>manhattanDistance = function(...args) {</p>
+<p>    coverageTracker.trackFunction('manhattanDistance');</p>
+<p>    return originalManhattanDistance.apply(this, args);</p>
+<p>};</p>
+<p>```</p>
+
+<p>---</p>
+<b>Previous:</b> <a href="11-code-walkthrough.md">Code Walkthrough</a>
+<b>Next:</b> <a href="13-performance.md">Performance Analysis</a>
+
+<b>Interactive:</b> <a href="demo.html">Run tests</a>
     </div>
 </body>
 </html>

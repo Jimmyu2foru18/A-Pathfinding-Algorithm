@@ -15,801 +15,822 @@
     </nav>
     <div class="container">
         <h1>Optimization Techniques</h1>
+
 <h2>Performance Bottlenecks</h2>
-<h3>Common Performance Issues</h3>
-<ol>
-<li><strong>Open Set Management</strong>: O(log n) operations</li>
-<li><strong>Neighbor Generation</strong>: Repeated calculations</li>
-<li><strong>Heuristic Computation</strong>: Called frequently</li>
-<li><strong>Memory Allocation</strong>: Creating/destroying objects</li>
-<li><strong>Grid Access</strong>: Bounds checking overhead</li>
-</ol>
+
+<p>### Common Performance Issues</p>
+<p>1. <b>Open Set Management</b>: O(log n) operations</p>
+<p>2. <b>Neighbor Generation</b>: Repeated calculations</p>
+<p>3. <b>Heuristic Computation</b>: Called frequently</p>
+<p>4. <b>Memory Allocation</b>: Creating/destroying objects</p>
+<p>5. <b>Grid Access</b>: Bounds checking overhead</p>
+
 <h2>Memory Optimizations</h2>
-<h3>1. Node Pooling</h3>
-<p>```javascript
-class NodePool {
-    constructor(initialSize = 1000) {
-        this.available = [];
-        this.inUse = new Set();</p>
-<pre><code>    // Pre-allocate nodes
-    for (let i = 0; i &lt; initialSize; i++) {
-        this.available.push(new PathNode());
-    }
-}
 
-acquire(x, y) {
-    const key = `${x},${y}`;
-
-    if (this.inUse.has(key)) {
-        return this.inUse.get(key);
-    }
-
-    let node = this.available.pop();
-    if (!node) {
-        node = new PathNode();
-    }
-
-    node.reset(x, y);
-    this.inUse.set(key, node);
-    return node;
-}
-
-release(node) {
-    const key = `${node.x},${node.y}`;
-    this.inUse.delete(key);
-    this.available.push(node);
-}
-
-releaseAll() {
-    for (const node of this.inUse.values()) {
-        this.available.push(node);
-    }
-    this.inUse.clear();
-}
-</code></pre>
+<p>### 1. Node Pooling</p>
+<p>```javascript</p>
+<p>class NodePool {</p>
+<p>    constructor(initialSize = 1000) {</p>
+<p>        this.available = [];</p>
+<p>        this.inUse = new Set();</p>
+        
+<p>        // Pre-allocate nodes</p>
+<p>        for (let i = 0; i < initialSize; i++) {</p>
+<p>            this.available.push(new PathNode());</p>
+<p>        }</p>
+<p>    }</p>
+    
+<p>    acquire(x, y) {</p>
+<p>        const key = `${x},${y}`;</p>
+        
+<p>        if (this.inUse.has(key)) {</p>
+<p>            return this.inUse.get(key);</p>
+<p>        }</p>
+        
+<p>        let node = this.available.pop();</p>
+<p>        if (!node) {</p>
+<p>            node = new PathNode();</p>
+<p>        }</p>
+        
+<p>        node.reset(x, y);</p>
+<p>        this.inUse.set(key, node);</p>
+<p>        return node;</p>
+<p>    }</p>
+    
+<p>    release(node) {</p>
+<p>        const key = `${node.x},${node.y}`;</p>
+<p>        this.inUse.delete(key);</p>
+<p>        this.available.push(node);</p>
+<p>    }</p>
+    
+<p>    releaseAll() {</p>
+<p>        for (const node of this.inUse.values()) {</p>
+<p>            this.available.push(node);</p>
+<p>        }</p>
+<p>        this.inUse.clear();</p>
+<p>    }</p>
 <p>}</p>
-<p>class PathNode {
-    constructor() {
-        this.reset(0, 0);
-    }</p>
-<pre><code>reset(x, y) {
-    this.x = x;
-    this.y = y;
-    this.gCost = Infinity;
-    this.hCost = 0;
-    this.fCost = Infinity;
-    this.parent = null;
-    this.inOpenSet = false;
-    this.inClosedSet = false;
-}
-</code></pre>
-<p>}
-```</p>
-<h3>2. Coordinate Hashing</h3>
-<p>```javascript
-class CoordinateHasher {
-    constructor(maxWidth = 10000) {
-        this.maxWidth = maxWidth;
-    }</p>
-<pre><code>hash(x, y) {
-    return y * this.maxWidth + x;
-}
 
-unhash(hash) {
-    return {
-        x: hash % this.maxWidth,
-        y: Math.floor(hash / this.maxWidth)
-    };
-}
-</code></pre>
+<p>class PathNode {</p>
+<p>    constructor() {</p>
+<p>        this.reset(0, 0);</p>
+<p>    }</p>
+    
+<p>    reset(x, y) {</p>
+<p>        this.x = x;</p>
+<p>        this.y = y;</p>
+<p>        this.gCost = Infinity;</p>
+<p>        this.hCost = 0;</p>
+<p>        this.fCost = Infinity;</p>
+<p>        this.parent = null;</p>
+<p>        this.inOpenSet = false;</p>
+<p>        this.inClosedSet = false;</p>
+<p>    }</p>
 <p>}</p>
-<p>// Usage in pathfinder
-class OptimizedAStar {
-    constructor() {
-        this.hasher = new CoordinateHasher();
-        this.gScores = new Map();  // hash -&gt; gScore
-        this.parents = new Map();  // hash -&gt; parentHash
-    }</p>
-<pre><code>findPath(grid, start, goal) {
-    const startHash = this.hasher.hash(start.x, start.y);
-    const goalHash = this.hasher.hash(goal.x, goal.y);
+<p>```</p>
 
-    this.gScores.set(startHash, 0);
-    // ... rest of algorithm using hashes
-}
-</code></pre>
-<p>}
-```</p>
-<h3>3. Bit-Packed Grid</h3>
-<p>```javascript
-class BitPackedGrid {
-    constructor(width, height) {
-        this.width = width;
-        this.height = height;
-        // Pack 32 cells per integer
-        this.data = new Uint32Array(Math.ceil(width * height / 32));
-    }</p>
-<pre><code>setObstacle(x, y, isObstacle) {
-    const index = y * this.width + x;
-    const arrayIndex = Math.floor(index / 32);
-    const bitIndex = index % 32;
+<p>### 2. Coordinate Hashing</p>
+<p>```javascript</p>
+<p>class CoordinateHasher {</p>
+<p>    constructor(maxWidth = 10000) {</p>
+<p>        this.maxWidth = maxWidth;</p>
+<p>    }</p>
+    
+<p>    hash(x, y) {</p>
+<p>        return y * this.maxWidth + x;</p>
+<p>    }</p>
+    
+<p>    unhash(hash) {</p>
+<p>        return {</p>
+<p>            x: hash % this.maxWidth,</p>
+<p>            y: Math.floor(hash / this.maxWidth)</p>
+<p>        };</p>
+<p>    }</p>
+<p>}</p>
 
-    if (isObstacle) {
-        this.data[arrayIndex] |= (1 &lt;&lt; bitIndex);
-    } else {
-        this.data[arrayIndex] &amp;= ~(1 &lt;&lt; bitIndex);
-    }
-}
+<p>// Usage in pathfinder</p>
+<p>class OptimizedAStar {</p>
+<p>    constructor() {</p>
+<p>        this.hasher = new CoordinateHasher();</p>
+<p>        this.gScores = new Map();  // hash -> gScore</p>
+<p>        this.parents = new Map();  // hash -> parentHash</p>
+<p>    }</p>
+    
+<p>    findPath(grid, start, goal) {</p>
+<p>        const startHash = this.hasher.hash(start.x, start.y);</p>
+<p>        const goalHash = this.hasher.hash(goal.x, goal.y);</p>
+        
+<p>        this.gScores.set(startHash, 0);</p>
+<p>        // ... rest of algorithm using hashes</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
 
-isObstacle(x, y) {
-    const index = y * this.width + x;
-    const arrayIndex = Math.floor(index / 32);
-    const bitIndex = index % 32;
+<p>### 3. Bit-Packed Grid</p>
+<p>```javascript</p>
+<p>class BitPackedGrid {</p>
+<p>    constructor(width, height) {</p>
+<p>        this.width = width;</p>
+<p>        this.height = height;</p>
+<p>        // Pack 32 cells per integer</p>
+<p>        this.data = new Uint32Array(Math.ceil(width * height / 32));</p>
+<p>    }</p>
+    
+<p>    setObstacle(x, y, isObstacle) {</p>
+<p>        const index = y * this.width + x;</p>
+<p>        const arrayIndex = Math.floor(index / 32);</p>
+<p>        const bitIndex = index % 32;</p>
+        
+<p>        if (isObstacle) {</p>
+<p>            this.data[arrayIndex] |= (1 << bitIndex);</p>
+<p>        } else {</p>
+<p>            this.data[arrayIndex] &= ~(1 << bitIndex);</p>
+<p>        }</p>
+<p>    }</p>
+    
+<p>    isObstacle(x, y) {</p>
+<p>        const index = y * this.width + x;</p>
+<p>        const arrayIndex = Math.floor(index / 32);</p>
+<p>        const bitIndex = index % 32;</p>
+        
+<p>        return (this.data[arrayIndex] & (1 << bitIndex)) !== 0;</p>
+<p>    }</p>
+    
+<p>    isValid(x, y) {</p>
+<p>        return x >= 0 && x < this.width && y >= 0 && y < this.height;</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
 
-    return (this.data[arrayIndex] &amp; (1 &lt;&lt; bitIndex)) !== 0;
-}
-
-isValid(x, y) {
-    return x &gt;= 0 &amp;&amp; x &lt; this.width &amp;&amp; y &gt;= 0 &amp;&amp; y &lt; this.height;
-}
-</code></pre>
-<p>}
-```</p>
 <h2>Algorithmic Optimizations</h2>
-<h3>1. Jump Point Search (JPS)</h3>
-<p>```javascript
-class JumpPointSearch {
-    constructor(grid) {
-        this.grid = grid;
-        this.width = grid[0].length;
-        this.height = grid.length;
-    }</p>
-<pre><code>findPath(start, goal) {
-    const openSet = new MinHeap();
-    const closedSet = new Set();
-    const cameFrom = new Map();
-    const gScore = new Map();
 
-    const startKey = `${start.x},${start.y}`;
-    gScore.set(startKey, 0);
-    openSet.insert({
-        ...start,
-        fCost: this.heuristic(start, goal)
-    });
-
-    while (!openSet.isEmpty()) {
-        const current = openSet.extractMin();
-        const currentKey = `${current.x},${current.y}`;
-
-        if (current.x === goal.x &amp;&amp; current.y === goal.y) {
-            return this.reconstructPath(cameFrom, current);
-        }
-
-        closedSet.add(currentKey);
-
-        // Find jump points instead of all neighbors
-        const jumpPoints = this.findJumpPoints(current, goal);
-
-        for (const jp of jumpPoints) {
-            const jpKey = `${jp.x},${jp.y}`;
-
-            if (closedSet.has(jpKey)) continue;
-
-            const tentativeG = gScore.get(currentKey) + jp.distance;
-
-            if (!gScore.has(jpKey) || tentativeG &lt; gScore.get(jpKey)) {
-                cameFrom.set(jpKey, current);
-                gScore.set(jpKey, tentativeG);
-
-                const fCost = tentativeG + this.heuristic(jp, goal);
-                openSet.insert({...jp, fCost});
-            }
-        }
-    }
-
-    return null;
-}
-
-findJumpPoints(current, goal) {
-    const jumpPoints = [];
-    const directions = [
-        [-1, -1], [-1, 0], [-1, 1],
-        [0, -1],           [0, 1],
-        [1, -1],  [1, 0],  [1, 1]
-    ];
-
-    for (const [dx, dy] of directions) {
-        const jp = this.jump(current.x, current.y, dx, dy, goal);
-        if (jp) {
-            const distance = Math.sqrt(
-                (jp.x - current.x) ** 2 + (jp.y - current.y) ** 2
-            );
-            jumpPoints.push({...jp, distance});
-        }
-    }
-
-    return jumpPoints;
-}
-
-jump(x, y, dx, dy, goal) {
-    const nx = x + dx;
-    const ny = y + dy;
-
-    if (!this.isWalkable(nx, ny)) return null;
-    if (nx === goal.x &amp;&amp; ny === goal.y) return {x: nx, y: ny};
-
-    // Check for forced neighbors
-    if (this.hasForcedNeighbors(nx, ny, dx, dy)) {
-        return {x: nx, y: ny};
-    }
-
-    // Diagonal movement: check cardinal directions
-    if (dx !== 0 &amp;&amp; dy !== 0) {
-        if (this.jump(nx, ny, dx, 0, goal) || 
-            this.jump(nx, ny, 0, dy, goal)) {
-            return {x: nx, y: ny};
-        }
-    }
-
-    // Continue jumping
-    return this.jump(nx, ny, dx, dy, goal);
-}
-
-hasForcedNeighbors(x, y, dx, dy) {
-    // Implementation depends on movement rules
-    // This is a simplified version
-    if (dx === 0) {  // Vertical movement
-        return (!this.isWalkable(x - 1, y - dy) &amp;&amp; this.isWalkable(x - 1, y)) ||
-               (!this.isWalkable(x + 1, y - dy) &amp;&amp; this.isWalkable(x + 1, y));
-    }
-
-    if (dy === 0) {  // Horizontal movement
-        return (!this.isWalkable(x - dx, y - 1) &amp;&amp; this.isWalkable(x, y - 1)) ||
-               (!this.isWalkable(x - dx, y + 1) &amp;&amp; this.isWalkable(x, y + 1));
-    }
-
-    // Diagonal movement
-    return (!this.isWalkable(x - dx, y) &amp;&amp; this.isWalkable(x - dx, y + dy)) ||
-           (!this.isWalkable(x, y - dy) &amp;&amp; this.isWalkable(x + dx, y - dy));
-}
-
-isWalkable(x, y) {
-    return x &gt;= 0 &amp;&amp; x &lt; this.width &amp;&amp; 
-           y &gt;= 0 &amp;&amp; y &lt; this.height &amp;&amp; 
-           !this.grid[y][x].isObstacle;
-}
-</code></pre>
-<p>}
-```</p>
-<h3>2. Bidirectional A*</h3>
-<p>```javascript
-class BidirectionalAStar {
-    constructor() {
-        this.forwardSearch = new AStarSearch();
-        this.backwardSearch = new AStarSearch();
-    }</p>
-<pre><code>findPath(grid, start, goal) {
-    this.forwardSearch.initialize(grid, start, goal);
-    this.backwardSearch.initialize(grid, goal, start);
-
-    let bestPath = null;
-    let bestCost = Infinity;
-
-    while (!this.forwardSearch.openSet.isEmpty() &amp;&amp; 
-           !this.backwardSearch.openSet.isEmpty()) {
-
-        // Expand forward search
-        const forwardNode = this.forwardSearch.expandBestNode();
-        if (forwardNode) {
-            const meetingPoint = this.checkMeeting(
-                forwardNode, this.backwardSearch.closedSet
-            );
-
-            if (meetingPoint) {
-                const path = this.constructBidirectionalPath(
-                    forwardNode, meetingPoint
-                );
-                const cost = this.calculatePathCost(path);
-
-                if (cost &lt; bestCost) {
-                    bestPath = path;
-                    bestCost = cost;
-                }
-            }
-        }
-
-        // Expand backward search
-        const backwardNode = this.backwardSearch.expandBestNode();
-        if (backwardNode) {
-            const meetingPoint = this.checkMeeting(
-                backwardNode, this.forwardSearch.closedSet
-            );
-
-            if (meetingPoint) {
-                const path = this.constructBidirectionalPath(
-                    meetingPoint, backwardNode
-                );
-                const cost = this.calculatePathCost(path);
-
-                if (cost &lt; bestCost) {
-                    bestPath = path;
-                    bestCost = cost;
-                }
-            }
-        }
-
-        // Early termination condition
-        if (bestPath &amp;&amp; this.shouldTerminate(bestCost)) {
-            break;
-        }
-    }
-
-    return bestPath;
-}
-
-checkMeeting(node, otherClosedSet) {
-    const key = `${node.x},${node.y}`;
-    return otherClosedSet.has(key) ? otherClosedSet.get(key) : null;
-}
-
-constructBidirectionalPath(forwardNode, backwardNode) {
-    const forwardPath = this.forwardSearch.reconstructPath(forwardNode);
-    const backwardPath = this.backwardSearch.reconstructPath(backwardNode);
-
-    // Reverse backward path and concatenate
-    backwardPath.reverse();
-    return [...forwardPath, ...backwardPath.slice(1)];
-}
-</code></pre>
-<p>}
-```</p>
-<h3>3. Hierarchical Pathfinding</h3>
-<p>```javascript
-class HierarchicalAStar {
-    constructor(grid, clusterSize = 10) {
-        this.grid = grid;
-        this.clusterSize = clusterSize;
-        this.abstractGraph = this.buildAbstractGraph();
-        this.lowLevelPathfinder = new AStarPathfinder();
-        this.highLevelPathfinder = new AStarPathfinder();
-    }</p>
-<pre><code>findPath(start, goal) {
-    // 1. Find abstract path
-    const startCluster = this.getCluster(start);
-    const goalCluster = this.getCluster(goal);
-
-    if (startCluster === goalCluster) {
-        // Same cluster, use low-level pathfinding
-        return this.lowLevelPathfinder.findPath(this.grid, start, goal);
-    }
-
-    const abstractPath = this.highLevelPathfinder.findPath(
-        this.abstractGraph,
-        startCluster,
-        goalCluster
-    );
-
-    if (!abstractPath) return null;
-
-    // 2. Refine abstract path
-    return this.refinePath(abstractPath, start, goal);
-}
-
-buildAbstractGraph() {
-    const clusters = this.createClusters();
-    const graph = [];
-
-    for (let y = 0; y &lt; clusters.height; y++) {
-        graph[y] = [];
-        for (let x = 0; x &lt; clusters.width; x++) {
-            graph[y][x] = {
-                isObstacle: this.isClusterBlocked(x, y),
-                entrances: this.findClusterEntrances(x, y),
-                exits: this.findClusterExits(x, y)
-            };
-        }
-    }
-
-    return graph;
-}
-
-createClusters() {
-    const width = Math.ceil(this.grid[0].length / this.clusterSize);
-    const height = Math.ceil(this.grid.length / this.clusterSize);
-
-    return { width, height };
-}
-
-isClusterBlocked(clusterX, clusterY) {
-    const startX = clusterX * this.clusterSize;
-    const startY = clusterY * this.clusterSize;
-    const endX = Math.min(startX + this.clusterSize, this.grid[0].length);
-    const endY = Math.min(startY + this.clusterSize, this.grid.length);
-
-    let passableCells = 0;
-    let totalCells = 0;
-
-    for (let y = startY; y &lt; endY; y++) {
-        for (let x = startX; x &lt; endX; x++) {
-            totalCells++;
-            if (!this.grid[y][x].isObstacle) {
-                passableCells++;
-            }
-        }
-    }
-
-    return (passableCells / totalCells) &lt; 0.3; // 30% threshold
-}
-</code></pre>
-<p>}
-```</p>
-<h2>Data Structure Optimizations</h2>
-<h3>1. Fibonacci Heap for Open Set</h3>
-<p>```javascript
-class FibonacciHeap {
-    constructor() {
-        this.minNode = null;
-        this.nodeCount = 0;
-        this.nodeMap = new Map();
-    }</p>
-<pre><code>insert(node) {
-    const fibNode = new FibNode(node);
-    this.nodeMap.set(`${node.x},${node.y}`, fibNode);
-
-    if (this.minNode === null) {
-        this.minNode = fibNode;
-    } else {
-        this.addToRootList(fibNode);
-        if (fibNode.key &lt; this.minNode.key) {
-            this.minNode = fibNode;
-        }
-    }
-
-    this.nodeCount++;
-}
-
-extractMin() {
-    const min = this.minNode;
-    if (min === null) return null;
-
-    // Add children to root list
-    if (min.child !== null) {
-        let child = min.child;
-        do {
-            const next = child.right;
-            this.addToRootList(child);
-            child.parent = null;
-            child = next;
-        } while (child !== min.child);
-    }
-
-    // Remove min from root list
-    this.removeFromRootList(min);
-
-    if (min === min.right) {
-        this.minNode = null;
-    } else {
-        this.minNode = min.right;
-        this.consolidate();
-    }
-
-    this.nodeCount--;
-    this.nodeMap.delete(`${min.data.x},${min.data.y}`);
-    return min.data;
-}
-
-decreaseKey(node, newKey) {
-    const fibNode = this.nodeMap.get(`${node.x},${node.y}`);
-    if (!fibNode || newKey &gt;= fibNode.key) return;
-
-    fibNode.key = newKey;
-    const parent = fibNode.parent;
-
-    if (parent !== null &amp;&amp; fibNode.key &lt; parent.key) {
-        this.cut(fibNode, parent);
-        this.cascadingCut(parent);
-    }
-
-    if (fibNode.key &lt; this.minNode.key) {
-        this.minNode = fibNode;
-    }
-}
-
-consolidate() {
-    const maxDegree = Math.floor(Math.log2(this.nodeCount)) + 1;
-    const degreeTable = new Array(maxDegree).fill(null);
-
-    const rootList = [];
-    let current = this.minNode;
-
-    if (current !== null) {
-        do {
-            rootList.push(current);
-            current = current.right;
-        } while (current !== this.minNode);
-    }
-
-    for (const node of rootList) {
-        let degree = node.degree;
-
-        while (degreeTable[degree] !== null) {
-            let other = degreeTable[degree];
-
-            if (node.key &gt; other.key) {
-                [node, other] = [other, node];
-            }
-
-            this.link(other, node);
-            degreeTable[degree] = null;
-            degree++;
-        }
-
-        degreeTable[degree] = node;
-    }
-
-    this.minNode = null;
-
-    for (const node of degreeTable) {
-        if (node !== null) {
-            if (this.minNode === null) {
-                this.minNode = node;
-            } else {
-                this.addToRootList(node);
-                if (node.key &lt; this.minNode.key) {
-                    this.minNode = node;
-                }
-            }
-        }
-    }
-}
-</code></pre>
-<p>}
-```</p>
-<h3>2. Cache-Friendly Memory Layout</h3>
-<p>```javascript
-class CacheOptimizedGrid {
-    constructor(width, height) {
-        this.width = width;
-        this.height = height;</p>
-<pre><code>    // Store grid data in a single flat array for better cache locality
-    this.data = new Float32Array(width * height * 4); // x, y, gCost, hCost
-    this.obstacles = new Uint8Array(width * height); // 1 byte per cell
-}
-
-getIndex(x, y) {
-    return y * this.width + x;
-}
-
-setObstacle(x, y, isObstacle) {
-    this.obstacles[this.getIndex(x, y)] = isObstacle ? 1 : 0;
-}
-
-isObstacle(x, y) {
-    return this.obstacles[this.getIndex(x, y)] === 1;
-}
-
-setGCost(x, y, cost) {
-    const baseIndex = this.getIndex(x, y) * 4;
-    this.data[baseIndex + 2] = cost;
-}
-
-getGCost(x, y) {
-    const baseIndex = this.getIndex(x, y) * 4;
-    return this.data[baseIndex + 2];
-}
-
-setHCost(x, y, cost) {
-    const baseIndex = this.getIndex(x, y) * 4;
-    this.data[baseIndex + 3] = cost;
-}
-
-getHCost(x, y) {
-    const baseIndex = this.getIndex(x, y) * 4;
-    return this.data[baseIndex + 3];
-}
-
-getFCost(x, y) {
-    return this.getGCost(x, y) + this.getHCost(x, y);
-}
-</code></pre>
-<p>}
-```</p>
-<h2>Parallel Processing</h2>
-<h3>1. Web Workers for Large Grids</h3>
-<p>```javascript
-// main.js
-class ParallelPathfinder {
-    constructor(numWorkers = 4) {
-        this.workers = [];
-        this.taskQueue = [];
-        this.activeJobs = new Map();</p>
-<pre><code>    for (let i = 0; i &lt; numWorkers; i++) {
-        const worker = new Worker('pathfinding-worker.js');
-        worker.onmessage = this.handleWorkerMessage.bind(this);
-        this.workers.push(worker);
-    }
-}
-
-findPathAsync(grid, start, goal) {
-    return new Promise((resolve, reject) =&gt; {
-        const jobId = this.generateJobId();
-        const task = {
-            id: jobId,
-            grid: grid,
-            start: start,
-            goal: goal,
-            resolve: resolve,
-            reject: reject
-        };
-
-        this.activeJobs.set(jobId, task);
-
-        const availableWorker = this.getAvailableWorker();
-        if (availableWorker) {
-            this.assignTask(availableWorker, task);
-        } else {
-            this.taskQueue.push(task);
-        }
-    });
-}
-
-handleWorkerMessage(event) {
-    const { jobId, result, error } = event.data;
-    const job = this.activeJobs.get(jobId);
-
-    if (job) {
-        this.activeJobs.delete(jobId);
-
-        if (error) {
-            job.reject(new Error(error));
-        } else {
-            job.resolve(result);
-        }
-
-        // Assign next task if available
-        if (this.taskQueue.length &gt; 0) {
-            const nextTask = this.taskQueue.shift();
-            this.assignTask(event.target, nextTask);
-        }
-    }
-}
-</code></pre>
+<p>### 1. Jump Point Search (JPS)</p>
+<p>```javascript</p>
+<p>class JumpPointSearch {</p>
+<p>    constructor(grid) {</p>
+<p>        this.grid = grid;</p>
+<p>        this.width = grid[0].length;</p>
+<p>        this.height = grid.length;</p>
+<p>    }</p>
+    
+<p>    findPath(start, goal) {</p>
+<p>        const openSet = new MinHeap();</p>
+<p>        const closedSet = new Set();</p>
+<p>        const cameFrom = new Map();</p>
+<p>        const gScore = new Map();</p>
+        
+<p>        const startKey = `${start.x},${start.y}`;</p>
+<p>        gScore.set(startKey, 0);</p>
+<p>        openSet.insert({</p>
+<p>            ...start,</p>
+<p>            fCost: this.heuristic(start, goal)</p>
+<p>        });</p>
+        
+<p>        while (!openSet.isEmpty()) {</p>
+<p>            const current = openSet.extractMin();</p>
+<p>            const currentKey = `${current.x},${current.y}`;</p>
+            
+<p>            if (current.x === goal.x && current.y === goal.y) {</p>
+<p>                return this.reconstructPath(cameFrom, current);</p>
+<p>            }</p>
+            
+<p>            closedSet.add(currentKey);</p>
+            
+<p>            // Find jump points instead of all neighbors</p>
+<p>            const jumpPoints = this.findJumpPoints(current, goal);</p>
+            
+<p>            for (const jp of jumpPoints) {</p>
+<p>                const jpKey = `${jp.x},${jp.y}`;</p>
+                
+<p>                if (closedSet.has(jpKey)) continue;</p>
+                
+<p>                const tentativeG = gScore.get(currentKey) + jp.distance;</p>
+                
+<p>                if (!gScore.has(jpKey) || tentativeG < gScore.get(jpKey)) {</p>
+<p>                    cameFrom.set(jpKey, current);</p>
+<p>                    gScore.set(jpKey, tentativeG);</p>
+                    
+<p>                    const fCost = tentativeG + this.heuristic(jp, goal);</p>
+<p>                    openSet.insert({...jp, fCost});</p>
+<p>                }</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        return null;</p>
+<p>    }</p>
+    
+<p>    findJumpPoints(current, goal) {</p>
+<p>        const jumpPoints = [];</p>
+<p>        const directions = [</p>
+<p>            [-1, -1], [-1, 0], [-1, 1],</p>
+<p>            [0, -1],           [0, 1],</p>
+<p>            [1, -1],  [1, 0],  [1, 1]</p>
+<p>        ];</p>
+        
+<p>        for (const [dx, dy] of directions) {</p>
+<p>            const jp = this.jump(current.x, current.y, dx, dy, goal);</p>
+<p>            if (jp) {</p>
+<p>                const distance = Math.sqrt(</p>
+<p>                    (jp.x - current.x) <b> 2 + (jp.y - current.y) </b> 2</p>
+<p>                );</p>
+<p>                jumpPoints.push({...jp, distance});</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        return jumpPoints;</p>
+<p>    }</p>
+    
+<p>    jump(x, y, dx, dy, goal) {</p>
+<p>        const nx = x + dx;</p>
+<p>        const ny = y + dy;</p>
+        
+<p>        if (!this.isWalkable(nx, ny)) return null;</p>
+<p>        if (nx === goal.x && ny === goal.y) return {x: nx, y: ny};</p>
+        
+<p>        // Check for forced neighbors</p>
+<p>        if (this.hasForcedNeighbors(nx, ny, dx, dy)) {</p>
+<p>            return {x: nx, y: ny};</p>
+<p>        }</p>
+        
+<p>        // Diagonal movement: check cardinal directions</p>
+<p>        if (dx !== 0 && dy !== 0) {</p>
+<p>            if (this.jump(nx, ny, dx, 0, goal) || </p>
+<p>                this.jump(nx, ny, 0, dy, goal)) {</p>
+<p>                return {x: nx, y: ny};</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        // Continue jumping</p>
+<p>        return this.jump(nx, ny, dx, dy, goal);</p>
+<p>    }</p>
+    
+<p>    hasForcedNeighbors(x, y, dx, dy) {</p>
+<p>        // Implementation depends on movement rules</p>
+<p>        // This is a simplified version</p>
+<p>        if (dx === 0) {  // Vertical movement</p>
+<p>            return (!this.isWalkable(x - 1, y - dy) && this.isWalkable(x - 1, y)) ||</p>
+<p>                   (!this.isWalkable(x + 1, y - dy) && this.isWalkable(x + 1, y));</p>
+<p>        }</p>
+        
+<p>        if (dy === 0) {  // Horizontal movement</p>
+<p>            return (!this.isWalkable(x - dx, y - 1) && this.isWalkable(x, y - 1)) ||</p>
+<p>                   (!this.isWalkable(x - dx, y + 1) && this.isWalkable(x, y + 1));</p>
+<p>        }</p>
+        
+<p>        // Diagonal movement</p>
+<p>        return (!this.isWalkable(x - dx, y) && this.isWalkable(x - dx, y + dy)) ||</p>
+<p>               (!this.isWalkable(x, y - dy) && this.isWalkable(x + dx, y - dy));</p>
+<p>    }</p>
+    
+<p>    isWalkable(x, y) {</p>
+<p>        return x >= 0 && x < this.width && </p>
+<p>               y >= 0 && y < this.height && </p>
+<p>               !this.grid[y][x].isObstacle;</p>
+<p>    }</p>
 <p>}</p>
-<p>// pathfinding-worker.js
-self.onmessage = function(event) {
-    const { jobId, grid, start, goal } = event.data;</p>
-<pre><code>try {
-    const pathfinder = new AStarPathfinder();
-    const path = pathfinder.findPath(grid, start, goal);
+<p>```</p>
 
-    self.postMessage({
-        jobId: jobId,
-        result: path
-    });
-} catch (error) {
-    self.postMessage({
-        jobId: jobId,
-        error: error.message
-    });
-}
-</code></pre>
-<p>};
-```</p>
-<h3>2. SIMD Optimizations</h3>
-<p>```javascript
-// Using SIMD for heuristic calculations (when available)
-class SIMDOptimizedPathfinder {
-    constructor() {
-        this.simdSupported = typeof SIMD !== 'undefined';
-    }</p>
-<pre><code>calculateManhattanDistanceBatch(points, goal) {
-    if (this.simdSupported &amp;&amp; points.length &gt;= 4) {
-        return this.calculateManhattanSIMD(points, goal);
-    } else {
-        return this.calculateManhattanScalar(points, goal);
-    }
-}
+<p>### 2. Bidirectional A*</p>
+<p>```javascript</p>
+<p>class BidirectionalAStar {</p>
+<p>    constructor() {</p>
+<p>        this.forwardSearch = new AStarSearch();</p>
+<p>        this.backwardSearch = new AStarSearch();</p>
+<p>    }</p>
+    
+<p>    findPath(grid, start, goal) {</p>
+<p>        this.forwardSearch.initialize(grid, start, goal);</p>
+<p>        this.backwardSearch.initialize(grid, goal, start);</p>
+        
+<p>        let bestPath = null;</p>
+<p>        let bestCost = Infinity;</p>
+        
+<p>        while (!this.forwardSearch.openSet.isEmpty() && </p>
+<p>               !this.backwardSearch.openSet.isEmpty()) {</p>
+            
+<p>            // Expand forward search</p>
+<p>            const forwardNode = this.forwardSearch.expandBestNode();</p>
+<p>            if (forwardNode) {</p>
+<p>                const meetingPoint = this.checkMeeting(</p>
+<p>                    forwardNode, this.backwardSearch.closedSet</p>
+<p>                );</p>
+                
+<p>                if (meetingPoint) {</p>
+<p>                    const path = this.constructBidirectionalPath(</p>
+<p>                        forwardNode, meetingPoint</p>
+<p>                    );</p>
+<p>                    const cost = this.calculatePathCost(path);</p>
+                    
+<p>                    if (cost < bestCost) {</p>
+<p>                        bestPath = path;</p>
+<p>                        bestCost = cost;</p>
+<p>                    }</p>
+<p>                }</p>
+<p>            }</p>
+            
+<p>            // Expand backward search</p>
+<p>            const backwardNode = this.backwardSearch.expandBestNode();</p>
+<p>            if (backwardNode) {</p>
+<p>                const meetingPoint = this.checkMeeting(</p>
+<p>                    backwardNode, this.forwardSearch.closedSet</p>
+<p>                );</p>
+                
+<p>                if (meetingPoint) {</p>
+<p>                    const path = this.constructBidirectionalPath(</p>
+<p>                        meetingPoint, backwardNode</p>
+<p>                    );</p>
+<p>                    const cost = this.calculatePathCost(path);</p>
+                    
+<p>                    if (cost < bestCost) {</p>
+<p>                        bestPath = path;</p>
+<p>                        bestCost = cost;</p>
+<p>                    }</p>
+<p>                }</p>
+<p>            }</p>
+            
+<p>            // Early termination condition</p>
+<p>            if (bestPath && this.shouldTerminate(bestCost)) {</p>
+<p>                break;</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        return bestPath;</p>
+<p>    }</p>
+    
+<p>    checkMeeting(node, otherClosedSet) {</p>
+<p>        const key = `${node.x},${node.y}`;</p>
+<p>        return otherClosedSet.has(key) ? otherClosedSet.get(key) : null;</p>
+<p>    }</p>
+    
+<p>    constructBidirectionalPath(forwardNode, backwardNode) {</p>
+<p>        const forwardPath = this.forwardSearch.reconstructPath(forwardNode);</p>
+<p>        const backwardPath = this.backwardSearch.reconstructPath(backwardNode);</p>
+        
+<p>        // Reverse backward path and concatenate</p>
+<p>        backwardPath.reverse();</p>
+<p>        return [...forwardPath, ...backwardPath.slice(1)];</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
 
-calculateManhattanSIMD(points, goal) {
-    const results = [];
-    const goalX = SIMD.Float32x4.splat(goal.x);
-    const goalY = SIMD.Float32x4.splat(goal.y);
+<p>### 3. Hierarchical Pathfinding</p>
+<p>```javascript</p>
+<p>class HierarchicalAStar {</p>
+<p>    constructor(grid, clusterSize = 10) {</p>
+<p>        this.grid = grid;</p>
+<p>        this.clusterSize = clusterSize;</p>
+<p>        this.abstractGraph = this.buildAbstractGraph();</p>
+<p>        this.lowLevelPathfinder = new AStarPathfinder();</p>
+<p>        this.highLevelPathfinder = new AStarPathfinder();</p>
+<p>    }</p>
+    
+<p>    findPath(start, goal) {</p>
+<p>        // 1. Find abstract path</p>
+<p>        const startCluster = this.getCluster(start);</p>
+<p>        const goalCluster = this.getCluster(goal);</p>
+        
+<p>        if (startCluster === goalCluster) {</p>
+<p>            // Same cluster, use low-level pathfinding</p>
+<p>            return this.lowLevelPathfinder.findPath(this.grid, start, goal);</p>
+<p>        }</p>
+        
+<p>        const abstractPath = this.highLevelPathfinder.findPath(</p>
+<p>            this.abstractGraph,</p>
+<p>            startCluster,</p>
+<p>            goalCluster</p>
+<p>        );</p>
+        
+<p>        if (!abstractPath) return null;</p>
+        
+<p>        // 2. Refine abstract path</p>
+<p>        return this.refinePath(abstractPath, start, goal);</p>
+<p>    }</p>
+    
+<p>    buildAbstractGraph() {</p>
+<p>        const clusters = this.createClusters();</p>
+<p>        const graph = [];</p>
+        
+<p>        for (let y = 0; y < clusters.height; y++) {</p>
+<p>            graph[y] = [];</p>
+<p>            for (let x = 0; x < clusters.width; x++) {</p>
+<p>                graph[y][x] = {</p>
+<p>                    isObstacle: this.isClusterBlocked(x, y),</p>
+<p>                    entrances: this.findClusterEntrances(x, y),</p>
+<p>                    exits: this.findClusterExits(x, y)</p>
+<p>                };</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        return graph;</p>
+<p>    }</p>
+    
+<p>    createClusters() {</p>
+<p>        const width = Math.ceil(this.grid[0].length / this.clusterSize);</p>
+<p>        const height = Math.ceil(this.grid.length / this.clusterSize);</p>
+        
+<p>        return { width, height };</p>
+<p>    }</p>
+    
+<p>    isClusterBlocked(clusterX, clusterY) {</p>
+<p>        const startX = clusterX * this.clusterSize;</p>
+<p>        const startY = clusterY * this.clusterSize;</p>
+<p>        const endX = Math.min(startX + this.clusterSize, this.grid[0].length);</p>
+<p>        const endY = Math.min(startY + this.clusterSize, this.grid.length);</p>
+        
+<p>        let passableCells = 0;</p>
+<p>        let totalCells = 0;</p>
+        
+<p>        for (let y = startY; y < endY; y++) {</p>
+<p>            for (let x = startX; x < endX; x++) {</p>
+<p>                totalCells++;</p>
+<p>                if (!this.grid[y][x].isObstacle) {</p>
+<p>                    passableCells++;</p>
+<p>                }</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        return (passableCells / totalCells) < 0.3; // 30% threshold</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
 
-    for (let i = 0; i &lt; points.length; i += 4) {
-        const x = SIMD.Float32x4(
-            points[i]?.x || 0,
-            points[i + 1]?.x || 0,
-            points[i + 2]?.x || 0,
-            points[i + 3]?.x || 0
-        );
+<h2>Data Structure Optimizations</h2>
 
-        const y = SIMD.Float32x4(
-            points[i]?.y || 0,
-            points[i + 1]?.y || 0,
-            points[i + 2]?.y || 0,
-            points[i + 3]?.y || 0
-        );
+<p>### 1. Fibonacci Heap for Open Set</p>
+<p>```javascript</p>
+<p>class FibonacciHeap {</p>
+<p>    constructor() {</p>
+<p>        this.minNode = null;</p>
+<p>        this.nodeCount = 0;</p>
+<p>        this.nodeMap = new Map();</p>
+<p>    }</p>
+    
+<p>    insert(node) {</p>
+<p>        const fibNode = new FibNode(node);</p>
+<p>        this.nodeMap.set(`${node.x},${node.y}`, fibNode);</p>
+        
+<p>        if (this.minNode === null) {</p>
+<p>            this.minNode = fibNode;</p>
+<p>        } else {</p>
+<p>            this.addToRootList(fibNode);</p>
+<p>            if (fibNode.key < this.minNode.key) {</p>
+<p>                this.minNode = fibNode;</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        this.nodeCount++;</p>
+<p>    }</p>
+    
+<p>    extractMin() {</p>
+<p>        const min = this.minNode;</p>
+<p>        if (min === null) return null;</p>
+        
+<p>        // Add children to root list</p>
+<p>        if (min.child !== null) {</p>
+<p>            let child = min.child;</p>
+<p>            do {</p>
+<p>                const next = child.right;</p>
+<p>                this.addToRootList(child);</p>
+<p>                child.parent = null;</p>
+<p>                child = next;</p>
+<p>            } while (child !== min.child);</p>
+<p>        }</p>
+        
+<p>        // Remove min from root list</p>
+<p>        this.removeFromRootList(min);</p>
+        
+<p>        if (min === min.right) {</p>
+<p>            this.minNode = null;</p>
+<p>        } else {</p>
+<p>            this.minNode = min.right;</p>
+<p>            this.consolidate();</p>
+<p>        }</p>
+        
+<p>        this.nodeCount--;</p>
+<p>        this.nodeMap.delete(`${min.data.x},${min.data.y}`);</p>
+<p>        return min.data;</p>
+<p>    }</p>
+    
+<p>    decreaseKey(node, newKey) {</p>
+<p>        const fibNode = this.nodeMap.get(`${node.x},${node.y}`);</p>
+<p>        if (!fibNode || newKey >= fibNode.key) return;</p>
+        
+<p>        fibNode.key = newKey;</p>
+<p>        const parent = fibNode.parent;</p>
+        
+<p>        if (parent !== null && fibNode.key < parent.key) {</p>
+<p>            this.cut(fibNode, parent);</p>
+<p>            this.cascadingCut(parent);</p>
+<p>        }</p>
+        
+<p>        if (fibNode.key < this.minNode.key) {</p>
+<p>            this.minNode = fibNode;</p>
+<p>        }</p>
+<p>    }</p>
+    
+<p>    consolidate() {</p>
+<p>        const maxDegree = Math.floor(Math.log2(this.nodeCount)) + 1;</p>
+<p>        const degreeTable = new Array(maxDegree).fill(null);</p>
+        
+<p>        const rootList = [];</p>
+<p>        let current = this.minNode;</p>
+        
+<p>        if (current !== null) {</p>
+<p>            do {</p>
+<p>                rootList.push(current);</p>
+<p>                current = current.right;</p>
+<p>            } while (current !== this.minNode);</p>
+<p>        }</p>
+        
+<p>        for (const node of rootList) {</p>
+<p>            let degree = node.degree;</p>
+            
+<p>            while (degreeTable[degree] !== null) {</p>
+<p>                let other = degreeTable[degree];</p>
+                
+<p>                if (node.key > other.key) {</p>
+<p>                    [node, other] = [other, node];</p>
+<p>                }</p>
+                
+<p>                this.link(other, node);</p>
+<p>                degreeTable[degree] = null;</p>
+<p>                degree++;</p>
+<p>            }</p>
+            
+<p>            degreeTable[degree] = node;</p>
+<p>        }</p>
+        
+<p>        this.minNode = null;</p>
+        
+<p>        for (const node of degreeTable) {</p>
+<p>            if (node !== null) {</p>
+<p>                if (this.minNode === null) {</p>
+<p>                    this.minNode = node;</p>
+<p>                } else {</p>
+<p>                    this.addToRootList(node);</p>
+<p>                    if (node.key < this.minNode.key) {</p>
+<p>                        this.minNode = node;</p>
+<p>                    }</p>
+<p>                }</p>
+<p>            }</p>
+<p>        }</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
 
-        const dx = SIMD.Float32x4.abs(SIMD.Float32x4.sub(x, goalX));
-        const dy = SIMD.Float32x4.abs(SIMD.Float32x4.sub(y, goalY));
-        const distances = SIMD.Float32x4.add(dx, dy);
+<p>### 2. Cache-Friendly Memory Layout</p>
+<p>```javascript</p>
+<p>class CacheOptimizedGrid {</p>
+<p>    constructor(width, height) {</p>
+<p>        this.width = width;</p>
+<p>        this.height = height;</p>
+        
+<p>        // Store grid data in a single flat array for better cache locality</p>
+<p>        this.data = new Float32Array(width * height * 4); // x, y, gCost, hCost</p>
+<p>        this.obstacles = new Uint8Array(width * height); // 1 byte per cell</p>
+<p>    }</p>
+    
+<p>    getIndex(x, y) {</p>
+<p>        return y * this.width + x;</p>
+<p>    }</p>
+    
+<p>    setObstacle(x, y, isObstacle) {</p>
+<p>        this.obstacles[this.getIndex(x, y)] = isObstacle ? 1 : 0;</p>
+<p>    }</p>
+    
+<p>    isObstacle(x, y) {</p>
+<p>        return this.obstacles[this.getIndex(x, y)] === 1;</p>
+<p>    }</p>
+    
+<p>    setGCost(x, y, cost) {</p>
+<p>        const baseIndex = this.getIndex(x, y) * 4;</p>
+<p>        this.data[baseIndex + 2] = cost;</p>
+<p>    }</p>
+    
+<p>    getGCost(x, y) {</p>
+<p>        const baseIndex = this.getIndex(x, y) * 4;</p>
+<p>        return this.data[baseIndex + 2];</p>
+<p>    }</p>
+    
+<p>    setHCost(x, y, cost) {</p>
+<p>        const baseIndex = this.getIndex(x, y) * 4;</p>
+<p>        this.data[baseIndex + 3] = cost;</p>
+<p>    }</p>
+    
+<p>    getHCost(x, y) {</p>
+<p>        const baseIndex = this.getIndex(x, y) * 4;</p>
+<p>        return this.data[baseIndex + 3];</p>
+<p>    }</p>
+    
+<p>    getFCost(x, y) {</p>
+<p>        return this.getGCost(x, y) + this.getHCost(x, y);</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
 
-        results.push(
-            SIMD.Float32x4.extractLane(distances, 0),
-            SIMD.Float32x4.extractLane(distances, 1),
-            SIMD.Float32x4.extractLane(distances, 2),
-            SIMD.Float32x4.extractLane(distances, 3)
-        );
-    }
+<h2>Parallel Processing</h2>
 
-    return results.slice(0, points.length);
-}
-</code></pre>
-<p>}
-```</p>
+<p>### 1. Web Workers for Large Grids</p>
+<p>```javascript</p>
+<p>// main.js</p>
+<p>class ParallelPathfinder {</p>
+<p>    constructor(numWorkers = 4) {</p>
+<p>        this.workers = [];</p>
+<p>        this.taskQueue = [];</p>
+<p>        this.activeJobs = new Map();</p>
+        
+<p>        for (let i = 0; i < numWorkers; i++) {</p>
+<p>            const worker = new Worker('pathfinding-worker.js');</p>
+<p>            worker.onmessage = this.handleWorkerMessage.bind(this);</p>
+<p>            this.workers.push(worker);</p>
+<p>        }</p>
+<p>    }</p>
+    
+<p>    findPathAsync(grid, start, goal) {</p>
+<p>        return new Promise((resolve, reject) => {</p>
+<p>            const jobId = this.generateJobId();</p>
+<p>            const task = {</p>
+<p>                id: jobId,</p>
+<p>                grid: grid,</p>
+<p>                start: start,</p>
+<p>                goal: goal,</p>
+<p>                resolve: resolve,</p>
+<p>                reject: reject</p>
+<p>            };</p>
+            
+<p>            this.activeJobs.set(jobId, task);</p>
+            
+<p>            const availableWorker = this.getAvailableWorker();</p>
+<p>            if (availableWorker) {</p>
+<p>                this.assignTask(availableWorker, task);</p>
+<p>            } else {</p>
+<p>                this.taskQueue.push(task);</p>
+<p>            }</p>
+<p>        });</p>
+<p>    }</p>
+    
+<p>    handleWorkerMessage(event) {</p>
+<p>        const { jobId, result, error } = event.data;</p>
+<p>        const job = this.activeJobs.get(jobId);</p>
+        
+<p>        if (job) {</p>
+<p>            this.activeJobs.delete(jobId);</p>
+            
+<p>            if (error) {</p>
+<p>                job.reject(new Error(error));</p>
+<p>            } else {</p>
+<p>                job.resolve(result);</p>
+<p>            }</p>
+            
+<p>            // Assign next task if available</p>
+<p>            if (this.taskQueue.length > 0) {</p>
+<p>                const nextTask = this.taskQueue.shift();</p>
+<p>                this.assignTask(event.target, nextTask);</p>
+<p>            }</p>
+<p>        }</p>
+<p>    }</p>
+<p>}</p>
+
+<p>// pathfinding-worker.js</p>
+<p>self.onmessage = function(event) {</p>
+<p>    const { jobId, grid, start, goal } = event.data;</p>
+    
+<p>    try {</p>
+<p>        const pathfinder = new AStarPathfinder();</p>
+<p>        const path = pathfinder.findPath(grid, start, goal);</p>
+        
+<p>        self.postMessage({</p>
+<p>            jobId: jobId,</p>
+<p>            result: path</p>
+<p>        });</p>
+<p>    } catch (error) {</p>
+<p>        self.postMessage({</p>
+<p>            jobId: jobId,</p>
+<p>            error: error.message</p>
+<p>        });</p>
+<p>    }</p>
+<p>};</p>
+<p>```</p>
+
+<p>### 2. SIMD Optimizations</p>
+<p>```javascript</p>
+<p>// Using SIMD for heuristic calculations (when available)</p>
+<p>class SIMDOptimizedPathfinder {</p>
+<p>    constructor() {</p>
+<p>        this.simdSupported = typeof SIMD !== 'undefined';</p>
+<p>    }</p>
+    
+<p>    calculateManhattanDistanceBatch(points, goal) {</p>
+<p>        if (this.simdSupported && points.length >= 4) {</p>
+<p>            return this.calculateManhattanSIMD(points, goal);</p>
+<p>        } else {</p>
+<p>            return this.calculateManhattanScalar(points, goal);</p>
+<p>        }</p>
+<p>    }</p>
+    
+<p>    calculateManhattanSIMD(points, goal) {</p>
+<p>        const results = [];</p>
+<p>        const goalX = SIMD.Float32x4.splat(goal.x);</p>
+<p>        const goalY = SIMD.Float32x4.splat(goal.y);</p>
+        
+<p>        for (let i = 0; i < points.length; i += 4) {</p>
+<p>            const x = SIMD.Float32x4(</p>
+<p>                points[i]?.x || 0,</p>
+<p>                points[i + 1]?.x || 0,</p>
+<p>                points[i + 2]?.x || 0,</p>
+<p>                points[i + 3]?.x || 0</p>
+<p>            );</p>
+            
+<p>            const y = SIMD.Float32x4(</p>
+<p>                points[i]?.y || 0,</p>
+<p>                points[i + 1]?.y || 0,</p>
+<p>                points[i + 2]?.y || 0,</p>
+<p>                points[i + 3]?.y || 0</p>
+<p>            );</p>
+            
+<p>            const dx = SIMD.Float32x4.abs(SIMD.Float32x4.sub(x, goalX));</p>
+<p>            const dy = SIMD.Float32x4.abs(SIMD.Float32x4.sub(y, goalY));</p>
+<p>            const distances = SIMD.Float32x4.add(dx, dy);</p>
+            
+<p>            results.push(</p>
+<p>                SIMD.Float32x4.extractLane(distances, 0),</p>
+<p>                SIMD.Float32x4.extractLane(distances, 1),</p>
+<p>                SIMD.Float32x4.extractLane(distances, 2),</p>
+<p>                SIMD.Float32x4.extractLane(distances, 3)</p>
+<p>            );</p>
+<p>        }</p>
+        
+<p>        return results.slice(0, points.length);</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
+
 <h2>Benchmarking and Profiling</h2>
-<h3>Performance Measurement</h3>
-<p>```javascript
-class PathfindingBenchmark {
-    constructor() {
-        this.results = [];
-    }</p>
-<pre><code>benchmark(pathfinder, testCases) {
-    for (const testCase of testCases) {
-        const result = this.runSingleBenchmark(pathfinder, testCase);
-        this.results.push(result);
-    }
 
-    return this.analyzeResults();
-}
+<p>### Performance Measurement</p>
+<p>```javascript</p>
+<p>class PathfindingBenchmark {</p>
+<p>    constructor() {</p>
+<p>        this.results = [];</p>
+<p>    }</p>
+    
+<p>    benchmark(pathfinder, testCases) {</p>
+<p>        for (const testCase of testCases) {</p>
+<p>            const result = this.runSingleBenchmark(pathfinder, testCase);</p>
+<p>            this.results.push(result);</p>
+<p>        }</p>
+        
+<p>        return this.analyzeResults();</p>
+<p>    }</p>
+    
+<p>    runSingleBenchmark(pathfinder, testCase) {</p>
+<p>        const { grid, start, goal, name } = testCase;</p>
+        
+<p>        // Warm up</p>
+<p>        for (let i = 0; i < 3; i++) {</p>
+<p>            pathfinder.findPath(grid, start, goal);</p>
+<p>        }</p>
+        
+<p>        // Measure</p>
+<p>        const iterations = 100;</p>
+<p>        const startTime = performance.now();</p>
+        
+<p>        for (let i = 0; i < iterations; i++) {</p>
+<p>            pathfinder.findPath(grid, start, goal);</p>
+<p>        }</p>
+        
+<p>        const endTime = performance.now();</p>
+<p>        const avgTime = (endTime - startTime) / iterations;</p>
+        
+<p>        return {</p>
+<p>            name: name,</p>
+<p>            avgTime: avgTime,</p>
+<p>            gridSize: `${grid[0].length}x${grid.length}`,</p>
+<p>            pathLength: pathfinder.findPath(grid, start, goal)?.length || 0</p>
+<p>        };</p>
+<p>    }</p>
+    
+<p>    analyzeResults() {</p>
+<p>        const analysis = {</p>
+<p>            totalTests: this.results.length,</p>
+<p>            avgTime: this.results.reduce((sum, r) => sum + r.avgTime, 0) / this.results.length,</p>
+<p>            fastest: this.results.reduce((min, r) => r.avgTime < min.avgTime ? r : min),</p>
+<p>            slowest: this.results.reduce((max, r) => r.avgTime > max.avgTime ? r : max)</p>
+<p>        };</p>
+        
+<p>        console.table(this.results);</p>
+<p>        console.log('Analysis:', analysis);</p>
+        
+<p>        return analysis;</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
 
-runSingleBenchmark(pathfinder, testCase) {
-    const { grid, start, goal, name } = testCase;
+<p>---</p>
+<b>Previous:</b> <a href="08-applications.md">Real-World Applications</a>
+<b>Next:</b> <a href="10-demo-guide.md">Interactive Demo Guide</a>
 
-    // Warm up
-    for (let i = 0; i &lt; 3; i++) {
-        pathfinder.findPath(grid, start, goal);
-    }
-
-    // Measure
-    const iterations = 100;
-    const startTime = performance.now();
-
-    for (let i = 0; i &lt; iterations; i++) {
-        pathfinder.findPath(grid, start, goal);
-    }
-
-    const endTime = performance.now();
-    const avgTime = (endTime - startTime) / iterations;
-
-    return {
-        name: name,
-        avgTime: avgTime,
-        gridSize: `${grid[0].length}x${grid.length}`,
-        pathLength: pathfinder.findPath(grid, start, goal)?.length || 0
-    };
-}
-
-analyzeResults() {
-    const analysis = {
-        totalTests: this.results.length,
-        avgTime: this.results.reduce((sum, r) =&gt; sum + r.avgTime, 0) / this.results.length,
-        fastest: this.results.reduce((min, r) =&gt; r.avgTime &lt; min.avgTime ? r : min),
-        slowest: this.results.reduce((max, r) =&gt; r.avgTime &gt; max.avgTime ? r : max)
-    };
-
-    console.table(this.results);
-    console.log('Analysis:', analysis);
-
-    return analysis;
-}
-</code></pre>
-<p>}
-```</p>
-<hr />
-<p><strong>Previous:</strong> <a href="08-applications.md">Real-World Applications</a>
-<strong>Next:</strong> <a href="10-demo-guide.md">Interactive Demo Guide</a></p>
-<p><strong>Interactive:</strong> <a href="demo.html">Test optimizations</a></p>
+<b>Interactive:</b> <a href="demo.html">Test optimizations</a>
     </div>
 </body>
 </html>

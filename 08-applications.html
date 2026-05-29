@@ -15,541 +15,556 @@
     </nav>
     <div class="container">
         <h1>Real-World Applications</h1>
+
 <h2>Game Development</h2>
-<h3>NPC Pathfinding</h3>
-<p>```javascript
-class GameNPC {
-    constructor(x, y, gameWorld) {
-        this.x = x;
-        this.y = y;
-        this.world = gameWorld;
-        this.pathfinder = new AStarPathfinder({
-            allowDiagonal: true,
-            heuristic: 'octile',
-            weight: 1.1  // Slightly faster, still near-optimal
-        });
-        this.currentPath = [];
-        this.pathIndex = 0;
-    }</p>
-<pre><code>moveToTarget(targetX, targetY) {
-    const start = {x: this.x, y: this.y};
-    const goal = {x: targetX, y: targetY};
 
-    this.currentPath = this.pathfinder.findPath(
-        this.world.grid, start, goal
-    );
+<p>### NPC Pathfinding</p>
+<p>```javascript</p>
+<p>class GameNPC {</p>
+<p>    constructor(x, y, gameWorld) {</p>
+<p>        this.x = x;</p>
+<p>        this.y = y;</p>
+<p>        this.world = gameWorld;</p>
+<p>        this.pathfinder = new AStarPathfinder({</p>
+<p>            allowDiagonal: true,</p>
+<p>            heuristic: 'octile',</p>
+<p>            weight: 1.1  // Slightly faster, still near-optimal</p>
+<p>        });</p>
+<p>        this.currentPath = [];</p>
+<p>        this.pathIndex = 0;</p>
+<p>    }</p>
+    
+<p>    moveToTarget(targetX, targetY) {</p>
+<p>        const start = {x: this.x, y: this.y};</p>
+<p>        const goal = {x: targetX, y: targetY};</p>
+        
+<p>        this.currentPath = this.pathfinder.findPath(</p>
+<p>            this.world.grid, start, goal</p>
+<p>        );</p>
+        
+<p>        if (this.currentPath) {</p>
+<p>            this.pathIndex = 1; // Skip current position</p>
+<p>            return true;</p>
+<p>        }</p>
+<p>        return false;</p>
+<p>    }</p>
+    
+<p>    update(deltaTime) {</p>
+<p>        if (this.currentPath && this.pathIndex < this.currentPath.length) {</p>
+<p>            const target = this.currentPath[this.pathIndex];</p>
+            
+<p>            // Move towards next waypoint</p>
+<p>            const dx = target.x - this.x;</p>
+<p>            const dy = target.y - this.y;</p>
+<p>            const distance = Math.sqrt(dx * dx + dy * dy);</p>
+            
+<p>            if (distance < 0.1) {</p>
+<p>                // Reached waypoint, move to next</p>
+<p>                this.pathIndex++;</p>
+<p>            } else {</p>
+<p>                // Move towards waypoint</p>
+<p>                const speed = 2.0; // units per second</p>
+<p>                this.x += (dx / distance) * speed * deltaTime;</p>
+<p>                this.y += (dy / distance) * speed * deltaTime;</p>
+<p>            }</p>
+<p>        }</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
 
-    if (this.currentPath) {
-        this.pathIndex = 1; // Skip current position
-        return true;
-    }
-    return false;
-}
+<p>### Dynamic Obstacle Avoidance</p>
+<p>```javascript</p>
+<p>class DynamicPathfinder {</p>
+<p>    constructor(gameWorld) {</p>
+<p>        this.world = gameWorld;</p>
+<p>        this.pathfinder = new AStarPathfinder({allowDiagonal: true});</p>
+<p>        this.lastPathTime = 0;</p>
+<p>        this.pathCacheTime = 500; // Recalculate every 500ms</p>
+<p>    }</p>
+    
+<p>    findPathWithDynamicObstacles(start, goal, movingEntities) {</p>
+<p>        // Create temporary grid with dynamic obstacles</p>
+<p>        const tempGrid = this.cloneGrid(this.world.staticGrid);</p>
+        
+<p>        // Add moving entities as temporary obstacles</p>
+<p>        for (const entity of movingEntities) {</p>
+<p>            const x = Math.floor(entity.x);</p>
+<p>            const y = Math.floor(entity.y);</p>
+<p>            if (this.isValidCoordinate(tempGrid, x, y)) {</p>
+<p>                tempGrid[y][x].isObstacle = true;</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        return this.pathfinder.findPath(tempGrid, start, goal);</p>
+<p>    }</p>
+    
+<p>    cloneGrid(grid) {</p>
+<p>        return grid.map(row => </p>
+<p>            row.map(cell => ({...cell}))</p>
+<p>        );</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
 
-update(deltaTime) {
-    if (this.currentPath &amp;&amp; this.pathIndex &lt; this.currentPath.length) {
-        const target = this.currentPath[this.pathIndex];
-
-        // Move towards next waypoint
-        const dx = target.x - this.x;
-        const dy = target.y - this.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-
-        if (distance &lt; 0.1) {
-            // Reached waypoint, move to next
-            this.pathIndex++;
-        } else {
-            // Move towards waypoint
-            const speed = 2.0; // units per second
-            this.x += (dx / distance) * speed * deltaTime;
-            this.y += (dy / distance) * speed * deltaTime;
-        }
-    }
-}
-</code></pre>
-<p>}
-```</p>
-<h3>Dynamic Obstacle Avoidance</h3>
-<p>```javascript
-class DynamicPathfinder {
-    constructor(gameWorld) {
-        this.world = gameWorld;
-        this.pathfinder = new AStarPathfinder({allowDiagonal: true});
-        this.lastPathTime = 0;
-        this.pathCacheTime = 500; // Recalculate every 500ms
-    }</p>
-<pre><code>findPathWithDynamicObstacles(start, goal, movingEntities) {
-    // Create temporary grid with dynamic obstacles
-    const tempGrid = this.cloneGrid(this.world.staticGrid);
-
-    // Add moving entities as temporary obstacles
-    for (const entity of movingEntities) {
-        const x = Math.floor(entity.x);
-        const y = Math.floor(entity.y);
-        if (this.isValidCoordinate(tempGrid, x, y)) {
-            tempGrid[y][x].isObstacle = true;
-        }
-    }
-
-    return this.pathfinder.findPath(tempGrid, start, goal);
-}
-
-cloneGrid(grid) {
-    return grid.map(row =&gt; 
-        row.map(cell =&gt; ({...cell}))
-    );
-}
-</code></pre>
-<p>}
-```</p>
 <h2>Robotics Navigation</h2>
-<h3>Robot Path Planning</h3>
-<p>```javascript
-class RobotNavigator {
-    constructor(mapData, robotSize) {
-        this.mapData = mapData;
-        this.robotSize = robotSize;
-        this.pathfinder = new AStarPathfinder({
-            heuristic: 'euclidean',
-            allowDiagonal: true
-        });
-    }</p>
-<pre><code>planPath(startPose, goalPose) {
-    // Convert real-world coordinates to grid coordinates
-    const startGrid = this.worldToGrid(startPose);
-    const goalGrid = this.worldToGrid(goalPose);
 
-    // Inflate obstacles by robot size
-    const inflatedGrid = this.inflateObstacles(
-        this.mapData, 
-        this.robotSize
-    );
+<p>### Robot Path Planning</p>
+<p>```javascript</p>
+<p>class RobotNavigator {</p>
+<p>    constructor(mapData, robotSize) {</p>
+<p>        this.mapData = mapData;</p>
+<p>        this.robotSize = robotSize;</p>
+<p>        this.pathfinder = new AStarPathfinder({</p>
+<p>            heuristic: 'euclidean',</p>
+<p>            allowDiagonal: true</p>
+<p>        });</p>
+<p>    }</p>
+    
+<p>    planPath(startPose, goalPose) {</p>
+<p>        // Convert real-world coordinates to grid coordinates</p>
+<p>        const startGrid = this.worldToGrid(startPose);</p>
+<p>        const goalGrid = this.worldToGrid(goalPose);</p>
+        
+<p>        // Inflate obstacles by robot size</p>
+<p>        const inflatedGrid = this.inflateObstacles(</p>
+<p>            this.mapData, </p>
+<p>            this.robotSize</p>
+<p>        );</p>
+        
+<p>        // Find path</p>
+<p>        const gridPath = this.pathfinder.findPath(</p>
+<p>            inflatedGrid, startGrid, goalGrid</p>
+<p>        );</p>
+        
+<p>        if (!gridPath) return null;</p>
+        
+<p>        // Convert back to world coordinates</p>
+<p>        const worldPath = gridPath.map(point => </p>
+<p>            this.gridToWorld(point)</p>
+<p>        );</p>
+        
+<p>        // Smooth path for robot movement</p>
+<p>        return this.smoothPathForRobot(worldPath);</p>
+<p>    }</p>
+    
+<p>    worldToGrid(worldPos) {</p>
+<p>        const resolution = 0.1; // 10cm per grid cell</p>
+<p>        return {</p>
+<p>            x: Math.floor(worldPos.x / resolution),</p>
+<p>            y: Math.floor(worldPos.y / resolution)</p>
+<p>        };</p>
+<p>    }</p>
+    
+<p>    gridToWorld(gridPos) {</p>
+<p>        const resolution = 0.1;</p>
+<p>        return {</p>
+<p>            x: (gridPos.x + 0.5) * resolution,</p>
+<p>            y: (gridPos.y + 0.5) * resolution</p>
+<p>        };</p>
+<p>    }</p>
+    
+<p>    inflateObstacles(grid, robotRadius) {</p>
+<p>        const inflatedGrid = this.cloneGrid(grid);</p>
+<p>        const inflationCells = Math.ceil(robotRadius / 0.1);</p>
+        
+<p>        for (let y = 0; y < grid.length; y++) {</p>
+<p>            for (let x = 0; x < grid[0].length; x++) {</p>
+<p>                if (grid[y][x].isObstacle) {</p>
+<p>                    // Inflate around this obstacle</p>
+<p>                    for (let dy = -inflationCells; dy <= inflationCells; dy++) {</p>
+<p>                        for (let dx = -inflationCells; dx <= inflationCells; dx++) {</p>
+<p>                            const nx = x + dx;</p>
+<p>                            const ny = y + dy;</p>
+                            
+<p>                            if (this.isValidCoordinate(inflatedGrid, nx, ny)) {</p>
+<p>                                const distance = Math.sqrt(dx*dx + dy*dy);</p>
+<p>                                if (distance <= inflationCells) {</p>
+<p>                                    inflatedGrid[ny][nx].isObstacle = true;</p>
+<p>                                }</p>
+<p>                            }</p>
+<p>                        }</p>
+<p>                    }</p>
+<p>                }</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        return inflatedGrid;</p>
+<p>    }</p>
+    
+<p>    smoothPathForRobot(path) {</p>
+<p>        // Apply Bezier curve smoothing for robot movement</p>
+<p>        const smoothed = [];</p>
+        
+<p>        for (let i = 0; i < path.length; i++) {</p>
+<p>            if (i === 0 || i === path.length - 1) {</p>
+<p>                smoothed.push(path[i]);</p>
+<p>            } else {</p>
+<p>                // Create smooth curve through three points</p>
+<p>                const p0 = path[i - 1];</p>
+<p>                const p1 = path[i];</p>
+<p>                const p2 = path[i + 1];</p>
+                
+<p>                // Add intermediate points for smooth curve</p>
+<p>                for (let t = 0; t <= 1; t += 0.2) {</p>
+<p>                    const smoothPoint = this.bezierPoint(p0, p1, p2, t);</p>
+<p>                    smoothed.push(smoothPoint);</p>
+<p>                }</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        return smoothed;</p>
+<p>    }</p>
+    
+<p>    bezierPoint(p0, p1, p2, t) {</p>
+<p>        const x = (1-t)*(1-t)*p0.x + 2*(1-t)*t*p1.x + t*t*p2.x;</p>
+<p>        const y = (1-t)*(1-t)*p0.y + 2*(1-t)*t*p1.y + t*t*p2.y;</p>
+<p>        return {x, y};</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
 
-    // Find path
-    const gridPath = this.pathfinder.findPath(
-        inflatedGrid, startGrid, goalGrid
-    );
-
-    if (!gridPath) return null;
-
-    // Convert back to world coordinates
-    const worldPath = gridPath.map(point =&gt; 
-        this.gridToWorld(point)
-    );
-
-    // Smooth path for robot movement
-    return this.smoothPathForRobot(worldPath);
-}
-
-worldToGrid(worldPos) {
-    const resolution = 0.1; // 10cm per grid cell
-    return {
-        x: Math.floor(worldPos.x / resolution),
-        y: Math.floor(worldPos.y / resolution)
-    };
-}
-
-gridToWorld(gridPos) {
-    const resolution = 0.1;
-    return {
-        x: (gridPos.x + 0.5) * resolution,
-        y: (gridPos.y + 0.5) * resolution
-    };
-}
-
-inflateObstacles(grid, robotRadius) {
-    const inflatedGrid = this.cloneGrid(grid);
-    const inflationCells = Math.ceil(robotRadius / 0.1);
-
-    for (let y = 0; y &lt; grid.length; y++) {
-        for (let x = 0; x &lt; grid[0].length; x++) {
-            if (grid[y][x].isObstacle) {
-                // Inflate around this obstacle
-                for (let dy = -inflationCells; dy &lt;= inflationCells; dy++) {
-                    for (let dx = -inflationCells; dx &lt;= inflationCells; dx++) {
-                        const nx = x + dx;
-                        const ny = y + dy;
-
-                        if (this.isValidCoordinate(inflatedGrid, nx, ny)) {
-                            const distance = Math.sqrt(dx*dx + dy*dy);
-                            if (distance &lt;= inflationCells) {
-                                inflatedGrid[ny][nx].isObstacle = true;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    return inflatedGrid;
-}
-
-smoothPathForRobot(path) {
-    // Apply Bezier curve smoothing for robot movement
-    const smoothed = [];
-
-    for (let i = 0; i &lt; path.length; i++) {
-        if (i === 0 || i === path.length - 1) {
-            smoothed.push(path[i]);
-        } else {
-            // Create smooth curve through three points
-            const p0 = path[i - 1];
-            const p1 = path[i];
-            const p2 = path[i + 1];
-
-            // Add intermediate points for smooth curve
-            for (let t = 0; t &lt;= 1; t += 0.2) {
-                const smoothPoint = this.bezierPoint(p0, p1, p2, t);
-                smoothed.push(smoothPoint);
-            }
-        }
-    }
-
-    return smoothed;
-}
-
-bezierPoint(p0, p1, p2, t) {
-    const x = (1-t)*(1-t)*p0.x + 2*(1-t)*t*p1.x + t*t*p2.x;
-    const y = (1-t)*(1-t)*p0.y + 2*(1-t)*t*p1.y + t*t*p2.y;
-    return {x, y};
-}
-</code></pre>
-<p>}
-```</p>
 <h2>Logistics and Route Optimization</h2>
-<h3>Warehouse Robot Coordination</h3>
-<p>```javascript
-class WarehouseManager {
-    constructor(warehouseLayout) {
-        this.layout = warehouseLayout;
-        this.robots = new Map();
-        this.reservedCells = new Map(); // Time-based reservations
-        this.pathfinder = new AStarPathfinder({allowDiagonal: false});
-    }</p>
-<pre><code>assignTask(robotId, pickupLocation, dropoffLocation) {
-    const robot = this.robots.get(robotId);
-    if (!robot) return false;
 
-    // Find path avoiding other robots' reserved paths
-    const path = this.findConflictFreePath(
-        robot.currentLocation,
-        pickupLocation,
-        robot.estimatedArrivalTime
-    );
+<p>### Warehouse Robot Coordination</p>
+<p>```javascript</p>
+<p>class WarehouseManager {</p>
+<p>    constructor(warehouseLayout) {</p>
+<p>        this.layout = warehouseLayout;</p>
+<p>        this.robots = new Map();</p>
+<p>        this.reservedCells = new Map(); // Time-based reservations</p>
+<p>        this.pathfinder = new AStarPathfinder({allowDiagonal: false});</p>
+<p>    }</p>
+    
+<p>    assignTask(robotId, pickupLocation, dropoffLocation) {</p>
+<p>        const robot = this.robots.get(robotId);</p>
+<p>        if (!robot) return false;</p>
+        
+<p>        // Find path avoiding other robots' reserved paths</p>
+<p>        const path = this.findConflictFreePath(</p>
+<p>            robot.currentLocation,</p>
+<p>            pickupLocation,</p>
+<p>            robot.estimatedArrivalTime</p>
+<p>        );</p>
+        
+<p>        if (path) {</p>
+<p>            this.reservePath(robotId, path, robot.estimatedArrivalTime);</p>
+<p>            robot.assignPath(path);</p>
+<p>            return true;</p>
+<p>        }</p>
+        
+<p>        return false;</p>
+<p>    }</p>
+    
+<p>    findConflictFreePath(start, goal, startTime) {</p>
+<p>        // Create dynamic grid that considers time-based reservations</p>
+<p>        const timeSlots = 60; // Plan for next 60 seconds</p>
+        
+<p>        for (let timeOffset = 0; timeOffset < timeSlots; timeOffset++) {</p>
+<p>            const currentTime = startTime + timeOffset;</p>
+<p>            const tempGrid = this.createTemporaryGrid(currentTime);</p>
+            
+<p>            const path = this.pathfinder.findPath(tempGrid, start, goal);</p>
+            
+<p>            if (path && this.isPathFree(path, currentTime)) {</p>
+<p>                return path;</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        return null; // No conflict-free path found</p>
+<p>    }</p>
+    
+<p>    createTemporaryGrid(time) {</p>
+<p>        const grid = this.cloneGrid(this.layout);</p>
+        
+<p>        // Mark cells reserved by other robots at this time</p>
+<p>        for (const [robotId, reservations] of this.reservedCells) {</p>
+<p>            for (const reservation of reservations) {</p>
+<p>                if (reservation.time === time) {</p>
+<p>                    const {x, y} = reservation.cell;</p>
+<p>                    if (this.isValidCoordinate(grid, x, y)) {</p>
+<p>                        grid[y][x].isObstacle = true;</p>
+<p>                    }</p>
+<p>                }</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        return grid;</p>
+<p>    }</p>
+    
+<p>    reservePath(robotId, path, startTime) {</p>
+<p>        const reservations = [];</p>
+        
+<p>        for (let i = 0; i < path.length; i++) {</p>
+<p>            reservations.push({</p>
+<p>                cell: path[i],</p>
+<p>                time: startTime + i,</p>
+<p>                robotId: robotId</p>
+<p>            });</p>
+<p>        }</p>
+        
+<p>        this.reservedCells.set(robotId, reservations);</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
 
-    if (path) {
-        this.reservePath(robotId, path, robot.estimatedArrivalTime);
-        robot.assignPath(path);
-        return true;
-    }
-
-    return false;
-}
-
-findConflictFreePath(start, goal, startTime) {
-    // Create dynamic grid that considers time-based reservations
-    const timeSlots = 60; // Plan for next 60 seconds
-
-    for (let timeOffset = 0; timeOffset &lt; timeSlots; timeOffset++) {
-        const currentTime = startTime + timeOffset;
-        const tempGrid = this.createTemporaryGrid(currentTime);
-
-        const path = this.pathfinder.findPath(tempGrid, start, goal);
-
-        if (path &amp;&amp; this.isPathFree(path, currentTime)) {
-            return path;
-        }
-    }
-
-    return null; // No conflict-free path found
-}
-
-createTemporaryGrid(time) {
-    const grid = this.cloneGrid(this.layout);
-
-    // Mark cells reserved by other robots at this time
-    for (const [robotId, reservations] of this.reservedCells) {
-        for (const reservation of reservations) {
-            if (reservation.time === time) {
-                const {x, y} = reservation.cell;
-                if (this.isValidCoordinate(grid, x, y)) {
-                    grid[y][x].isObstacle = true;
-                }
-            }
-        }
-    }
-
-    return grid;
-}
-
-reservePath(robotId, path, startTime) {
-    const reservations = [];
-
-    for (let i = 0; i &lt; path.length; i++) {
-        reservations.push({
-            cell: path[i],
-            time: startTime + i,
-            robotId: robotId
-        });
-    }
-
-    this.reservedCells.set(robotId, reservations);
-}
-</code></pre>
-<p>}
-```</p>
 <h2>Network Routing</h2>
-<h3>Internet Packet Routing</h3>
-<p>```javascript
-class NetworkRouter {
-    constructor(networkTopology) {
-        this.topology = networkTopology;
-        this.pathfinder = new AStarPathfinder({
-            heuristic: 'custom'
-        });</p>
-<pre><code>    // Override heuristic for network latency
-    this.pathfinder.calculateHeuristic = (from, to) =&gt; {
-        return this.estimateLatency(from, to);
-    };
-}
 
-findOptimalRoute(sourceNode, destinationNode, packet) {
-    // Create network graph with current congestion levels
-    const networkGrid = this.createNetworkGrid();
+<p>### Internet Packet Routing</p>
+<p>```javascript</p>
+<p>class NetworkRouter {</p>
+<p>    constructor(networkTopology) {</p>
+<p>        this.topology = networkTopology;</p>
+<p>        this.pathfinder = new AStarPathfinder({</p>
+<p>            heuristic: 'custom'</p>
+<p>        });</p>
+        
+<p>        // Override heuristic for network latency</p>
+<p>        this.pathfinder.calculateHeuristic = (from, to) => {</p>
+<p>            return this.estimateLatency(from, to);</p>
+<p>        };</p>
+<p>    }</p>
+    
+<p>    findOptimalRoute(sourceNode, destinationNode, packet) {</p>
+<p>        // Create network graph with current congestion levels</p>
+<p>        const networkGrid = this.createNetworkGrid();</p>
+        
+<p>        const path = this.pathfinder.findPath(</p>
+<p>            networkGrid,</p>
+<p>            {x: sourceNode.x, y: sourceNode.y},</p>
+<p>            {x: destinationNode.x, y: destinationNode.y}</p>
+<p>        );</p>
+        
+<p>        if (path) {</p>
+<p>            return this.convertToNetworkPath(path);</p>
+<p>        }</p>
+        
+<p>        return null;</p>
+<p>    }</p>
+    
+<p>    createNetworkGrid() {</p>
+<p>        // Convert network topology to grid representation</p>
+<p>        const grid = [];</p>
+        
+<p>        for (let y = 0; y < this.topology.height; y++) {</p>
+<p>            grid[y] = [];</p>
+<p>            for (let x = 0; x < this.topology.width; x++) {</p>
+<p>                const node = this.topology.getNode(x, y);</p>
+<p>                grid[y][x] = {</p>
+<p>                    isObstacle: !node || node.isDown,</p>
+<p>                    latency: node ? node.currentLatency : Infinity,</p>
+<p>                    bandwidth: node ? node.availableBandwidth : 0</p>
+<p>                };</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        return grid;</p>
+<p>    }</p>
+    
+<p>    estimateLatency(from, to) {</p>
+<p>        // Estimate network latency based on geographic distance</p>
+<p>        const dx = to.x - from.x;</p>
+<p>        const dy = to.y - from.y;</p>
+<p>        const distance = Math.sqrt(dx * dx + dy * dy);</p>
+        
+<p>        // Speed of light in fiber optic cable</p>
+<p>        const fiberSpeedKmMs = 200; // km/ms</p>
+<p>        const estimatedLatency = distance / fiberSpeedKmMs;</p>
+        
+<p>        return estimatedLatency;</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
 
-    const path = this.pathfinder.findPath(
-        networkGrid,
-        {x: sourceNode.x, y: sourceNode.y},
-        {x: destinationNode.x, y: destinationNode.y}
-    );
-
-    if (path) {
-        return this.convertToNetworkPath(path);
-    }
-
-    return null;
-}
-
-createNetworkGrid() {
-    // Convert network topology to grid representation
-    const grid = [];
-
-    for (let y = 0; y &lt; this.topology.height; y++) {
-        grid[y] = [];
-        for (let x = 0; x &lt; this.topology.width; x++) {
-            const node = this.topology.getNode(x, y);
-            grid[y][x] = {
-                isObstacle: !node || node.isDown,
-                latency: node ? node.currentLatency : Infinity,
-                bandwidth: node ? node.availableBandwidth : 0
-            };
-        }
-    }
-
-    return grid;
-}
-
-estimateLatency(from, to) {
-    // Estimate network latency based on geographic distance
-    const dx = to.x - from.x;
-    const dy = to.y - from.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-
-    // Speed of light in fiber optic cable
-    const fiberSpeedKmMs = 200; // km/ms
-    const estimatedLatency = distance / fiberSpeedKmMs;
-
-    return estimatedLatency;
-}
-</code></pre>
-<p>}
-```</p>
 <h2>Video Game AI</h2>
-<h3>RTS Unit Movement</h3>
-<p>```javascript
-class RTSUnitManager {
-    constructor(gameMap) {
-        this.gameMap = gameMap;
-        this.pathfinder = new AStarPathfinder({
-            allowDiagonal: true,
-            heuristic: 'octile'
-        });
-        this.unitFormations = new Map();
-    }</p>
-<pre><code>moveUnitsInFormation(units, destination) {
-    const formationCenter = this.calculateFormationCenter(units);
-    const leaderPath = this.pathfinder.findPath(
-        this.gameMap,
-        formationCenter,
-        destination
-    );
 
-    if (!leaderPath) return false;
+<p>### RTS Unit Movement</p>
+<p>```javascript</p>
+<p>class RTSUnitManager {</p>
+<p>    constructor(gameMap) {</p>
+<p>        this.gameMap = gameMap;</p>
+<p>        this.pathfinder = new AStarPathfinder({</p>
+<p>            allowDiagonal: true,</p>
+<p>            heuristic: 'octile'</p>
+<p>        });</p>
+<p>        this.unitFormations = new Map();</p>
+<p>    }</p>
+    
+<p>    moveUnitsInFormation(units, destination) {</p>
+<p>        const formationCenter = this.calculateFormationCenter(units);</p>
+<p>        const leaderPath = this.pathfinder.findPath(</p>
+<p>            this.gameMap,</p>
+<p>            formationCenter,</p>
+<p>            destination</p>
+<p>        );</p>
+        
+<p>        if (!leaderPath) return false;</p>
+        
+<p>        // Calculate offset paths for each unit</p>
+<p>        for (const unit of units) {</p>
+<p>            const offset = {</p>
+<p>                x: unit.x - formationCenter.x,</p>
+<p>                y: unit.y - formationCenter.y</p>
+<p>            };</p>
+            
+<p>            const unitPath = leaderPath.map(point => ({</p>
+<p>                x: point.x + offset.x,</p>
+<p>                y: point.y + offset.y</p>
+<p>            }));</p>
+            
+<p>            // Validate and adjust path for obstacles</p>
+<p>            const validPath = this.validateUnitPath(unitPath);</p>
+<p>            unit.setPath(validPath);</p>
+<p>        }</p>
+        
+<p>        return true;</p>
+<p>    }</p>
+    
+<p>    calculateFormationCenter(units) {</p>
+<p>        const totalX = units.reduce((sum, unit) => sum + unit.x, 0);</p>
+<p>        const totalY = units.reduce((sum, unit) => sum + unit.y, 0);</p>
+        
+<p>        return {</p>
+<p>            x: Math.floor(totalX / units.length),</p>
+<p>            y: Math.floor(totalY / units.length)</p>
+<p>        };</p>
+<p>    }</p>
+    
+<p>    validateUnitPath(path) {</p>
+<p>        const validPath = [];</p>
+        
+<p>        for (const point of path) {</p>
+<p>            if (this.isValidPosition(point)) {</p>
+<p>                validPath.push(point);</p>
+<p>            } else {</p>
+<p>                // Find nearest valid position</p>
+<p>                const nearestValid = this.findNearestValidPosition(point);</p>
+<p>                if (nearestValid) {</p>
+<p>                    validPath.push(nearestValid);</p>
+<p>                }</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        return validPath;</p>
+<p>    }</p>
+    
+<p>    findNearestValidPosition(target) {</p>
+<p>        const searchRadius = 5;</p>
+        
+<p>        for (let radius = 1; radius <= searchRadius; radius++) {</p>
+<p>            for (let angle = 0; angle < 360; angle += 45) {</p>
+<p>                const radian = (angle * Math.PI) / 180;</p>
+<p>                const x = Math.floor(target.x + radius * Math.cos(radian));</p>
+<p>                const y = Math.floor(target.y + radius * Math.sin(radian));</p>
+                
+<p>                if (this.isValidPosition({x, y})) {</p>
+<p>                    return {x, y};</p>
+<p>                }</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        return null;</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
 
-    // Calculate offset paths for each unit
-    for (const unit of units) {
-        const offset = {
-            x: unit.x - formationCenter.x,
-            y: unit.y - formationCenter.y
-        };
-
-        const unitPath = leaderPath.map(point =&gt; ({
-            x: point.x + offset.x,
-            y: point.y + offset.y
-        }));
-
-        // Validate and adjust path for obstacles
-        const validPath = this.validateUnitPath(unitPath);
-        unit.setPath(validPath);
-    }
-
-    return true;
-}
-
-calculateFormationCenter(units) {
-    const totalX = units.reduce((sum, unit) =&gt; sum + unit.x, 0);
-    const totalY = units.reduce((sum, unit) =&gt; sum + unit.y, 0);
-
-    return {
-        x: Math.floor(totalX / units.length),
-        y: Math.floor(totalY / units.length)
-    };
-}
-
-validateUnitPath(path) {
-    const validPath = [];
-
-    for (const point of path) {
-        if (this.isValidPosition(point)) {
-            validPath.push(point);
-        } else {
-            // Find nearest valid position
-            const nearestValid = this.findNearestValidPosition(point);
-            if (nearestValid) {
-                validPath.push(nearestValid);
-            }
-        }
-    }
-
-    return validPath;
-}
-
-findNearestValidPosition(target) {
-    const searchRadius = 5;
-
-    for (let radius = 1; radius &lt;= searchRadius; radius++) {
-        for (let angle = 0; angle &lt; 360; angle += 45) {
-            const radian = (angle * Math.PI) / 180;
-            const x = Math.floor(target.x + radius * Math.cos(radian));
-            const y = Math.floor(target.y + radius * Math.sin(radian));
-
-            if (this.isValidPosition({x, y})) {
-                return {x, y};
-            }
-        }
-    }
-
-    return null;
-}
-</code></pre>
-<p>}
-```</p>
 <h2>Performance Considerations</h2>
-<h3>Hierarchical Pathfinding</h3>
-<p>```javascript
-class HierarchicalPathfinder {
-    constructor(detailedMap, clusterSize = 10) {
-        this.detailedMap = detailedMap;
-        this.clusterSize = clusterSize;
-        this.abstractMap = this.createAbstractMap();</p>
-<pre><code>    this.detailedPathfinder = new AStarPathfinder({allowDiagonal: true});
-    this.abstractPathfinder = new AStarPathfinder({allowDiagonal: true});
-}
 
-findHierarchicalPath(start, goal) {
-    // 1. Find abstract path between clusters
-    const startCluster = this.getCluster(start);
-    const goalCluster = this.getCluster(goal);
+<p>### Hierarchical Pathfinding</p>
+<p>```javascript</p>
+<p>class HierarchicalPathfinder {</p>
+<p>    constructor(detailedMap, clusterSize = 10) {</p>
+<p>        this.detailedMap = detailedMap;</p>
+<p>        this.clusterSize = clusterSize;</p>
+<p>        this.abstractMap = this.createAbstractMap();</p>
+        
+<p>        this.detailedPathfinder = new AStarPathfinder({allowDiagonal: true});</p>
+<p>        this.abstractPathfinder = new AStarPathfinder({allowDiagonal: true});</p>
+<p>    }</p>
+    
+<p>    findHierarchicalPath(start, goal) {</p>
+<p>        // 1. Find abstract path between clusters</p>
+<p>        const startCluster = this.getCluster(start);</p>
+<p>        const goalCluster = this.getCluster(goal);</p>
+        
+<p>        const abstractPath = this.abstractPathfinder.findPath(</p>
+<p>            this.abstractMap,</p>
+<p>            startCluster,</p>
+<p>            goalCluster</p>
+<p>        );</p>
+        
+<p>        if (!abstractPath) return null;</p>
+        
+<p>        // 2. Refine path within each cluster</p>
+<p>        const detailedPath = [];</p>
+        
+<p>        for (let i = 0; i < abstractPath.length - 1; i++) {</p>
+<p>            const clusterStart = i === 0 ? start : </p>
+<p>                this.getClusterEntrance(abstractPath[i]);</p>
+<p>            const clusterGoal = i === abstractPath.length - 2 ? goal :</p>
+<p>                this.getClusterExit(abstractPath[i], abstractPath[i + 1]);</p>
+            
+<p>            const clusterPath = this.detailedPathfinder.findPath(</p>
+<p>                this.getClusterMap(abstractPath[i]),</p>
+<p>                clusterStart,</p>
+<p>                clusterGoal</p>
+<p>            );</p>
+            
+<p>            if (clusterPath) {</p>
+<p>                detailedPath.push(...clusterPath.slice(0, -1));</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        detailedPath.push(goal);</p>
+<p>        return detailedPath;</p>
+<p>    }</p>
+    
+<p>    createAbstractMap() {</p>
+<p>        const width = Math.ceil(this.detailedMap[0].length / this.clusterSize);</p>
+<p>        const height = Math.ceil(this.detailedMap.length / this.clusterSize);</p>
+        
+<p>        const abstractMap = [];</p>
+        
+<p>        for (let y = 0; y < height; y++) {</p>
+<p>            abstractMap[y] = [];</p>
+<p>            for (let x = 0; x < width; x++) {</p>
+<p>                abstractMap[y][x] = {</p>
+<p>                    isObstacle: this.isClusterBlocked(x, y)</p>
+<p>                };</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        return abstractMap;</p>
+<p>    }</p>
+    
+<p>    isClusterBlocked(clusterX, clusterY) {</p>
+<p>        const startX = clusterX * this.clusterSize;</p>
+<p>        const startY = clusterY * this.clusterSize;</p>
+<p>        const endX = Math.min(startX + this.clusterSize, this.detailedMap[0].length);</p>
+<p>        const endY = Math.min(startY + this.clusterSize, this.detailedMap.length);</p>
+        
+<p>        let passableCells = 0;</p>
+<p>        let totalCells = 0;</p>
+        
+<p>        for (let y = startY; y < endY; y++) {</p>
+<p>            for (let x = startX; x < endX; x++) {</p>
+<p>                totalCells++;</p>
+<p>                if (!this.detailedMap[y][x].isObstacle) {</p>
+<p>                    passableCells++;</p>
+<p>                }</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        // Cluster is blocked if less than 50% passable</p>
+<p>        return (passableCells / totalCells) < 0.5;</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
 
-    const abstractPath = this.abstractPathfinder.findPath(
-        this.abstractMap,
-        startCluster,
-        goalCluster
-    );
+<p>---</p>
+<b>Previous:</b> <a href="07-complete-implementation.md">Complete Implementation</a>
+<b>Next:</b> <a href="09-optimizations.md">Optimization Techniques</a>
 
-    if (!abstractPath) return null;
-
-    // 2. Refine path within each cluster
-    const detailedPath = [];
-
-    for (let i = 0; i &lt; abstractPath.length - 1; i++) {
-        const clusterStart = i === 0 ? start : 
-            this.getClusterEntrance(abstractPath[i]);
-        const clusterGoal = i === abstractPath.length - 2 ? goal :
-            this.getClusterExit(abstractPath[i], abstractPath[i + 1]);
-
-        const clusterPath = this.detailedPathfinder.findPath(
-            this.getClusterMap(abstractPath[i]),
-            clusterStart,
-            clusterGoal
-        );
-
-        if (clusterPath) {
-            detailedPath.push(...clusterPath.slice(0, -1));
-        }
-    }
-
-    detailedPath.push(goal);
-    return detailedPath;
-}
-
-createAbstractMap() {
-    const width = Math.ceil(this.detailedMap[0].length / this.clusterSize);
-    const height = Math.ceil(this.detailedMap.length / this.clusterSize);
-
-    const abstractMap = [];
-
-    for (let y = 0; y &lt; height; y++) {
-        abstractMap[y] = [];
-        for (let x = 0; x &lt; width; x++) {
-            abstractMap[y][x] = {
-                isObstacle: this.isClusterBlocked(x, y)
-            };
-        }
-    }
-
-    return abstractMap;
-}
-
-isClusterBlocked(clusterX, clusterY) {
-    const startX = clusterX * this.clusterSize;
-    const startY = clusterY * this.clusterSize;
-    const endX = Math.min(startX + this.clusterSize, this.detailedMap[0].length);
-    const endY = Math.min(startY + this.clusterSize, this.detailedMap.length);
-
-    let passableCells = 0;
-    let totalCells = 0;
-
-    for (let y = startY; y &lt; endY; y++) {
-        for (let x = startX; x &lt; endX; x++) {
-            totalCells++;
-            if (!this.detailedMap[y][x].isObstacle) {
-                passableCells++;
-            }
-        }
-    }
-
-    // Cluster is blocked if less than 50% passable
-    return (passableCells / totalCells) &lt; 0.5;
-}
-</code></pre>
-<p>}
-```</p>
-<hr />
-<p><strong>Previous:</strong> <a href="07-complete-implementation.md">Complete Implementation</a>
-<strong>Next:</strong> <a href="09-optimizations.md">Optimization Techniques</a></p>
-<p><strong>Interactive:</strong> <a href="demo.html">Explore applications</a></p>
+<b>Interactive:</b> <a href="demo.html">Explore applications</a>
     </div>
 </body>
 </html>

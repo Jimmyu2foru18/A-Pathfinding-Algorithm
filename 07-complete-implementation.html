@@ -15,491 +15,510 @@
     </nav>
     <div class="container">
         <h1>Complete A* Implementation</h1>
+
 <h2>Production-Ready JavaScript Implementation</h2>
-<p>```javascript
-class AStarPathfinder {
-    constructor(options = {}) {
-        this.heuristic = options.heuristic || 'manhattan';
-        this.allowDiagonal = options.allowDiagonal || false;
-        this.diagonalCost = options.diagonalCost || Math.sqrt(2);
-        this.weight = options.weight || 1.0;  // Heuristic weight (1.0 = optimal)
-    }</p>
-<pre><code>/**
- * Find path from start to goal
- * @param {Object} grid - 2D array of nodes
- * @param {Object} start - {x, y} coordinates
- * @param {Object} goal - {x, y} coordinates
- * @returns {Array|null} - Path array or null if no path found
- */
-findPath(grid, start, goal) {
-    // Validate inputs
-    if (!this.isValidCoordinate(grid, start) || 
-        !this.isValidCoordinate(grid, goal)) {
-        throw new Error('Invalid start or goal coordinates');
-    }
 
-    if (grid[start.y][start.x].isObstacle || 
-        grid[goal.y][goal.x].isObstacle) {
-        return null;  // Start or goal is blocked
-    }
-
-    // Initialize data structures
-    const openSet = new MinHeap();
-    const closedSet = new Set();
-    const cameFrom = new Map();
-    const gScore = new Map();
-    const fScore = new Map();
-
-    // Helper function to get node key
-    const getKey = (node) =&gt; `${node.x},${node.y}`;
-
-    // Initialize start node
-    const startKey = getKey(start);
-    gScore.set(startKey, 0);
-    fScore.set(startKey, this.calculateHeuristic(start, goal));
-    openSet.insert({...start, fCost: fScore.get(startKey)});
-
-    while (!openSet.isEmpty()) {
-        // Get node with lowest f-cost
-        const current = openSet.extractMin();
-        const currentKey = getKey(current);
-
-        // Check if we reached the goal
-        if (current.x === goal.x &amp;&amp; current.y === goal.y) {
-            return this.reconstructPath(cameFrom, current);
-        }
-
-        // Move current to closed set
-        closedSet.add(currentKey);
-
-        // Examine neighbors
-        const neighbors = this.getNeighbors(grid, current);
-
-        for (const neighbor of neighbors) {
-            const neighborKey = getKey(neighbor);
-
-            // Skip if already evaluated
-            if (closedSet.has(neighborKey)) {
-                continue;
-            }
-
-            // Calculate tentative g-score
-            const tentativeGScore = gScore.get(currentKey) + 
-                this.getMovementCost(current, neighbor);
-
-            // Initialize neighbor scores if not seen before
-            if (!gScore.has(neighborKey)) {
-                gScore.set(neighborKey, Infinity);
-            }
-
-            // Check if this path is better
-            if (tentativeGScore &lt; gScore.get(neighborKey)) {
-                // Record the best path
-                cameFrom.set(neighborKey, current);
-                gScore.set(neighborKey, tentativeGScore);
-
-                const hCost = this.calculateHeuristic(neighbor, goal);
-                const fCost = tentativeGScore + this.weight * hCost;
-                fScore.set(neighborKey, fCost);
-
-                // Add to open set if not already there
-                if (!openSet.contains(neighbor)) {
-                    openSet.insert({...neighbor, fCost});
-                }
-            }
-        }
-    }
-
-    return null;  // No path found
-}
-
-/**
- * Get valid neighbors for a node
- */
-getNeighbors(grid, node) {
-    const neighbors = [];
-    const directions = this.allowDiagonal ? 
-        [[-1,-1], [-1,0], [-1,1], [0,-1], [0,1], [1,-1], [1,0], [1,1]] :
-        [[-1,0], [1,0], [0,-1], [0,1]];
-
-    for (const [dx, dy] of directions) {
-        const x = node.x + dx;
-        const y = node.y + dy;
-
-        if (this.isValidCoordinate(grid, {x, y}) &amp;&amp; 
-            !grid[y][x].isObstacle) {
-
-            // Check diagonal movement restrictions
-            if (this.allowDiagonal &amp;&amp; Math.abs(dx) === 1 &amp;&amp; Math.abs(dy) === 1) {
-                // Ensure diagonal movement doesn't cut corners
-                if (grid[node.y + dy][node.x].isObstacle || 
-                    grid[node.y][node.x + dx].isObstacle) {
-                    continue;
-                }
-            }
-
-            neighbors.push({x, y});
-        }
-    }
-
-    return neighbors;
-}
-
-/**
- * Calculate movement cost between two adjacent nodes
- */
-getMovementCost(from, to) {
-    const dx = Math.abs(to.x - from.x);
-    const dy = Math.abs(to.y - from.y);
-
-    if (dx === 1 &amp;&amp; dy === 1) {
-        return this.diagonalCost;  // Diagonal movement
-    }
-    return 1;  // Cardinal movement
-}
-
-/**
- * Calculate heuristic distance
- */
-calculateHeuristic(from, to) {
-    const dx = Math.abs(to.x - from.x);
-    const dy = Math.abs(to.y - from.y);
-
-    switch (this.heuristic) {
-        case 'manhattan':
-            return dx + dy;
-
-        case 'euclidean':
-            return Math.sqrt(dx * dx + dy * dy);
-
-        case 'chebyshev':
-            return Math.max(dx, dy);
-
-        case 'octile':  // Optimized for 8-directional movement
-            return Math.max(dx, dy) + (Math.sqrt(2) - 1) * Math.min(dx, dy);
-
-        default:
-            return dx + dy;  // Default to Manhattan
-    }
-}
-
-/**
- * Reconstruct path from goal to start
- */
-reconstructPath(cameFrom, goal) {
-    const path = [];
-    let current = goal;
-
-    while (current) {
-        path.unshift({x: current.x, y: current.y});
-        current = cameFrom.get(`${current.x},${current.y}`);
-    }
-
-    return path;
-}
-
-/**
- * Validate coordinate bounds
- */
-isValidCoordinate(grid, coord) {
-    return coord.x &gt;= 0 &amp;&amp; coord.x &lt; grid[0].length &amp;&amp;
-           coord.y &gt;= 0 &amp;&amp; coord.y &lt; grid.length;
-}
-</code></pre>
+<p>```javascript</p>
+<p>class AStarPathfinder {</p>
+<p>    constructor(options = {}) {</p>
+<p>        this.heuristic = options.heuristic || 'manhattan';</p>
+<p>        this.allowDiagonal = options.allowDiagonal || false;</p>
+<p>        this.diagonalCost = options.diagonalCost || Math.sqrt(2);</p>
+<p>        this.weight = options.weight || 1.0;  // Heuristic weight (1.0 = optimal)</p>
+<p>    }</p>
+    
+<p>    /**</p>
+<p>     * Find path from start to goal</p>
+<p>     * @param {Object} grid - 2D array of nodes</p>
+<p>     * @param {Object} start - {x, y} coordinates</p>
+<p>     * @param {Object} goal - {x, y} coordinates</p>
+<p>     * @returns {Array|null} - Path array or null if no path found</p>
+<p>     */</p>
+<p>    findPath(grid, start, goal) {</p>
+<p>        // Validate inputs</p>
+<p>        if (!this.isValidCoordinate(grid, start) || </p>
+<p>            !this.isValidCoordinate(grid, goal)) {</p>
+<p>            throw new Error('Invalid start or goal coordinates');</p>
+<p>        }</p>
+        
+<p>        if (grid[start.y][start.x].isObstacle || </p>
+<p>            grid[goal.y][goal.x].isObstacle) {</p>
+<p>            return null;  // Start or goal is blocked</p>
+<p>        }</p>
+        
+<p>        // Initialize data structures</p>
+<p>        const openSet = new MinHeap();</p>
+<p>        const closedSet = new Set();</p>
+<p>        const cameFrom = new Map();</p>
+<p>        const gScore = new Map();</p>
+<p>        const fScore = new Map();</p>
+        
+<p>        // Helper function to get node key</p>
+<p>        const getKey = (node) => `${node.x},${node.y}`;</p>
+        
+<p>        // Initialize start node</p>
+<p>        const startKey = getKey(start);</p>
+<p>        gScore.set(startKey, 0);</p>
+<p>        fScore.set(startKey, this.calculateHeuristic(start, goal));</p>
+<p>        openSet.insert({...start, fCost: fScore.get(startKey)});</p>
+        
+<p>        while (!openSet.isEmpty()) {</p>
+<p>            // Get node with lowest f-cost</p>
+<p>            const current = openSet.extractMin();</p>
+<p>            const currentKey = getKey(current);</p>
+            
+<p>            // Check if we reached the goal</p>
+<p>            if (current.x === goal.x && current.y === goal.y) {</p>
+<p>                return this.reconstructPath(cameFrom, current);</p>
+<p>            }</p>
+            
+<p>            // Move current to closed set</p>
+<p>            closedSet.add(currentKey);</p>
+            
+<p>            // Examine neighbors</p>
+<p>            const neighbors = this.getNeighbors(grid, current);</p>
+            
+<p>            for (const neighbor of neighbors) {</p>
+<p>                const neighborKey = getKey(neighbor);</p>
+                
+<p>                // Skip if already evaluated</p>
+<p>                if (closedSet.has(neighborKey)) {</p>
+<p>                    continue;</p>
+<p>                }</p>
+                
+<p>                // Calculate tentative g-score</p>
+<p>                const tentativeGScore = gScore.get(currentKey) + </p>
+<p>                    this.getMovementCost(current, neighbor);</p>
+                
+<p>                // Initialize neighbor scores if not seen before</p>
+<p>                if (!gScore.has(neighborKey)) {</p>
+<p>                    gScore.set(neighborKey, Infinity);</p>
+<p>                }</p>
+                
+<p>                // Check if this path is better</p>
+<p>                if (tentativeGScore < gScore.get(neighborKey)) {</p>
+<p>                    // Record the best path</p>
+<p>                    cameFrom.set(neighborKey, current);</p>
+<p>                    gScore.set(neighborKey, tentativeGScore);</p>
+                    
+<p>                    const hCost = this.calculateHeuristic(neighbor, goal);</p>
+<p>                    const fCost = tentativeGScore + this.weight * hCost;</p>
+<p>                    fScore.set(neighborKey, fCost);</p>
+                    
+<p>                    // Add to open set if not already there</p>
+<p>                    if (!openSet.contains(neighbor)) {</p>
+<p>                        openSet.insert({...neighbor, fCost});</p>
+<p>                    }</p>
+<p>                }</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        return null;  // No path found</p>
+<p>    }</p>
+    
+<p>    /**</p>
+<p>     * Get valid neighbors for a node</p>
+<p>     */</p>
+<p>    getNeighbors(grid, node) {</p>
+<p>        const neighbors = [];</p>
+<p>        const directions = this.allowDiagonal ? </p>
+<p>            [[-1,-1], [-1,0], [-1,1], [0,-1], [0,1], [1,-1], [1,0], [1,1]] :</p>
+<p>            [[-1,0], [1,0], [0,-1], [0,1]];</p>
+        
+<p>        for (const [dx, dy] of directions) {</p>
+<p>            const x = node.x + dx;</p>
+<p>            const y = node.y + dy;</p>
+            
+<p>            if (this.isValidCoordinate(grid, {x, y}) && </p>
+<p>                !grid[y][x].isObstacle) {</p>
+                
+<p>                // Check diagonal movement restrictions</p>
+<p>                if (this.allowDiagonal && Math.abs(dx) === 1 && Math.abs(dy) === 1) {</p>
+<p>                    // Ensure diagonal movement doesn't cut corners</p>
+<p>                    if (grid[node.y + dy][node.x].isObstacle || </p>
+<p>                        grid[node.y][node.x + dx].isObstacle) {</p>
+<p>                        continue;</p>
+<p>                    }</p>
+<p>                }</p>
+                
+<p>                neighbors.push({x, y});</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        return neighbors;</p>
+<p>    }</p>
+    
+<p>    /**</p>
+<p>     * Calculate movement cost between two adjacent nodes</p>
+<p>     */</p>
+<p>    getMovementCost(from, to) {</p>
+<p>        const dx = Math.abs(to.x - from.x);</p>
+<p>        const dy = Math.abs(to.y - from.y);</p>
+        
+<p>        if (dx === 1 && dy === 1) {</p>
+<p>            return this.diagonalCost;  // Diagonal movement</p>
+<p>        }</p>
+<p>        return 1;  // Cardinal movement</p>
+<p>    }</p>
+    
+<p>    /**</p>
+<p>     * Calculate heuristic distance</p>
+<p>     */</p>
+<p>    calculateHeuristic(from, to) {</p>
+<p>        const dx = Math.abs(to.x - from.x);</p>
+<p>        const dy = Math.abs(to.y - from.y);</p>
+        
+<p>        switch (this.heuristic) {</p>
+<p>            case 'manhattan':</p>
+<p>                return dx + dy;</p>
+            
+<p>            case 'euclidean':</p>
+<p>                return Math.sqrt(dx * dx + dy * dy);</p>
+            
+<p>            case 'chebyshev':</p>
+<p>                return Math.max(dx, dy);</p>
+            
+<p>            case 'octile':  // Optimized for 8-directional movement</p>
+<p>                return Math.max(dx, dy) + (Math.sqrt(2) - 1) * Math.min(dx, dy);</p>
+            
+<p>            default:</p>
+<p>                return dx + dy;  // Default to Manhattan</p>
+<p>        }</p>
+<p>    }</p>
+    
+<p>    /**</p>
+<p>     * Reconstruct path from goal to start</p>
+<p>     */</p>
+<p>    reconstructPath(cameFrom, goal) {</p>
+<p>        const path = [];</p>
+<p>        let current = goal;</p>
+        
+<p>        while (current) {</p>
+<p>            path.unshift({x: current.x, y: current.y});</p>
+<p>            current = cameFrom.get(`${current.x},${current.y}`);</p>
+<p>        }</p>
+        
+<p>        return path;</p>
+<p>    }</p>
+    
+<p>    /**</p>
+<p>     * Validate coordinate bounds</p>
+<p>     */</p>
+<p>    isValidCoordinate(grid, coord) {</p>
+<p>        return coord.x >= 0 && coord.x < grid[0].length &&</p>
+<p>               coord.y >= 0 && coord.y < grid.length;</p>
+<p>    }</p>
 <p>}</p>
-<p>/*<em>
- * Optimized Min-Heap implementation for open set
- </em>/
-class MinHeap {
-    constructor() {
-        this.heap = [];
-        this.nodeMap = new Map();  // For O(1) contains check
-    }</p>
-<pre><code>insert(node) {
-    const key = `${node.x},${node.y}`;
-    if (this.nodeMap.has(key)) {
-        // Update existing node if this path is better
-        const index = this.nodeMap.get(key);
-        if (node.fCost &lt; this.heap[index].fCost) {
-            this.heap[index] = node;
-            this.bubbleUp(index);
-            this.bubbleDown(index);
-        }
-        return;
-    }
 
-    this.heap.push(node);
-    this.nodeMap.set(key, this.heap.length - 1);
-    this.bubbleUp(this.heap.length - 1);
-}
-
-extractMin() {
-    if (this.heap.length === 0) return null;
-
-    const min = this.heap[0];
-    const last = this.heap.pop();
-    this.nodeMap.delete(`${min.x},${min.y}`);
-
-    if (this.heap.length &gt; 0) {
-        this.heap[0] = last;
-        this.nodeMap.set(`${last.x},${last.y}`, 0);
-        this.bubbleDown(0);
-    }
-
-    return min;
-}
-
-contains(node) {
-    return this.nodeMap.has(`${node.x},${node.y}`);
-}
-
-isEmpty() {
-    return this.heap.length === 0;
-}
-
-bubbleUp(index) {
-    while (index &gt; 0) {
-        const parentIndex = Math.floor((index - 1) / 2);
-        if (this.heap[parentIndex].fCost &lt;= this.heap[index].fCost) break;
-
-        this.swap(parentIndex, index);
-        index = parentIndex;
-    }
-}
-
-bubbleDown(index) {
-    while (true) {
-        let minIndex = index;
-        const leftChild = 2 * index + 1;
-        const rightChild = 2 * index + 2;
-
-        if (leftChild &lt; this.heap.length &amp;&amp; 
-            this.heap[leftChild].fCost &lt; this.heap[minIndex].fCost) {
-            minIndex = leftChild;
-        }
-
-        if (rightChild &lt; this.heap.length &amp;&amp; 
-            this.heap[rightChild].fCost &lt; this.heap[minIndex].fCost) {
-            minIndex = rightChild;
-        }
-
-        if (minIndex === index) break;
-
-        this.swap(index, minIndex);
-        index = minIndex;
-    }
-}
-
-swap(i, j) {
-    // Update node map
-    this.nodeMap.set(`${this.heap[i].x},${this.heap[i].y}`, j);
-    this.nodeMap.set(`${this.heap[j].x},${this.heap[j].y}`, i);
-
-    // Swap elements
-    [this.heap[i], this.heap[j]] = [this.heap[j], this.heap[i]];
-}
-</code></pre>
+<p>/**</p>
+<p> * Optimized Min-Heap implementation for open set</p>
+<p> */</p>
+<p>class MinHeap {</p>
+<p>    constructor() {</p>
+<p>        this.heap = [];</p>
+<p>        this.nodeMap = new Map();  // For O(1) contains check</p>
+<p>    }</p>
+    
+<p>    insert(node) {</p>
+<p>        const key = `${node.x},${node.y}`;</p>
+<p>        if (this.nodeMap.has(key)) {</p>
+<p>            // Update existing node if this path is better</p>
+<p>            const index = this.nodeMap.get(key);</p>
+<p>            if (node.fCost < this.heap[index].fCost) {</p>
+<p>                this.heap[index] = node;</p>
+<p>                this.bubbleUp(index);</p>
+<p>                this.bubbleDown(index);</p>
+<p>            }</p>
+<p>            return;</p>
+<p>        }</p>
+        
+<p>        this.heap.push(node);</p>
+<p>        this.nodeMap.set(key, this.heap.length - 1);</p>
+<p>        this.bubbleUp(this.heap.length - 1);</p>
+<p>    }</p>
+    
+<p>    extractMin() {</p>
+<p>        if (this.heap.length === 0) return null;</p>
+        
+<p>        const min = this.heap[0];</p>
+<p>        const last = this.heap.pop();</p>
+<p>        this.nodeMap.delete(`${min.x},${min.y}`);</p>
+        
+<p>        if (this.heap.length > 0) {</p>
+<p>            this.heap[0] = last;</p>
+<p>            this.nodeMap.set(`${last.x},${last.y}`, 0);</p>
+<p>            this.bubbleDown(0);</p>
+<p>        }</p>
+        
+<p>        return min;</p>
+<p>    }</p>
+    
+<p>    contains(node) {</p>
+<p>        return this.nodeMap.has(`${node.x},${node.y}`);</p>
+<p>    }</p>
+    
+<p>    isEmpty() {</p>
+<p>        return this.heap.length === 0;</p>
+<p>    }</p>
+    
+<p>    bubbleUp(index) {</p>
+<p>        while (index > 0) {</p>
+<p>            const parentIndex = Math.floor((index - 1) / 2);</p>
+<p>            if (this.heap[parentIndex].fCost <= this.heap[index].fCost) break;</p>
+            
+<p>            this.swap(parentIndex, index);</p>
+<p>            index = parentIndex;</p>
+<p>        }</p>
+<p>    }</p>
+    
+<p>    bubbleDown(index) {</p>
+<p>        while (true) {</p>
+<p>            let minIndex = index;</p>
+<p>            const leftChild = 2 * index + 1;</p>
+<p>            const rightChild = 2 * index + 2;</p>
+            
+<p>            if (leftChild < this.heap.length && </p>
+<p>                this.heap[leftChild].fCost < this.heap[minIndex].fCost) {</p>
+<p>                minIndex = leftChild;</p>
+<p>            }</p>
+            
+<p>            if (rightChild < this.heap.length && </p>
+<p>                this.heap[rightChild].fCost < this.heap[minIndex].fCost) {</p>
+<p>                minIndex = rightChild;</p>
+<p>            }</p>
+            
+<p>            if (minIndex === index) break;</p>
+            
+<p>            this.swap(index, minIndex);</p>
+<p>            index = minIndex;</p>
+<p>        }</p>
+<p>    }</p>
+    
+<p>    swap(i, j) {</p>
+<p>        // Update node map</p>
+<p>        this.nodeMap.set(`${this.heap[i].x},${this.heap[i].y}`, j);</p>
+<p>        this.nodeMap.set(`${this.heap[j].x},${this.heap[j].y}`, i);</p>
+        
+<p>        // Swap elements</p>
+<p>        [this.heap[i], this.heap[j]] = [this.heap[j], this.heap[i]];</p>
+<p>    }</p>
 <p>}</p>
-<p>/*<em>
- * Grid node class
- </em>/
-class GridNode {
-    constructor(x, y, isObstacle = false) {
-        this.x = x;
-        this.y = y;
-        this.isObstacle = isObstacle;
-    }
-}</p>
-<p>/<strong>
- * Utility functions
- */
-class PathfindingUtils {
-    /</strong>
-     * Create a grid from a 2D array
-     */
-    static createGrid(width, height, obstacles = []) {
-        const grid = [];</p>
-<pre><code>    for (let y = 0; y &lt; height; y++) {
-        grid[y] = [];
-        for (let x = 0; x &lt; width; x++) {
-            const isObstacle = obstacles.some(obs =&gt; obs.x === x &amp;&amp; obs.y === y);
-            grid[y][x] = new GridNode(x, y, isObstacle);
-        }
-    }
 
-    return grid;
-}
-
-/**
- * Calculate path length
- */
-static calculatePathLength(path) {
-    if (!path || path.length &lt; 2) return 0;
-
-    let length = 0;
-    for (let i = 1; i &lt; path.length; i++) {
-        const dx = path[i].x - path[i-1].x;
-        const dy = path[i].y - path[i-1].y;
-        length += Math.sqrt(dx * dx + dy * dy);
-    }
-
-    return length;
-}
-
-/**
- * Smooth path using line-of-sight optimization
- */
-static smoothPath(path, grid) {
-    if (!path || path.length &lt; 3) return path;
-
-    const smoothed = [path[0]];
-    let current = 0;
-
-    while (current &lt; path.length - 1) {
-        let farthest = current + 1;
-
-        for (let i = current + 2; i &lt; path.length; i++) {
-            if (this.hasLineOfSight(path[current], path[i], grid)) {
-                farthest = i;
-            } else {
-                break;
-            }
-        }
-
-        smoothed.push(path[farthest]);
-        current = farthest;
-    }
-
-    return smoothed;
-}
-
-/**
- * Check line of sight between two points
- */
-static hasLineOfSight(start, end, grid) {
-    const dx = Math.abs(end.x - start.x);
-    const dy = Math.abs(end.y - start.y);
-    const sx = start.x &lt; end.x ? 1 : -1;
-    const sy = start.y &lt; end.y ? 1 : -1;
-    let err = dx - dy;
-
-    let x = start.x;
-    let y = start.y;
-
-    while (true) {
-        if (x &lt; 0 || x &gt;= grid[0].length || y &lt; 0 || y &gt;= grid.length ||
-            grid[y][x].isObstacle) {
-            return false;
-        }
-
-        if (x === end.x &amp;&amp; y === end.y) break;
-
-        const e2 = 2 * err;
-        if (e2 &gt; -dy) {
-            err -= dy;
-            x += sx;
-        }
-        if (e2 &lt; dx) {
-            err += dx;
-            y += sy;
-        }
-    }
-
-    return true;
-}
-</code></pre>
+<p>/**</p>
+<p> * Grid node class</p>
+<p> */</p>
+<p>class GridNode {</p>
+<p>    constructor(x, y, isObstacle = false) {</p>
+<p>        this.x = x;</p>
+<p>        this.y = y;</p>
+<p>        this.isObstacle = isObstacle;</p>
+<p>    }</p>
 <p>}</p>
-<p>// Export for use in other modules
-if (typeof module !== 'undefined' &amp;&amp; module.exports) {
-    module.exports = { AStarPathfinder, GridNode, PathfindingUtils };
-}
-```</p>
+
+<p>/**</p>
+<p> * Utility functions</p>
+<p> */</p>
+<p>class PathfindingUtils {</p>
+<p>    /**</p>
+<p>     * Create a grid from a 2D array</p>
+<p>     */</p>
+<p>    static createGrid(width, height, obstacles = []) {</p>
+<p>        const grid = [];</p>
+        
+<p>        for (let y = 0; y < height; y++) {</p>
+<p>            grid[y] = [];</p>
+<p>            for (let x = 0; x < width; x++) {</p>
+<p>                const isObstacle = obstacles.some(obs => obs.x === x && obs.y === y);</p>
+<p>                grid[y][x] = new GridNode(x, y, isObstacle);</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        return grid;</p>
+<p>    }</p>
+    
+<p>    /**</p>
+<p>     * Calculate path length</p>
+<p>     */</p>
+<p>    static calculatePathLength(path) {</p>
+<p>        if (!path || path.length < 2) return 0;</p>
+        
+<p>        let length = 0;</p>
+<p>        for (let i = 1; i < path.length; i++) {</p>
+<p>            const dx = path[i].x - path[i-1].x;</p>
+<p>            const dy = path[i].y - path[i-1].y;</p>
+<p>            length += Math.sqrt(dx * dx + dy * dy);</p>
+<p>        }</p>
+        
+<p>        return length;</p>
+<p>    }</p>
+    
+<p>    /**</p>
+<p>     * Smooth path using line-of-sight optimization</p>
+<p>     */</p>
+<p>    static smoothPath(path, grid) {</p>
+<p>        if (!path || path.length < 3) return path;</p>
+        
+<p>        const smoothed = [path[0]];</p>
+<p>        let current = 0;</p>
+        
+<p>        while (current < path.length - 1) {</p>
+<p>            let farthest = current + 1;</p>
+            
+<p>            for (let i = current + 2; i < path.length; i++) {</p>
+<p>                if (this.hasLineOfSight(path[current], path[i], grid)) {</p>
+<p>                    farthest = i;</p>
+<p>                } else {</p>
+<p>                    break;</p>
+<p>                }</p>
+<p>            }</p>
+            
+<p>            smoothed.push(path[farthest]);</p>
+<p>            current = farthest;</p>
+<p>        }</p>
+        
+<p>        return smoothed;</p>
+<p>    }</p>
+    
+<p>    /**</p>
+<p>     * Check line of sight between two points</p>
+<p>     */</p>
+<p>    static hasLineOfSight(start, end, grid) {</p>
+<p>        const dx = Math.abs(end.x - start.x);</p>
+<p>        const dy = Math.abs(end.y - start.y);</p>
+<p>        const sx = start.x < end.x ? 1 : -1;</p>
+<p>        const sy = start.y < end.y ? 1 : -1;</p>
+<p>        let err = dx - dy;</p>
+        
+<p>        let x = start.x;</p>
+<p>        let y = start.y;</p>
+        
+<p>        while (true) {</p>
+<p>            if (x < 0 || x >= grid[0].length || y < 0 || y >= grid.length ||</p>
+<p>                grid[y][x].isObstacle) {</p>
+<p>                return false;</p>
+<p>            }</p>
+            
+<p>            if (x === end.x && y === end.y) break;</p>
+            
+<p>            const e2 = 2 * err;</p>
+<p>            if (e2 > -dy) {</p>
+<p>                err -= dy;</p>
+<p>                x += sx;</p>
+<p>            }</p>
+<p>            if (e2 < dx) {</p>
+<p>                err += dx;</p>
+<p>                y += sy;</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        return true;</p>
+<p>    }</p>
+<p>}</p>
+
+<p>// Export for use in other modules</p>
+<p>if (typeof module !== 'undefined' && module.exports) {</p>
+<p>    module.exports = { AStarPathfinder, GridNode, PathfindingUtils };</p>
+<p>}</p>
+<p>```</p>
+
 <h2>Usage Examples</h2>
-<h3>Basic Usage</h3>
-<p>```javascript
-// Create a 10x10 grid with some obstacles
-const obstacles = [
-    {x: 2, y: 1}, {x: 2, y: 2}, {x: 2, y: 3},
-    {x: 6, y: 4}, {x: 6, y: 5}, {x: 6, y: 6}
-];
-const grid = PathfindingUtils.createGrid(10, 10, obstacles);</p>
-<p>// Create pathfinder with default settings
-const pathfinder = new AStarPathfinder();</p>
-<p>// Find path
-const start = {x: 0, y: 0};
-const goal = {x: 9, y: 9};
-const path = pathfinder.findPath(grid, start, goal);</p>
-<p>if (path) {
-    console.log('Path found:', path);
-    console.log('Path length:', PathfindingUtils.calculatePathLength(path));
-} else {
-    console.log('No path found');
-}
-```</p>
-<h3>Advanced Configuration</h3>
-<p>```javascript
-// Create pathfinder with custom settings
-const pathfinder = new AStarPathfinder({
-    heuristic: 'octile',      // Best for 8-directional movement
-    allowDiagonal: true,      // Enable diagonal movement
-    diagonalCost: 1.414,      // √2 cost for diagonal moves
-    weight: 1.2               // Slightly weighted for faster search
-});</p>
-<p>// Find and smooth path
-const path = pathfinder.findPath(grid, start, goal);
-const smoothedPath = PathfindingUtils.smoothPath(path, grid);</p>
-<p>console.log('Original path length:', path.length);
-console.log('Smoothed path length:', smoothedPath.length);
-```</p>
-<h3>Performance Testing</h3>
-<p>```javascript
-function benchmarkPathfinding() {
-    const sizes = [50, 100, 200, 500];
-    const results = [];</p>
-<pre><code>for (const size of sizes) {
-    const grid = PathfindingUtils.createGrid(size, size, []);
-    const pathfinder = new AStarPathfinder();
 
-    const start = performance.now();
-    const path = pathfinder.findPath(
-        grid, 
-        {x: 0, y: 0}, 
-        {x: size-1, y: size-1}
-    );
-    const end = performance.now();
+<p>### Basic Usage</p>
+<p>```javascript</p>
+<p>// Create a 10x10 grid with some obstacles</p>
+<p>const obstacles = [</p>
+<p>    {x: 2, y: 1}, {x: 2, y: 2}, {x: 2, y: 3},</p>
+<p>    {x: 6, y: 4}, {x: 6, y: 5}, {x: 6, y: 6}</p>
+<p>];</p>
+<p>const grid = PathfindingUtils.createGrid(10, 10, obstacles);</p>
 
-    results.push({
-        gridSize: `${size}x${size}`,
-        pathLength: path ? path.length : 0,
-        timeMs: (end - start).toFixed(2)
-    });
-}
+<p>// Create pathfinder with default settings</p>
+<p>const pathfinder = new AStarPathfinder();</p>
 
-console.table(results);
-</code></pre>
-<p>}
-```</p>
+<p>// Find path</p>
+<p>const start = {x: 0, y: 0};</p>
+<p>const goal = {x: 9, y: 9};</p>
+<p>const path = pathfinder.findPath(grid, start, goal);</p>
+
+<p>if (path) {</p>
+<p>    console.log('Path found:', path);</p>
+<p>    console.log('Path length:', PathfindingUtils.calculatePathLength(path));</p>
+<p>} else {</p>
+<p>    console.log('No path found');</p>
+<p>}</p>
+<p>```</p>
+
+<p>### Advanced Configuration</p>
+<p>```javascript</p>
+<p>// Create pathfinder with custom settings</p>
+<p>const pathfinder = new AStarPathfinder({</p>
+<p>    heuristic: 'octile',      // Best for 8-directional movement</p>
+<p>    allowDiagonal: true,      // Enable diagonal movement</p>
+<p>    diagonalCost: 1.414,      // √2 cost for diagonal moves</p>
+<p>    weight: 1.2               // Slightly weighted for faster search</p>
+<p>});</p>
+
+<p>// Find and smooth path</p>
+<p>const path = pathfinder.findPath(grid, start, goal);</p>
+<p>const smoothedPath = PathfindingUtils.smoothPath(path, grid);</p>
+
+<p>console.log('Original path length:', path.length);</p>
+<p>console.log('Smoothed path length:', smoothedPath.length);</p>
+<p>```</p>
+
+<p>### Performance Testing</p>
+<p>```javascript</p>
+<p>function benchmarkPathfinding() {</p>
+<p>    const sizes = [50, 100, 200, 500];</p>
+<p>    const results = [];</p>
+    
+<p>    for (const size of sizes) {</p>
+<p>        const grid = PathfindingUtils.createGrid(size, size, []);</p>
+<p>        const pathfinder = new AStarPathfinder();</p>
+        
+<p>        const start = performance.now();</p>
+<p>        const path = pathfinder.findPath(</p>
+<p>            grid, </p>
+<p>            {x: 0, y: 0}, </p>
+<p>            {x: size-1, y: size-1}</p>
+<p>        );</p>
+<p>        const end = performance.now();</p>
+        
+<p>        results.push({</p>
+<p>            gridSize: `${size}x${size}`,</p>
+<p>            pathLength: path ? path.length : 0,</p>
+<p>            timeMs: (end - start).toFixed(2)</p>
+<p>        });</p>
+<p>    }</p>
+    
+<p>    console.table(results);</p>
+<p>}</p>
+<p>```</p>
+
 <h2>Error Handling</h2>
-<p>```javascript
-try {
-    const path = pathfinder.findPath(grid, start, goal);</p>
-<pre><code>if (!path) {
-    console.log('No path exists between start and goal');
-    // Handle no path case
-} else {
-    console.log('Path found successfully');
-    // Process path
-}
-</code></pre>
-<p>} catch (error) {
-    console.error('Pathfinding error:', error.message);
-    // Handle invalid inputs or other errors
-}
-```</p>
-<hr />
-<p><strong>Previous:</strong> <a href="06-path-reconstruction.md">Path Reconstruction</a>
-<strong>Next:</strong> <a href="08-applications.md">Real-World Applications</a></p>
-<p><strong>Interactive:</strong> <a href="demo.html">Test complete implementation</a></p>
+
+<p>```javascript</p>
+<p>try {</p>
+<p>    const path = pathfinder.findPath(grid, start, goal);</p>
+    
+<p>    if (!path) {</p>
+<p>        console.log('No path exists between start and goal');</p>
+<p>        // Handle no path case</p>
+<p>    } else {</p>
+<p>        console.log('Path found successfully');</p>
+<p>        // Process path</p>
+<p>    }</p>
+<p>} catch (error) {</p>
+<p>    console.error('Pathfinding error:', error.message);</p>
+<p>    // Handle invalid inputs or other errors</p>
+<p>}</p>
+<p>```</p>
+
+<p>---</p>
+<b>Previous:</b> <a href="06-path-reconstruction.md">Path Reconstruction</a>
+<b>Next:</b> <a href="08-applications.md">Real-World Applications</a>
+
+<b>Interactive:</b> <a href="demo.html">Test complete implementation</a>
     </div>
 </body>
 </html>

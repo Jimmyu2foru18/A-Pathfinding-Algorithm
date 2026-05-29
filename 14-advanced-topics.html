@@ -15,1477 +15,1491 @@
     </nav>
     <div class="container">
         <h1>Advanced Topics</h1>
+
 <h2>Hierarchical Pathfinding</h2>
-<h3>Concept Overview</h3>
+
+<p>### Concept Overview</p>
 <p>Hierarchical pathfinding breaks down large pathfinding problems into smaller, manageable chunks by creating multiple levels of abstraction.</p>
-<h3>Implementation Strategy</h3>
-<p>```javascript
-class HierarchicalPathfinder {
-    constructor(gridWidth, gridHeight, clusterSize = 10) {
-        this.gridWidth = gridWidth;
-        this.gridHeight = gridHeight;
-        this.clusterSize = clusterSize;
-        this.clusters = [];
-        this.abstractGraph = new Map();
-        this.entrancePoints = new Map();</p>
-<pre><code>    this.buildHierarchy();
-}
 
-buildHierarchy() {
-    // Step 1: Divide grid into clusters
-    this.createClusters();
+<p>### Implementation Strategy</p>
+<p>```javascript</p>
+<p>class HierarchicalPathfinder {</p>
+<p>    constructor(gridWidth, gridHeight, clusterSize = 10) {</p>
+<p>        this.gridWidth = gridWidth;</p>
+<p>        this.gridHeight = gridHeight;</p>
+<p>        this.clusterSize = clusterSize;</p>
+<p>        this.clusters = [];</p>
+<p>        this.abstractGraph = new Map();</p>
+<p>        this.entrancePoints = new Map();</p>
+        
+<p>        this.buildHierarchy();</p>
+<p>    }</p>
+    
+<p>    buildHierarchy() {</p>
+<p>        // Step 1: Divide grid into clusters</p>
+<p>        this.createClusters();</p>
+        
+<p>        // Step 2: Identify entrance points between clusters</p>
+<p>        this.identifyEntrancePoints();</p>
+        
+<p>        // Step 3: Build abstract graph</p>
+<p>        this.buildAbstractGraph();</p>
+<p>    }</p>
+    
+<p>    createClusters() {</p>
+<p>        const clustersX = Math.ceil(this.gridWidth / this.clusterSize);</p>
+<p>        const clustersY = Math.ceil(this.gridHeight / this.clusterSize);</p>
+        
+<p>        for (let cy = 0; cy < clustersY; cy++) {</p>
+<p>            for (let cx = 0; cx < clustersX; cx++) {</p>
+<p>                const cluster = {</p>
+<p>                    id: `${cx}_${cy}`,</p>
+<p>                    x: cx,</p>
+<p>                    y: cy,</p>
+<p>                    startX: cx * this.clusterSize,</p>
+<p>                    startY: cy * this.clusterSize,</p>
+<p>                    endX: Math.min((cx + 1) * this.clusterSize - 1, this.gridWidth - 1),</p>
+<p>                    endY: Math.min((cy + 1) * this.clusterSize - 1, this.gridHeight - 1),</p>
+<p>                    entrances: [],</p>
+<p>                    internalPaths: new Map()</p>
+<p>                };</p>
+                
+<p>                this.clusters.push(cluster);</p>
+<p>            }</p>
+<p>        }</p>
+<p>    }</p>
+    
+<p>    identifyEntrancePoints() {</p>
+<p>        for (const cluster of this.clusters) {</p>
+<p>            // Check horizontal borders (top and bottom)</p>
+<p>            this.findHorizontalEntrances(cluster);</p>
+            
+<p>            // Check vertical borders (left and right)</p>
+<p>            this.findVerticalEntrances(cluster);</p>
+<p>        }</p>
+<p>    }</p>
+    
+<p>    findHorizontalEntrances(cluster) {</p>
+<p>        // Top border</p>
+<p>        if (cluster.startY > 0) {</p>
+<p>            for (let x = cluster.startX; x <= cluster.endX; x++) {</p>
+<p>                if (!grid[cluster.startY][x].isObstacle && </p>
+<p>                    !grid[cluster.startY - 1][x].isObstacle) {</p>
+                    
+<p>                    const entrance = {</p>
+<p>                        x: x,</p>
+<p>                        y: cluster.startY,</p>
+<p>                        direction: 'north',</p>
+<p>                        clusterId: cluster.id,</p>
+<p>                        neighborClusterId: this.getClusterAt(x, cluster.startY - 1)?.id</p>
+<p>                    };</p>
+                    
+<p>                    cluster.entrances.push(entrance);</p>
+<p>                    this.entrancePoints.set(`${x}_${cluster.startY}`, entrance);</p>
+<p>                }</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        // Bottom border</p>
+<p>        if (cluster.endY < this.gridHeight - 1) {</p>
+<p>            for (let x = cluster.startX; x <= cluster.endX; x++) {</p>
+<p>                if (!grid[cluster.endY][x].isObstacle && </p>
+<p>                    !grid[cluster.endY + 1][x].isObstacle) {</p>
+                    
+<p>                    const entrance = {</p>
+<p>                        x: x,</p>
+<p>                        y: cluster.endY,</p>
+<p>                        direction: 'south',</p>
+<p>                        clusterId: cluster.id,</p>
+<p>                        neighborClusterId: this.getClusterAt(x, cluster.endY + 1)?.id</p>
+<p>                    };</p>
+                    
+<p>                    cluster.entrances.push(entrance);</p>
+<p>                    this.entrancePoints.set(`${x}_${cluster.endY}`, entrance);</p>
+<p>                }</p>
+<p>            }</p>
+<p>        }</p>
+<p>    }</p>
+    
+<p>    findVerticalEntrances(cluster) {</p>
+<p>        // Left border</p>
+<p>        if (cluster.startX > 0) {</p>
+<p>            for (let y = cluster.startY; y <= cluster.endY; y++) {</p>
+<p>                if (!grid[y][cluster.startX].isObstacle && </p>
+<p>                    !grid[y][cluster.startX - 1].isObstacle) {</p>
+                    
+<p>                    const entrance = {</p>
+<p>                        x: cluster.startX,</p>
+<p>                        y: y,</p>
+<p>                        direction: 'west',</p>
+<p>                        clusterId: cluster.id,</p>
+<p>                        neighborClusterId: this.getClusterAt(cluster.startX - 1, y)?.id</p>
+<p>                    };</p>
+                    
+<p>                    cluster.entrances.push(entrance);</p>
+<p>                    this.entrancePoints.set(`${cluster.startX}_${y}`, entrance);</p>
+<p>                }</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        // Right border</p>
+<p>        if (cluster.endX < this.gridWidth - 1) {</p>
+<p>            for (let y = cluster.startY; y <= cluster.endY; y++) {</p>
+<p>                if (!grid[y][cluster.endX].isObstacle && </p>
+<p>                    !grid[y][cluster.endX + 1].isObstacle) {</p>
+                    
+<p>                    const entrance = {</p>
+<p>                        x: cluster.endX,</p>
+<p>                        y: y,</p>
+<p>                        direction: 'east',</p>
+<p>                        clusterId: cluster.id,</p>
+<p>                        neighborClusterId: this.getClusterAt(cluster.endX + 1, y)?.id</p>
+<p>                    };</p>
+                    
+<p>                    cluster.entrances.push(entrance);</p>
+<p>                    this.entrancePoints.set(`${cluster.endX}_${y}`, entrance);</p>
+<p>                }</p>
+<p>            }</p>
+<p>        }</p>
+<p>    }</p>
+    
+<p>    buildAbstractGraph() {</p>
+<p>        for (const cluster of this.clusters) {</p>
+<p>            // Pre-compute paths between all entrance points within the cluster</p>
+<p>            this.computeIntraClusterPaths(cluster);</p>
+            
+<p>            // Add cluster to abstract graph</p>
+<p>            this.abstractGraph.set(cluster.id, {</p>
+<p>                cluster: cluster,</p>
+<p>                connections: new Map()</p>
+<p>            });</p>
+<p>        }</p>
+        
+<p>        // Connect adjacent clusters</p>
+<p>        this.connectAdjacentClusters();</p>
+<p>    }</p>
+    
+<p>    computeIntraClusterPaths(cluster) {</p>
+<p>        const entrances = cluster.entrances;</p>
+        
+<p>        for (let i = 0; i < entrances.length; i++) {</p>
+<p>            for (let j = i + 1; j < entrances.length; j++) {</p>
+<p>                const start = entrances[i];</p>
+<p>                const end = entrances[j];</p>
+                
+<p>                // Run A* within the cluster</p>
+<p>                const path = this.findPathWithinCluster(start, end, cluster);</p>
+                
+<p>                if (path) {</p>
+<p>                    const pathKey = `${start.x}_${start.y}_to_${end.x}_${end.y}`;</p>
+<p>                    cluster.internalPaths.set(pathKey, {</p>
+<p>                        path: path,</p>
+<p>                        cost: path.length - 1</p>
+<p>                    });</p>
+                    
+<p>                    // Also store reverse path</p>
+<p>                    const reverseKey = `${end.x}_${end.y}_to_${start.x}_${start.y}`;</p>
+<p>                    cluster.internalPaths.set(reverseKey, {</p>
+<p>                        path: path.slice().reverse(),</p>
+<p>                        cost: path.length - 1</p>
+<p>                    });</p>
+<p>                }</p>
+<p>            }</p>
+<p>        }</p>
+<p>    }</p>
+    
+<p>    findPathWithinCluster(start, end, cluster) {</p>
+<p>        // Simplified A* implementation for intra-cluster pathfinding</p>
+<p>        const openSet = [{ x: start.x, y: start.y, gCost: 0, hCost: 0, fCost: 0, parent: null }];</p>
+<p>        const closedSet = new Set();</p>
+        
+<p>        while (openSet.length > 0) {</p>
+<p>            let currentNode = openSet[0];</p>
+<p>            for (let i = 1; i < openSet.length; i++) {</p>
+<p>                if (openSet[i].fCost < currentNode.fCost) {</p>
+<p>                    currentNode = openSet[i];</p>
+<p>                }</p>
+<p>            }</p>
+            
+<p>            const currentIndex = openSet.indexOf(currentNode);</p>
+<p>            openSet.splice(currentIndex, 1);</p>
+<p>            closedSet.add(`${currentNode.x}_${currentNode.y}`);</p>
+            
+<p>            if (currentNode.x === end.x && currentNode.y === end.y) {</p>
+<p>                return this.reconstructClusterPath(currentNode);</p>
+<p>            }</p>
+            
+<p>            const neighbors = this.getClusterNeighbors(currentNode, cluster);</p>
+            
+<p>            for (const neighbor of neighbors) {</p>
+<p>                const neighborKey = `${neighbor.x}_${neighbor.y}`;</p>
+<p>                if (closedSet.has(neighborKey)) continue;</p>
+                
+<p>                const tentativeGCost = currentNode.gCost + 1;</p>
+                
+<p>                let neighborNode = openSet.find(n => n.x === neighbor.x && n.y === neighbor.y);</p>
+<p>                if (!neighborNode) {</p>
+<p>                    neighborNode = {</p>
+<p>                        x: neighbor.x,</p>
+<p>                        y: neighbor.y,</p>
+<p>                        gCost: tentativeGCost,</p>
+<p>                        hCost: manhattanDistance(neighbor, end),</p>
+<p>                        parent: currentNode</p>
+<p>                    };</p>
+<p>                    neighborNode.fCost = neighborNode.gCost + neighborNode.hCost;</p>
+<p>                    openSet.push(neighborNode);</p>
+<p>                } else if (tentativeGCost < neighborNode.gCost) {</p>
+<p>                    neighborNode.gCost = tentativeGCost;</p>
+<p>                    neighborNode.fCost = neighborNode.gCost + neighborNode.hCost;</p>
+<p>                    neighborNode.parent = currentNode;</p>
+<p>                }</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        return null; // No path found</p>
+<p>    }</p>
+    
+<p>    getClusterNeighbors(node, cluster) {</p>
+<p>        const neighbors = [];</p>
+<p>        const directions = [</p>
+<p>            { dx: 0, dy: -1 }, { dx: 1, dy: 0 },</p>
+<p>            { dx: 0, dy: 1 }, { dx: -1, dy: 0 }</p>
+<p>        ];</p>
+        
+<p>        for (const dir of directions) {</p>
+<p>            const newX = node.x + dir.dx;</p>
+<p>            const newY = node.y + dir.dy;</p>
+            
+<p>            // Check if within cluster bounds</p>
+<p>            if (newX >= cluster.startX && newX <= cluster.endX &&</p>
+<p>                newY >= cluster.startY && newY <= cluster.endY &&</p>
+<p>                newX >= 0 && newX < this.gridWidth &&</p>
+<p>                newY >= 0 && newY < this.gridHeight &&</p>
+<p>                !grid[newY][newX].isObstacle) {</p>
+                
+<p>                neighbors.push({ x: newX, y: newY });</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        return neighbors;</p>
+<p>    }</p>
+    
+<p>    reconstructClusterPath(node) {</p>
+<p>        const path = [];</p>
+<p>        let current = node;</p>
+        
+<p>        while (current) {</p>
+<p>            path.unshift({ x: current.x, y: current.y });</p>
+<p>            current = current.parent;</p>
+<p>        }</p>
+        
+<p>        return path;</p>
+<p>    }</p>
+    
+<p>    connectAdjacentClusters() {</p>
+<p>        for (const [clusterId, clusterData] of this.abstractGraph) {</p>
+<p>            const cluster = clusterData.cluster;</p>
+            
+<p>            for (const entrance of cluster.entrances) {</p>
+<p>                if (entrance.neighborClusterId) {</p>
+<p>                    const neighborData = this.abstractGraph.get(entrance.neighborClusterId);</p>
+<p>                    if (neighborData) {</p>
+<p>                        clusterData.connections.set(entrance.neighborClusterId, {</p>
+<p>                            cost: 1, // Base cost for cluster transition</p>
+<p>                            entrance: entrance</p>
+<p>                        });</p>
+<p>                    }</p>
+<p>                }</p>
+<p>            }</p>
+<p>        }</p>
+<p>    }</p>
+    
+<p>    findHierarchicalPath(startX, startY, goalX, goalY) {</p>
+<p>        const startCluster = this.getClusterAt(startX, startY);</p>
+<p>        const goalCluster = this.getClusterAt(goalX, goalY);</p>
+        
+<p>        if (!startCluster || !goalCluster) {</p>
+<p>            return null;</p>
+<p>        }</p>
+        
+<p>        // If start and goal are in the same cluster</p>
+<p>        if (startCluster.id === goalCluster.id) {</p>
+<p>            return this.findPathWithinCluster(</p>
+<p>                { x: startX, y: startY },</p>
+<p>                { x: goalX, y: goalY },</p>
+<p>                startCluster</p>
+<p>            );</p>
+<p>        }</p>
+        
+<p>        // Find path through abstract graph</p>
+<p>        const abstractPath = this.findAbstractPath(startCluster.id, goalCluster.id);</p>
+<p>        if (!abstractPath) {</p>
+<p>            return null;</p>
+<p>        }</p>
+        
+<p>        // Refine abstract path to concrete path</p>
+<p>        return this.refinePath(abstractPath, startX, startY, goalX, goalY);</p>
+<p>    }</p>
+    
+<p>    findAbstractPath(startClusterId, goalClusterId) {</p>
+<p>        const openSet = [{ </p>
+<p>            clusterId: startClusterId, </p>
+<p>            gCost: 0, </p>
+<p>            hCost: 0, </p>
+<p>            fCost: 0, </p>
+<p>            parent: null </p>
+<p>        }];</p>
+<p>        const closedSet = new Set();</p>
+        
+<p>        while (openSet.length > 0) {</p>
+<p>            let currentNode = openSet[0];</p>
+<p>            for (let i = 1; i < openSet.length; i++) {</p>
+<p>                if (openSet[i].fCost < currentNode.fCost) {</p>
+<p>                    currentNode = openSet[i];</p>
+<p>                }</p>
+<p>            }</p>
+            
+<p>            const currentIndex = openSet.indexOf(currentNode);</p>
+<p>            openSet.splice(currentIndex, 1);</p>
+<p>            closedSet.add(currentNode.clusterId);</p>
+            
+<p>            if (currentNode.clusterId === goalClusterId) {</p>
+<p>                return this.reconstructAbstractPath(currentNode);</p>
+<p>            }</p>
+            
+<p>            const clusterData = this.abstractGraph.get(currentNode.clusterId);</p>
+            
+<p>            for (const [neighborId, connection] of clusterData.connections) {</p>
+<p>                if (closedSet.has(neighborId)) continue;</p>
+                
+<p>                const tentativeGCost = currentNode.gCost + connection.cost;</p>
+                
+<p>                let neighborNode = openSet.find(n => n.clusterId === neighborId);</p>
+<p>                if (!neighborNode) {</p>
+<p>                    neighborNode = {</p>
+<p>                        clusterId: neighborId,</p>
+<p>                        gCost: tentativeGCost,</p>
+<p>                        hCost: this.getClusterHeuristic(neighborId, goalClusterId),</p>
+<p>                        parent: currentNode</p>
+<p>                    };</p>
+<p>                    neighborNode.fCost = neighborNode.gCost + neighborNode.hCost;</p>
+<p>                    openSet.push(neighborNode);</p>
+<p>                } else if (tentativeGCost < neighborNode.gCost) {</p>
+<p>                    neighborNode.gCost = tentativeGCost;</p>
+<p>                    neighborNode.fCost = neighborNode.gCost + neighborNode.hCost;</p>
+<p>                    neighborNode.parent = currentNode;</p>
+<p>                }</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        return null;</p>
+<p>    }</p>
+    
+<p>    getClusterHeuristic(clusterId1, clusterId2) {</p>
+<p>        const cluster1 = this.clusters.find(c => c.id === clusterId1);</p>
+<p>        const cluster2 = this.clusters.find(c => c.id === clusterId2);</p>
+        
+<p>        return Math.abs(cluster1.x - cluster2.x) + Math.abs(cluster1.y - cluster2.y);</p>
+<p>    }</p>
+    
+<p>    reconstructAbstractPath(node) {</p>
+<p>        const path = [];</p>
+<p>        let current = node;</p>
+        
+<p>        while (current) {</p>
+<p>            path.unshift(current.clusterId);</p>
+<p>            current = current.parent;</p>
+<p>        }</p>
+        
+<p>        return path;</p>
+<p>    }</p>
+    
+<p>    refinePath(abstractPath, startX, startY, goalX, goalY) {</p>
+<p>        let fullPath = [];</p>
+        
+<p>        for (let i = 0; i < abstractPath.length; i++) {</p>
+<p>            const clusterId = abstractPath[i];</p>
+<p>            const cluster = this.clusters.find(c => c.id === clusterId);</p>
+            
+<p>            if (i === 0) {</p>
+<p>                // First cluster: path from start to exit entrance</p>
+<p>                if (abstractPath.length === 1) {</p>
+<p>                    // Start and goal in same cluster</p>
+<p>                    return this.findPathWithinCluster(</p>
+<p>                        { x: startX, y: startY },</p>
+<p>                        { x: goalX, y: goalY },</p>
+<p>                        cluster</p>
+<p>                    );</p>
+<p>                } else {</p>
+<p>                    // Find best exit entrance</p>
+<p>                    const nextClusterId = abstractPath[i + 1];</p>
+<p>                    const exitEntrance = this.findBestExitEntrance(cluster, nextClusterId);</p>
+                    
+<p>                    const segmentPath = this.findPathWithinCluster(</p>
+<p>                        { x: startX, y: startY },</p>
+<p>                        exitEntrance,</p>
+<p>                        cluster</p>
+<p>                    );</p>
+                    
+<p>                    if (segmentPath) {</p>
+<p>                        fullPath = fullPath.concat(segmentPath.slice(0, -1)); // Exclude last point to avoid duplication</p>
+<p>                    }</p>
+<p>                }</p>
+<p>            } else if (i === abstractPath.length - 1) {</p>
+<p>                // Last cluster: path from entrance to goal</p>
+<p>                const prevClusterId = abstractPath[i - 1];</p>
+<p>                const entryEntrance = this.findBestEntryEntrance(cluster, prevClusterId);</p>
+                
+<p>                const segmentPath = this.findPathWithinCluster(</p>
+<p>                    entryEntrance,</p>
+<p>                    { x: goalX, y: goalY },</p>
+<p>                    cluster</p>
+<p>                );</p>
+                
+<p>                if (segmentPath) {</p>
+<p>                    fullPath = fullPath.concat(segmentPath);</p>
+<p>                }</p>
+<p>            } else {</p>
+<p>                // Middle cluster: path from entrance to exit</p>
+<p>                const prevClusterId = abstractPath[i - 1];</p>
+<p>                const nextClusterId = abstractPath[i + 1];</p>
+                
+<p>                const entryEntrance = this.findBestEntryEntrance(cluster, prevClusterId);</p>
+<p>                const exitEntrance = this.findBestExitEntrance(cluster, nextClusterId);</p>
+                
+<p>                const pathKey = `${entryEntrance.x}_${entryEntrance.y}_to_${exitEntrance.x}_${exitEntrance.y}`;</p>
+<p>                const precomputedPath = cluster.internalPaths.get(pathKey);</p>
+                
+<p>                if (precomputedPath) {</p>
+<p>                    fullPath = fullPath.concat(precomputedPath.path.slice(0, -1));</p>
+<p>                } else {</p>
+<p>                    const segmentPath = this.findPathWithinCluster(entryEntrance, exitEntrance, cluster);</p>
+<p>                    if (segmentPath) {</p>
+<p>                        fullPath = fullPath.concat(segmentPath.slice(0, -1));</p>
+<p>                    }</p>
+<p>                }</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        return fullPath;</p>
+<p>    }</p>
+    
+<p>    findBestExitEntrance(cluster, nextClusterId) {</p>
+<p>        return cluster.entrances.find(e => e.neighborClusterId === nextClusterId);</p>
+<p>    }</p>
+    
+<p>    findBestEntryEntrance(cluster, prevClusterId) {</p>
+<p>        return cluster.entrances.find(e => e.neighborClusterId === prevClusterId);</p>
+<p>    }</p>
+    
+<p>    getClusterAt(x, y) {</p>
+<p>        const clusterX = Math.floor(x / this.clusterSize);</p>
+<p>        const clusterY = Math.floor(y / this.clusterSize);</p>
+<p>        return this.clusters.find(c => c.x === clusterX && c.y === clusterY);</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
 
-    // Step 2: Identify entrance points between clusters
-    this.identifyEntrancePoints();
-
-    // Step 3: Build abstract graph
-    this.buildAbstractGraph();
-}
-
-createClusters() {
-    const clustersX = Math.ceil(this.gridWidth / this.clusterSize);
-    const clustersY = Math.ceil(this.gridHeight / this.clusterSize);
-
-    for (let cy = 0; cy &lt; clustersY; cy++) {
-        for (let cx = 0; cx &lt; clustersX; cx++) {
-            const cluster = {
-                id: `${cx}_${cy}`,
-                x: cx,
-                y: cy,
-                startX: cx * this.clusterSize,
-                startY: cy * this.clusterSize,
-                endX: Math.min((cx + 1) * this.clusterSize - 1, this.gridWidth - 1),
-                endY: Math.min((cy + 1) * this.clusterSize - 1, this.gridHeight - 1),
-                entrances: [],
-                internalPaths: new Map()
-            };
-
-            this.clusters.push(cluster);
-        }
-    }
-}
-
-identifyEntrancePoints() {
-    for (const cluster of this.clusters) {
-        // Check horizontal borders (top and bottom)
-        this.findHorizontalEntrances(cluster);
-
-        // Check vertical borders (left and right)
-        this.findVerticalEntrances(cluster);
-    }
-}
-
-findHorizontalEntrances(cluster) {
-    // Top border
-    if (cluster.startY &gt; 0) {
-        for (let x = cluster.startX; x &lt;= cluster.endX; x++) {
-            if (!grid[cluster.startY][x].isObstacle &amp;&amp; 
-                !grid[cluster.startY - 1][x].isObstacle) {
-
-                const entrance = {
-                    x: x,
-                    y: cluster.startY,
-                    direction: 'north',
-                    clusterId: cluster.id,
-                    neighborClusterId: this.getClusterAt(x, cluster.startY - 1)?.id
-                };
-
-                cluster.entrances.push(entrance);
-                this.entrancePoints.set(`${x}_${cluster.startY}`, entrance);
-            }
-        }
-    }
-
-    // Bottom border
-    if (cluster.endY &lt; this.gridHeight - 1) {
-        for (let x = cluster.startX; x &lt;= cluster.endX; x++) {
-            if (!grid[cluster.endY][x].isObstacle &amp;&amp; 
-                !grid[cluster.endY + 1][x].isObstacle) {
-
-                const entrance = {
-                    x: x,
-                    y: cluster.endY,
-                    direction: 'south',
-                    clusterId: cluster.id,
-                    neighborClusterId: this.getClusterAt(x, cluster.endY + 1)?.id
-                };
-
-                cluster.entrances.push(entrance);
-                this.entrancePoints.set(`${x}_${cluster.endY}`, entrance);
-            }
-        }
-    }
-}
-
-findVerticalEntrances(cluster) {
-    // Left border
-    if (cluster.startX &gt; 0) {
-        for (let y = cluster.startY; y &lt;= cluster.endY; y++) {
-            if (!grid[y][cluster.startX].isObstacle &amp;&amp; 
-                !grid[y][cluster.startX - 1].isObstacle) {
-
-                const entrance = {
-                    x: cluster.startX,
-                    y: y,
-                    direction: 'west',
-                    clusterId: cluster.id,
-                    neighborClusterId: this.getClusterAt(cluster.startX - 1, y)?.id
-                };
-
-                cluster.entrances.push(entrance);
-                this.entrancePoints.set(`${cluster.startX}_${y}`, entrance);
-            }
-        }
-    }
-
-    // Right border
-    if (cluster.endX &lt; this.gridWidth - 1) {
-        for (let y = cluster.startY; y &lt;= cluster.endY; y++) {
-            if (!grid[y][cluster.endX].isObstacle &amp;&amp; 
-                !grid[y][cluster.endX + 1].isObstacle) {
-
-                const entrance = {
-                    x: cluster.endX,
-                    y: y,
-                    direction: 'east',
-                    clusterId: cluster.id,
-                    neighborClusterId: this.getClusterAt(cluster.endX + 1, y)?.id
-                };
-
-                cluster.entrances.push(entrance);
-                this.entrancePoints.set(`${cluster.endX}_${y}`, entrance);
-            }
-        }
-    }
-}
-
-buildAbstractGraph() {
-    for (const cluster of this.clusters) {
-        // Pre-compute paths between all entrance points within the cluster
-        this.computeIntraClusterPaths(cluster);
-
-        // Add cluster to abstract graph
-        this.abstractGraph.set(cluster.id, {
-            cluster: cluster,
-            connections: new Map()
-        });
-    }
-
-    // Connect adjacent clusters
-    this.connectAdjacentClusters();
-}
-
-computeIntraClusterPaths(cluster) {
-    const entrances = cluster.entrances;
-
-    for (let i = 0; i &lt; entrances.length; i++) {
-        for (let j = i + 1; j &lt; entrances.length; j++) {
-            const start = entrances[i];
-            const end = entrances[j];
-
-            // Run A* within the cluster
-            const path = this.findPathWithinCluster(start, end, cluster);
-
-            if (path) {
-                const pathKey = `${start.x}_${start.y}_to_${end.x}_${end.y}`;
-                cluster.internalPaths.set(pathKey, {
-                    path: path,
-                    cost: path.length - 1
-                });
-
-                // Also store reverse path
-                const reverseKey = `${end.x}_${end.y}_to_${start.x}_${start.y}`;
-                cluster.internalPaths.set(reverseKey, {
-                    path: path.slice().reverse(),
-                    cost: path.length - 1
-                });
-            }
-        }
-    }
-}
-
-findPathWithinCluster(start, end, cluster) {
-    // Simplified A* implementation for intra-cluster pathfinding
-    const openSet = [{ x: start.x, y: start.y, gCost: 0, hCost: 0, fCost: 0, parent: null }];
-    const closedSet = new Set();
-
-    while (openSet.length &gt; 0) {
-        let currentNode = openSet[0];
-        for (let i = 1; i &lt; openSet.length; i++) {
-            if (openSet[i].fCost &lt; currentNode.fCost) {
-                currentNode = openSet[i];
-            }
-        }
-
-        const currentIndex = openSet.indexOf(currentNode);
-        openSet.splice(currentIndex, 1);
-        closedSet.add(`${currentNode.x}_${currentNode.y}`);
-
-        if (currentNode.x === end.x &amp;&amp; currentNode.y === end.y) {
-            return this.reconstructClusterPath(currentNode);
-        }
-
-        const neighbors = this.getClusterNeighbors(currentNode, cluster);
-
-        for (const neighbor of neighbors) {
-            const neighborKey = `${neighbor.x}_${neighbor.y}`;
-            if (closedSet.has(neighborKey)) continue;
-
-            const tentativeGCost = currentNode.gCost + 1;
-
-            let neighborNode = openSet.find(n =&gt; n.x === neighbor.x &amp;&amp; n.y === neighbor.y);
-            if (!neighborNode) {
-                neighborNode = {
-                    x: neighbor.x,
-                    y: neighbor.y,
-                    gCost: tentativeGCost,
-                    hCost: manhattanDistance(neighbor, end),
-                    parent: currentNode
-                };
-                neighborNode.fCost = neighborNode.gCost + neighborNode.hCost;
-                openSet.push(neighborNode);
-            } else if (tentativeGCost &lt; neighborNode.gCost) {
-                neighborNode.gCost = tentativeGCost;
-                neighborNode.fCost = neighborNode.gCost + neighborNode.hCost;
-                neighborNode.parent = currentNode;
-            }
-        }
-    }
-
-    return null; // No path found
-}
-
-getClusterNeighbors(node, cluster) {
-    const neighbors = [];
-    const directions = [
-        { dx: 0, dy: -1 }, { dx: 1, dy: 0 },
-        { dx: 0, dy: 1 }, { dx: -1, dy: 0 }
-    ];
-
-    for (const dir of directions) {
-        const newX = node.x + dir.dx;
-        const newY = node.y + dir.dy;
-
-        // Check if within cluster bounds
-        if (newX &gt;= cluster.startX &amp;&amp; newX &lt;= cluster.endX &amp;&amp;
-            newY &gt;= cluster.startY &amp;&amp; newY &lt;= cluster.endY &amp;&amp;
-            newX &gt;= 0 &amp;&amp; newX &lt; this.gridWidth &amp;&amp;
-            newY &gt;= 0 &amp;&amp; newY &lt; this.gridHeight &amp;&amp;
-            !grid[newY][newX].isObstacle) {
-
-            neighbors.push({ x: newX, y: newY });
-        }
-    }
-
-    return neighbors;
-}
-
-reconstructClusterPath(node) {
-    const path = [];
-    let current = node;
-
-    while (current) {
-        path.unshift({ x: current.x, y: current.y });
-        current = current.parent;
-    }
-
-    return path;
-}
-
-connectAdjacentClusters() {
-    for (const [clusterId, clusterData] of this.abstractGraph) {
-        const cluster = clusterData.cluster;
-
-        for (const entrance of cluster.entrances) {
-            if (entrance.neighborClusterId) {
-                const neighborData = this.abstractGraph.get(entrance.neighborClusterId);
-                if (neighborData) {
-                    clusterData.connections.set(entrance.neighborClusterId, {
-                        cost: 1, // Base cost for cluster transition
-                        entrance: entrance
-                    });
-                }
-            }
-        }
-    }
-}
-
-findHierarchicalPath(startX, startY, goalX, goalY) {
-    const startCluster = this.getClusterAt(startX, startY);
-    const goalCluster = this.getClusterAt(goalX, goalY);
-
-    if (!startCluster || !goalCluster) {
-        return null;
-    }
-
-    // If start and goal are in the same cluster
-    if (startCluster.id === goalCluster.id) {
-        return this.findPathWithinCluster(
-            { x: startX, y: startY },
-            { x: goalX, y: goalY },
-            startCluster
-        );
-    }
-
-    // Find path through abstract graph
-    const abstractPath = this.findAbstractPath(startCluster.id, goalCluster.id);
-    if (!abstractPath) {
-        return null;
-    }
-
-    // Refine abstract path to concrete path
-    return this.refinePath(abstractPath, startX, startY, goalX, goalY);
-}
-
-findAbstractPath(startClusterId, goalClusterId) {
-    const openSet = [{ 
-        clusterId: startClusterId, 
-        gCost: 0, 
-        hCost: 0, 
-        fCost: 0, 
-        parent: null 
-    }];
-    const closedSet = new Set();
-
-    while (openSet.length &gt; 0) {
-        let currentNode = openSet[0];
-        for (let i = 1; i &lt; openSet.length; i++) {
-            if (openSet[i].fCost &lt; currentNode.fCost) {
-                currentNode = openSet[i];
-            }
-        }
-
-        const currentIndex = openSet.indexOf(currentNode);
-        openSet.splice(currentIndex, 1);
-        closedSet.add(currentNode.clusterId);
-
-        if (currentNode.clusterId === goalClusterId) {
-            return this.reconstructAbstractPath(currentNode);
-        }
-
-        const clusterData = this.abstractGraph.get(currentNode.clusterId);
-
-        for (const [neighborId, connection] of clusterData.connections) {
-            if (closedSet.has(neighborId)) continue;
-
-            const tentativeGCost = currentNode.gCost + connection.cost;
-
-            let neighborNode = openSet.find(n =&gt; n.clusterId === neighborId);
-            if (!neighborNode) {
-                neighborNode = {
-                    clusterId: neighborId,
-                    gCost: tentativeGCost,
-                    hCost: this.getClusterHeuristic(neighborId, goalClusterId),
-                    parent: currentNode
-                };
-                neighborNode.fCost = neighborNode.gCost + neighborNode.hCost;
-                openSet.push(neighborNode);
-            } else if (tentativeGCost &lt; neighborNode.gCost) {
-                neighborNode.gCost = tentativeGCost;
-                neighborNode.fCost = neighborNode.gCost + neighborNode.hCost;
-                neighborNode.parent = currentNode;
-            }
-        }
-    }
-
-    return null;
-}
-
-getClusterHeuristic(clusterId1, clusterId2) {
-    const cluster1 = this.clusters.find(c =&gt; c.id === clusterId1);
-    const cluster2 = this.clusters.find(c =&gt; c.id === clusterId2);
-
-    return Math.abs(cluster1.x - cluster2.x) + Math.abs(cluster1.y - cluster2.y);
-}
-
-reconstructAbstractPath(node) {
-    const path = [];
-    let current = node;
-
-    while (current) {
-        path.unshift(current.clusterId);
-        current = current.parent;
-    }
-
-    return path;
-}
-
-refinePath(abstractPath, startX, startY, goalX, goalY) {
-    let fullPath = [];
-
-    for (let i = 0; i &lt; abstractPath.length; i++) {
-        const clusterId = abstractPath[i];
-        const cluster = this.clusters.find(c =&gt; c.id === clusterId);
-
-        if (i === 0) {
-            // First cluster: path from start to exit entrance
-            if (abstractPath.length === 1) {
-                // Start and goal in same cluster
-                return this.findPathWithinCluster(
-                    { x: startX, y: startY },
-                    { x: goalX, y: goalY },
-                    cluster
-                );
-            } else {
-                // Find best exit entrance
-                const nextClusterId = abstractPath[i + 1];
-                const exitEntrance = this.findBestExitEntrance(cluster, nextClusterId);
-
-                const segmentPath = this.findPathWithinCluster(
-                    { x: startX, y: startY },
-                    exitEntrance,
-                    cluster
-                );
-
-                if (segmentPath) {
-                    fullPath = fullPath.concat(segmentPath.slice(0, -1)); // Exclude last point to avoid duplication
-                }
-            }
-        } else if (i === abstractPath.length - 1) {
-            // Last cluster: path from entrance to goal
-            const prevClusterId = abstractPath[i - 1];
-            const entryEntrance = this.findBestEntryEntrance(cluster, prevClusterId);
-
-            const segmentPath = this.findPathWithinCluster(
-                entryEntrance,
-                { x: goalX, y: goalY },
-                cluster
-            );
-
-            if (segmentPath) {
-                fullPath = fullPath.concat(segmentPath);
-            }
-        } else {
-            // Middle cluster: path from entrance to exit
-            const prevClusterId = abstractPath[i - 1];
-            const nextClusterId = abstractPath[i + 1];
-
-            const entryEntrance = this.findBestEntryEntrance(cluster, prevClusterId);
-            const exitEntrance = this.findBestExitEntrance(cluster, nextClusterId);
-
-            const pathKey = `${entryEntrance.x}_${entryEntrance.y}_to_${exitEntrance.x}_${exitEntrance.y}`;
-            const precomputedPath = cluster.internalPaths.get(pathKey);
-
-            if (precomputedPath) {
-                fullPath = fullPath.concat(precomputedPath.path.slice(0, -1));
-            } else {
-                const segmentPath = this.findPathWithinCluster(entryEntrance, exitEntrance, cluster);
-                if (segmentPath) {
-                    fullPath = fullPath.concat(segmentPath.slice(0, -1));
-                }
-            }
-        }
-    }
-
-    return fullPath;
-}
-
-findBestExitEntrance(cluster, nextClusterId) {
-    return cluster.entrances.find(e =&gt; e.neighborClusterId === nextClusterId);
-}
-
-findBestEntryEntrance(cluster, prevClusterId) {
-    return cluster.entrances.find(e =&gt; e.neighborClusterId === prevClusterId);
-}
-
-getClusterAt(x, y) {
-    const clusterX = Math.floor(x / this.clusterSize);
-    const clusterY = Math.floor(y / this.clusterSize);
-    return this.clusters.find(c =&gt; c.x === clusterX &amp;&amp; c.y === clusterY);
-}
-</code></pre>
-<p>}
-```</p>
 <h2>Jump Point Search (JPS)</h2>
-<h3>Concept and Implementation</h3>
+
+<p>### Concept and Implementation</p>
 <p>Jump Point Search is an optimization of A* for uniform-cost grids that can dramatically reduce the number of nodes explored.</p>
-<p>```javascript
-class JumpPointSearch {
-    constructor() {
-        this.directions = {
-            horizontal: [{ dx: 1, dy: 0 }, { dx: -1, dy: 0 }],
-            vertical: [{ dx: 0, dy: 1 }, { dx: 0, dy: -1 }],
-            diagonal: [
-                { dx: 1, dy: 1 }, { dx: 1, dy: -1 },
-                { dx: -1, dy: 1 }, { dx: -1, dy: -1 }
-            ]
-        };
-    }</p>
-<pre><code>findPath(startX, startY, goalX, goalY) {
-    const openSet = new MinHeap();
-    const closedSet = new Set();
 
-    const startNode = {
-        x: startX,
-        y: startY,
-        gCost: 0,
-        hCost: this.octileDistance(startX, startY, goalX, goalY),
-        parent: null
-    };
-    startNode.fCost = startNode.gCost + startNode.hCost;
+<p>```javascript</p>
+<p>class JumpPointSearch {</p>
+<p>    constructor() {</p>
+<p>        this.directions = {</p>
+<p>            horizontal: [{ dx: 1, dy: 0 }, { dx: -1, dy: 0 }],</p>
+<p>            vertical: [{ dx: 0, dy: 1 }, { dx: 0, dy: -1 }],</p>
+<p>            diagonal: [</p>
+<p>                { dx: 1, dy: 1 }, { dx: 1, dy: -1 },</p>
+<p>                { dx: -1, dy: 1 }, { dx: -1, dy: -1 }</p>
+<p>            ]</p>
+<p>        };</p>
+<p>    }</p>
+    
+<p>    findPath(startX, startY, goalX, goalY) {</p>
+<p>        const openSet = new MinHeap();</p>
+<p>        const closedSet = new Set();</p>
+        
+<p>        const startNode = {</p>
+<p>            x: startX,</p>
+<p>            y: startY,</p>
+<p>            gCost: 0,</p>
+<p>            hCost: this.octileDistance(startX, startY, goalX, goalY),</p>
+<p>            parent: null</p>
+<p>        };</p>
+<p>        startNode.fCost = startNode.gCost + startNode.hCost;</p>
+        
+<p>        openSet.insert(startNode);</p>
+        
+<p>        while (!openSet.isEmpty()) {</p>
+<p>            const currentNode = openSet.extractMin();</p>
+<p>            const nodeKey = `${currentNode.x}_${currentNode.y}`;</p>
+            
+<p>            if (closedSet.has(nodeKey)) continue;</p>
+<p>            closedSet.add(nodeKey);</p>
+            
+<p>            if (currentNode.x === goalX && currentNode.y === goalY) {</p>
+<p>                return this.reconstructPath(currentNode);</p>
+<p>            }</p>
+            
+<p>            const successors = this.getSuccessors(currentNode, goalX, goalY);</p>
+            
+<p>            for (const successor of successors) {</p>
+<p>                const successorKey = `${successor.x}_${successor.y}`;</p>
+<p>                if (closedSet.has(successorKey)) continue;</p>
+                
+<p>                const gCost = currentNode.gCost + this.octileDistance(</p>
+<p>                    currentNode.x, currentNode.y,</p>
+<p>                    successor.x, successor.y</p>
+<p>                );</p>
+                
+<p>                const successorNode = {</p>
+<p>                    x: successor.x,</p>
+<p>                    y: successor.y,</p>
+<p>                    gCost: gCost,</p>
+<p>                    hCost: this.octileDistance(successor.x, successor.y, goalX, goalY),</p>
+<p>                    parent: currentNode</p>
+<p>                };</p>
+<p>                successorNode.fCost = successorNode.gCost + successorNode.hCost;</p>
+                
+<p>                openSet.insert(successorNode);</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        return null;</p>
+<p>    }</p>
+    
+<p>    getSuccessors(node, goalX, goalY) {</p>
+<p>        const successors = [];</p>
+<p>        const neighbors = this.identifySuccessors(node, goalX, goalY);</p>
+        
+<p>        for (const neighbor of neighbors) {</p>
+<p>            const jumpPoint = this.jump(neighbor.x, neighbor.y, node.x, node.y, goalX, goalY);</p>
+<p>            if (jumpPoint) {</p>
+<p>                successors.push(jumpPoint);</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        return successors;</p>
+<p>    }</p>
+    
+<p>    identifySuccessors(node, goalX, goalY) {</p>
+<p>        const neighbors = [];</p>
+<p>        const parent = node.parent;</p>
+        
+<p>        if (!parent) {</p>
+<p>            // Initial node - add all valid neighbors</p>
+<p>            return this.getAllNeighbors(node.x, node.y);</p>
+<p>        }</p>
+        
+<p>        const dx = Math.sign(node.x - parent.x);</p>
+<p>        const dy = Math.sign(node.y - parent.y);</p>
+        
+<p>        if (dx !== 0 && dy !== 0) {</p>
+<p>            // Diagonal movement</p>
+<p>            this.addDiagonalSuccessors(node.x, node.y, dx, dy, neighbors);</p>
+<p>        } else if (dx !== 0) {</p>
+<p>            // Horizontal movement</p>
+<p>            this.addHorizontalSuccessors(node.x, node.y, dx, neighbors);</p>
+<p>        } else if (dy !== 0) {</p>
+<p>            // Vertical movement</p>
+<p>            this.addVerticalSuccessors(node.x, node.y, dy, neighbors);</p>
+<p>        }</p>
+        
+<p>        return neighbors;</p>
+<p>    }</p>
+    
+<p>    addDiagonalSuccessors(x, y, dx, dy, neighbors) {</p>
+<p>        // Continue diagonal</p>
+<p>        if (this.isWalkable(x + dx, y + dy)) {</p>
+<p>            neighbors.push({ x: x + dx, y: y + dy });</p>
+<p>        }</p>
+        
+<p>        // Horizontal component</p>
+<p>        if (this.isWalkable(x + dx, y)) {</p>
+<p>            neighbors.push({ x: x + dx, y: y });</p>
+<p>        }</p>
+        
+<p>        // Vertical component</p>
+<p>        if (this.isWalkable(x, y + dy)) {</p>
+<p>            neighbors.push({ x: x, y: y + dy });</p>
+<p>        }</p>
+        
+<p>        // Forced neighbors</p>
+<p>        if (!this.isWalkable(x - dx, y) && this.isWalkable(x - dx, y + dy)) {</p>
+<p>            neighbors.push({ x: x - dx, y: y + dy });</p>
+<p>        }</p>
+<p>        if (!this.isWalkable(x, y - dy) && this.isWalkable(x + dx, y - dy)) {</p>
+<p>            neighbors.push({ x: x + dx, y: y - dy });</p>
+<p>        }</p>
+<p>    }</p>
+    
+<p>    addHorizontalSuccessors(x, y, dx, neighbors) {</p>
+<p>        // Continue horizontal</p>
+<p>        if (this.isWalkable(x + dx, y)) {</p>
+<p>            neighbors.push({ x: x + dx, y: y });</p>
+<p>        }</p>
+        
+<p>        // Forced neighbors</p>
+<p>        if (!this.isWalkable(x, y - 1) && this.isWalkable(x + dx, y - 1)) {</p>
+<p>            neighbors.push({ x: x + dx, y: y - 1 });</p>
+<p>        }</p>
+<p>        if (!this.isWalkable(x, y + 1) && this.isWalkable(x + dx, y + 1)) {</p>
+<p>            neighbors.push({ x: x + dx, y: y + 1 });</p>
+<p>        }</p>
+<p>    }</p>
+    
+<p>    addVerticalSuccessors(x, y, dy, neighbors) {</p>
+<p>        // Continue vertical</p>
+<p>        if (this.isWalkable(x, y + dy)) {</p>
+<p>            neighbors.push({ x: x, y: y + dy });</p>
+<p>        }</p>
+        
+<p>        // Forced neighbors</p>
+<p>        if (!this.isWalkable(x - 1, y) && this.isWalkable(x - 1, y + dy)) {</p>
+<p>            neighbors.push({ x: x - 1, y: y + dy });</p>
+<p>        }</p>
+<p>        if (!this.isWalkable(x + 1, y) && this.isWalkable(x + 1, y + dy)) {</p>
+<p>            neighbors.push({ x: x + 1, y: y + dy });</p>
+<p>        }</p>
+<p>    }</p>
+    
+<p>    jump(x, y, parentX, parentY, goalX, goalY) {</p>
+<p>        if (!this.isWalkable(x, y)) {</p>
+<p>            return null;</p>
+<p>        }</p>
+        
+<p>        if (x === goalX && y === goalY) {</p>
+<p>            return { x, y };</p>
+<p>        }</p>
+        
+<p>        const dx = Math.sign(x - parentX);</p>
+<p>        const dy = Math.sign(y - parentY);</p>
+        
+<p>        if (dx !== 0 && dy !== 0) {</p>
+<p>            // Diagonal jump</p>
+<p>            return this.jumpDiagonal(x, y, dx, dy, goalX, goalY);</p>
+<p>        } else if (dx !== 0) {</p>
+<p>            // Horizontal jump</p>
+<p>            return this.jumpHorizontal(x, y, dx, goalX, goalY);</p>
+<p>        } else if (dy !== 0) {</p>
+<p>            // Vertical jump</p>
+<p>            return this.jumpVertical(x, y, dy, goalX, goalY);</p>
+<p>        }</p>
+        
+<p>        return null;</p>
+<p>    }</p>
+    
+<p>    jumpDiagonal(x, y, dx, dy, goalX, goalY) {</p>
+<p>        // Check for forced neighbors</p>
+<p>        if ((this.isWalkable(x - dx, y + dy) && !this.isWalkable(x - dx, y)) ||</p>
+<p>            (this.isWalkable(x + dx, y - dy) && !this.isWalkable(x, y - dy))) {</p>
+<p>            return { x, y };</p>
+<p>        }</p>
+        
+<p>        // Check horizontal and vertical components</p>
+<p>        if (this.jump(x + dx, y, x, y, goalX, goalY) ||</p>
+<p>            this.jump(x, y + dy, x, y, goalX, goalY)) {</p>
+<p>            return { x, y };</p>
+<p>        }</p>
+        
+<p>        // Continue diagonal</p>
+<p>        return this.jump(x + dx, y + dy, x, y, goalX, goalY);</p>
+<p>    }</p>
+    
+<p>    jumpHorizontal(x, y, dx, goalX, goalY) {</p>
+<p>        // Check for forced neighbors</p>
+<p>        if ((this.isWalkable(x + dx, y + 1) && !this.isWalkable(x, y + 1)) ||</p>
+<p>            (this.isWalkable(x + dx, y - 1) && !this.isWalkable(x, y - 1))) {</p>
+<p>            return { x, y };</p>
+<p>        }</p>
+        
+<p>        // Continue horizontal</p>
+<p>        return this.jump(x + dx, y, x, y, goalX, goalY);</p>
+<p>    }</p>
+    
+<p>    jumpVertical(x, y, dy, goalX, goalY) {</p>
+<p>        // Check for forced neighbors</p>
+<p>        if ((this.isWalkable(x + 1, y + dy) && !this.isWalkable(x + 1, y)) ||</p>
+<p>            (this.isWalkable(x - 1, y + dy) && !this.isWalkable(x - 1, y))) {</p>
+<p>            return { x, y };</p>
+<p>        }</p>
+        
+<p>        // Continue vertical</p>
+<p>        return this.jump(x, y + dy, x, y, goalX, goalY);</p>
+<p>    }</p>
+    
+<p>    getAllNeighbors(x, y) {</p>
+<p>        const neighbors = [];</p>
+        
+<p>        for (let dx = -1; dx <= 1; dx++) {</p>
+<p>            for (let dy = -1; dy <= 1; dy++) {</p>
+<p>                if (dx === 0 && dy === 0) continue;</p>
+                
+<p>                const newX = x + dx;</p>
+<p>                const newY = y + dy;</p>
+                
+<p>                if (this.isWalkable(newX, newY)) {</p>
+<p>                    neighbors.push({ x: newX, y: newY });</p>
+<p>                }</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        return neighbors;</p>
+<p>    }</p>
+    
+<p>    isWalkable(x, y) {</p>
+<p>        return x >= 0 && x < GRID_WIDTH && </p>
+<p>               y >= 0 && y < GRID_HEIGHT && </p>
+<p>               !grid[y][x].isObstacle;</p>
+<p>    }</p>
+    
+<p>    octileDistance(x1, y1, x2, y2) {</p>
+<p>        const dx = Math.abs(x2 - x1);</p>
+<p>        const dy = Math.abs(y2 - y1);</p>
+<p>        return Math.max(dx, dy) + (Math.sqrt(2) - 1) * Math.min(dx, dy);</p>
+<p>    }</p>
+    
+<p>    reconstructPath(node) {</p>
+<p>        const path = [];</p>
+<p>        let current = node;</p>
+        
+<p>        while (current) {</p>
+<p>            path.unshift({ x: current.x, y: current.y });</p>
+<p>            current = current.parent;</p>
+<p>        }</p>
+        
+<p>        return path;</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
 
-    openSet.insert(startNode);
-
-    while (!openSet.isEmpty()) {
-        const currentNode = openSet.extractMin();
-        const nodeKey = `${currentNode.x}_${currentNode.y}`;
-
-        if (closedSet.has(nodeKey)) continue;
-        closedSet.add(nodeKey);
-
-        if (currentNode.x === goalX &amp;&amp; currentNode.y === goalY) {
-            return this.reconstructPath(currentNode);
-        }
-
-        const successors = this.getSuccessors(currentNode, goalX, goalY);
-
-        for (const successor of successors) {
-            const successorKey = `${successor.x}_${successor.y}`;
-            if (closedSet.has(successorKey)) continue;
-
-            const gCost = currentNode.gCost + this.octileDistance(
-                currentNode.x, currentNode.y,
-                successor.x, successor.y
-            );
-
-            const successorNode = {
-                x: successor.x,
-                y: successor.y,
-                gCost: gCost,
-                hCost: this.octileDistance(successor.x, successor.y, goalX, goalY),
-                parent: currentNode
-            };
-            successorNode.fCost = successorNode.gCost + successorNode.hCost;
-
-            openSet.insert(successorNode);
-        }
-    }
-
-    return null;
-}
-
-getSuccessors(node, goalX, goalY) {
-    const successors = [];
-    const neighbors = this.identifySuccessors(node, goalX, goalY);
-
-    for (const neighbor of neighbors) {
-        const jumpPoint = this.jump(neighbor.x, neighbor.y, node.x, node.y, goalX, goalY);
-        if (jumpPoint) {
-            successors.push(jumpPoint);
-        }
-    }
-
-    return successors;
-}
-
-identifySuccessors(node, goalX, goalY) {
-    const neighbors = [];
-    const parent = node.parent;
-
-    if (!parent) {
-        // Initial node - add all valid neighbors
-        return this.getAllNeighbors(node.x, node.y);
-    }
-
-    const dx = Math.sign(node.x - parent.x);
-    const dy = Math.sign(node.y - parent.y);
-
-    if (dx !== 0 &amp;&amp; dy !== 0) {
-        // Diagonal movement
-        this.addDiagonalSuccessors(node.x, node.y, dx, dy, neighbors);
-    } else if (dx !== 0) {
-        // Horizontal movement
-        this.addHorizontalSuccessors(node.x, node.y, dx, neighbors);
-    } else if (dy !== 0) {
-        // Vertical movement
-        this.addVerticalSuccessors(node.x, node.y, dy, neighbors);
-    }
-
-    return neighbors;
-}
-
-addDiagonalSuccessors(x, y, dx, dy, neighbors) {
-    // Continue diagonal
-    if (this.isWalkable(x + dx, y + dy)) {
-        neighbors.push({ x: x + dx, y: y + dy });
-    }
-
-    // Horizontal component
-    if (this.isWalkable(x + dx, y)) {
-        neighbors.push({ x: x + dx, y: y });
-    }
-
-    // Vertical component
-    if (this.isWalkable(x, y + dy)) {
-        neighbors.push({ x: x, y: y + dy });
-    }
-
-    // Forced neighbors
-    if (!this.isWalkable(x - dx, y) &amp;&amp; this.isWalkable(x - dx, y + dy)) {
-        neighbors.push({ x: x - dx, y: y + dy });
-    }
-    if (!this.isWalkable(x, y - dy) &amp;&amp; this.isWalkable(x + dx, y - dy)) {
-        neighbors.push({ x: x + dx, y: y - dy });
-    }
-}
-
-addHorizontalSuccessors(x, y, dx, neighbors) {
-    // Continue horizontal
-    if (this.isWalkable(x + dx, y)) {
-        neighbors.push({ x: x + dx, y: y });
-    }
-
-    // Forced neighbors
-    if (!this.isWalkable(x, y - 1) &amp;&amp; this.isWalkable(x + dx, y - 1)) {
-        neighbors.push({ x: x + dx, y: y - 1 });
-    }
-    if (!this.isWalkable(x, y + 1) &amp;&amp; this.isWalkable(x + dx, y + 1)) {
-        neighbors.push({ x: x + dx, y: y + 1 });
-    }
-}
-
-addVerticalSuccessors(x, y, dy, neighbors) {
-    // Continue vertical
-    if (this.isWalkable(x, y + dy)) {
-        neighbors.push({ x: x, y: y + dy });
-    }
-
-    // Forced neighbors
-    if (!this.isWalkable(x - 1, y) &amp;&amp; this.isWalkable(x - 1, y + dy)) {
-        neighbors.push({ x: x - 1, y: y + dy });
-    }
-    if (!this.isWalkable(x + 1, y) &amp;&amp; this.isWalkable(x + 1, y + dy)) {
-        neighbors.push({ x: x + 1, y: y + dy });
-    }
-}
-
-jump(x, y, parentX, parentY, goalX, goalY) {
-    if (!this.isWalkable(x, y)) {
-        return null;
-    }
-
-    if (x === goalX &amp;&amp; y === goalY) {
-        return { x, y };
-    }
-
-    const dx = Math.sign(x - parentX);
-    const dy = Math.sign(y - parentY);
-
-    if (dx !== 0 &amp;&amp; dy !== 0) {
-        // Diagonal jump
-        return this.jumpDiagonal(x, y, dx, dy, goalX, goalY);
-    } else if (dx !== 0) {
-        // Horizontal jump
-        return this.jumpHorizontal(x, y, dx, goalX, goalY);
-    } else if (dy !== 0) {
-        // Vertical jump
-        return this.jumpVertical(x, y, dy, goalX, goalY);
-    }
-
-    return null;
-}
-
-jumpDiagonal(x, y, dx, dy, goalX, goalY) {
-    // Check for forced neighbors
-    if ((this.isWalkable(x - dx, y + dy) &amp;&amp; !this.isWalkable(x - dx, y)) ||
-        (this.isWalkable(x + dx, y - dy) &amp;&amp; !this.isWalkable(x, y - dy))) {
-        return { x, y };
-    }
-
-    // Check horizontal and vertical components
-    if (this.jump(x + dx, y, x, y, goalX, goalY) ||
-        this.jump(x, y + dy, x, y, goalX, goalY)) {
-        return { x, y };
-    }
-
-    // Continue diagonal
-    return this.jump(x + dx, y + dy, x, y, goalX, goalY);
-}
-
-jumpHorizontal(x, y, dx, goalX, goalY) {
-    // Check for forced neighbors
-    if ((this.isWalkable(x + dx, y + 1) &amp;&amp; !this.isWalkable(x, y + 1)) ||
-        (this.isWalkable(x + dx, y - 1) &amp;&amp; !this.isWalkable(x, y - 1))) {
-        return { x, y };
-    }
-
-    // Continue horizontal
-    return this.jump(x + dx, y, x, y, goalX, goalY);
-}
-
-jumpVertical(x, y, dy, goalX, goalY) {
-    // Check for forced neighbors
-    if ((this.isWalkable(x + 1, y + dy) &amp;&amp; !this.isWalkable(x + 1, y)) ||
-        (this.isWalkable(x - 1, y + dy) &amp;&amp; !this.isWalkable(x - 1, y))) {
-        return { x, y };
-    }
-
-    // Continue vertical
-    return this.jump(x, y + dy, x, y, goalX, goalY);
-}
-
-getAllNeighbors(x, y) {
-    const neighbors = [];
-
-    for (let dx = -1; dx &lt;= 1; dx++) {
-        for (let dy = -1; dy &lt;= 1; dy++) {
-            if (dx === 0 &amp;&amp; dy === 0) continue;
-
-            const newX = x + dx;
-            const newY = y + dy;
-
-            if (this.isWalkable(newX, newY)) {
-                neighbors.push({ x: newX, y: newY });
-            }
-        }
-    }
-
-    return neighbors;
-}
-
-isWalkable(x, y) {
-    return x &gt;= 0 &amp;&amp; x &lt; GRID_WIDTH &amp;&amp; 
-           y &gt;= 0 &amp;&amp; y &lt; GRID_HEIGHT &amp;&amp; 
-           !grid[y][x].isObstacle;
-}
-
-octileDistance(x1, y1, x2, y2) {
-    const dx = Math.abs(x2 - x1);
-    const dy = Math.abs(y2 - y1);
-    return Math.max(dx, dy) + (Math.sqrt(2) - 1) * Math.min(dx, dy);
-}
-
-reconstructPath(node) {
-    const path = [];
-    let current = node;
-
-    while (current) {
-        path.unshift({ x: current.x, y: current.y });
-        current = current.parent;
-    }
-
-    return path;
-}
-</code></pre>
-<p>}
-```</p>
 <h2>Bidirectional A*</h2>
-<h3>Implementation</h3>
-<p>```javascript
-class BidirectionalAStar {
-    constructor() {
-        this.forwardSearch = {
-            openSet: new MinHeap(),
-            closedSet: new Map(),
-            gCosts: new Map()
-        };</p>
-<pre><code>    this.backwardSearch = {
-        openSet: new MinHeap(),
-        closedSet: new Map(),
-        gCosts: new Map()
-    };
 
-    this.meetingPoint = null;
-    this.bestPathCost = Infinity;
-}
+<p>### Implementation</p>
+<p>```javascript</p>
+<p>class BidirectionalAStar {</p>
+<p>    constructor() {</p>
+<p>        this.forwardSearch = {</p>
+<p>            openSet: new MinHeap(),</p>
+<p>            closedSet: new Map(),</p>
+<p>            gCosts: new Map()</p>
+<p>        };</p>
+        
+<p>        this.backwardSearch = {</p>
+<p>            openSet: new MinHeap(),</p>
+<p>            closedSet: new Map(),</p>
+<p>            gCosts: new Map()</p>
+<p>        };</p>
+        
+<p>        this.meetingPoint = null;</p>
+<p>        this.bestPathCost = Infinity;</p>
+<p>    }</p>
+    
+<p>    findPath(startX, startY, goalX, goalY) {</p>
+<p>        this.initializeSearch(startX, startY, goalX, goalY);</p>
+        
+<p>        while (!this.forwardSearch.openSet.isEmpty() && !this.backwardSearch.openSet.isEmpty()) {</p>
+<p>            // Expand from the search with smaller f-cost</p>
+<p>            const forwardTop = this.forwardSearch.openSet.peek();</p>
+<p>            const backwardTop = this.backwardSearch.openSet.peek();</p>
+            
+<p>            if (forwardTop.fCost <= backwardTop.fCost) {</p>
+<p>                if (this.expandNode(this.forwardSearch, this.backwardSearch, 'forward', goalX, goalY)) {</p>
+<p>                    break;</p>
+<p>                }</p>
+<p>            } else {</p>
+<p>                if (this.expandNode(this.backwardSearch, this.forwardSearch, 'backward', startX, startY)) {</p>
+<p>                    break;</p>
+<p>                }</p>
+<p>            }</p>
+            
+<p>            // Check termination condition</p>
+<p>            if (this.shouldTerminate()) {</p>
+<p>                break;</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        return this.reconstructBidirectionalPath();</p>
+<p>    }</p>
+    
+<p>    initializeSearch(startX, startY, goalX, goalY) {</p>
+<p>        // Initialize forward search</p>
+<p>        const startNode = {</p>
+<p>            x: startX,</p>
+<p>            y: startY,</p>
+<p>            gCost: 0,</p>
+<p>            hCost: manhattanDistance({ x: startX, y: startY }, { x: goalX, y: goalY }),</p>
+<p>            parent: null</p>
+<p>        };</p>
+<p>        startNode.fCost = startNode.gCost + startNode.hCost;</p>
+        
+<p>        this.forwardSearch.openSet.insert(startNode);</p>
+<p>        this.forwardSearch.gCosts.set(`${startX}_${startY}`, 0);</p>
+        
+<p>        // Initialize backward search</p>
+<p>        const goalNode = {</p>
+<p>            x: goalX,</p>
+<p>            y: goalY,</p>
+<p>            gCost: 0,</p>
+<p>            hCost: manhattanDistance({ x: goalX, y: goalY }, { x: startX, y: startY }),</p>
+<p>            parent: null</p>
+<p>        };</p>
+<p>        goalNode.fCost = goalNode.gCost + goalNode.hCost;</p>
+        
+<p>        this.backwardSearch.openSet.insert(goalNode);</p>
+<p>        this.backwardSearch.gCosts.set(`${goalX}_${goalY}`, 0);</p>
+<p>    }</p>
+    
+<p>    expandNode(currentSearch, oppositeSearch, direction, targetX, targetY) {</p>
+<p>        const currentNode = currentSearch.openSet.extractMin();</p>
+<p>        const nodeKey = `${currentNode.x}_${currentNode.y}`;</p>
+        
+<p>        currentSearch.closedSet.set(nodeKey, currentNode);</p>
+        
+<p>        // Check if this node was reached by the opposite search</p>
+<p>        if (oppositeSearch.closedSet.has(nodeKey) || oppositeSearch.gCosts.has(nodeKey)) {</p>
+<p>            const pathCost = this.calculateMeetingCost(currentNode, oppositeSearch, nodeKey);</p>
+            
+<p>            if (pathCost < this.bestPathCost) {</p>
+<p>                this.bestPathCost = pathCost;</p>
+<p>                this.meetingPoint = {</p>
+<p>                    node: currentNode,</p>
+<p>                    direction: direction,</p>
+<p>                    oppositeNode: oppositeSearch.closedSet.get(nodeKey) || </p>
+<p>                                 this.findNodeInOpenSet(oppositeSearch.openSet, currentNode.x, currentNode.y)</p>
+<p>                };</p>
+<p>            }</p>
+            
+<p>            return true; // Found meeting point</p>
+<p>        }</p>
+        
+<p>        // Expand neighbors</p>
+<p>        const neighbors = this.getNeighbors(currentNode.x, currentNode.y);</p>
+        
+<p>        for (const neighbor of neighbors) {</p>
+<p>            const neighborKey = `${neighbor.x}_${neighbor.y}`;</p>
+            
+<p>            if (currentSearch.closedSet.has(neighborKey)) continue;</p>
+            
+<p>            const tentativeGCost = currentNode.gCost + this.getMovementCost(currentNode, neighbor);</p>
+<p>            const existingGCost = currentSearch.gCosts.get(neighborKey);</p>
+            
+<p>            if (existingGCost === undefined || tentativeGCost < existingGCost) {</p>
+<p>                const neighborNode = {</p>
+<p>                    x: neighbor.x,</p>
+<p>                    y: neighbor.y,</p>
+<p>                    gCost: tentativeGCost,</p>
+<p>                    hCost: direction === 'forward' </p>
+<p>                        ? manhattanDistance(neighbor, { x: targetX, y: targetY })</p>
+<p>                        : manhattanDistance(neighbor, { x: targetX, y: targetY }),</p>
+<p>                    parent: currentNode</p>
+<p>                };</p>
+<p>                neighborNode.fCost = neighborNode.gCost + neighborNode.hCost;</p>
+                
+<p>                currentSearch.openSet.insert(neighborNode);</p>
+<p>                currentSearch.gCosts.set(neighborKey, tentativeGCost);</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        return false;</p>
+<p>    }</p>
+    
+<p>    calculateMeetingCost(currentNode, oppositeSearch, nodeKey) {</p>
+<p>        const oppositeGCost = oppositeSearch.gCosts.get(nodeKey) || </p>
+<p>                             oppositeSearch.closedSet.get(nodeKey)?.gCost || 0;</p>
+        
+<p>        return currentNode.gCost + oppositeGCost;</p>
+<p>    }</p>
+    
+<p>    shouldTerminate() {</p>
+<p>        // Terminate if the minimum f-cost in both open sets exceeds the best path cost</p>
+<p>        const forwardMinF = this.forwardSearch.openSet.isEmpty() ? Infinity : this.forwardSearch.openSet.peek().fCost;</p>
+<p>        const backwardMinF = this.backwardSearch.openSet.isEmpty() ? Infinity : this.backwardSearch.openSet.peek().fCost;</p>
+        
+<p>        return Math.min(forwardMinF, backwardMinF) >= this.bestPathCost;</p>
+<p>    }</p>
+    
+<p>    reconstructBidirectionalPath() {</p>
+<p>        if (!this.meetingPoint) {</p>
+<p>            return null;</p>
+<p>        }</p>
+        
+<p>        const forwardPath = [];</p>
+<p>        const backwardPath = [];</p>
+        
+<p>        // Reconstruct forward path</p>
+<p>        let current = this.meetingPoint.direction === 'forward' </p>
+<p>            ? this.meetingPoint.node </p>
+<p>            : this.meetingPoint.oppositeNode;</p>
+        
+<p>        while (current) {</p>
+<p>            forwardPath.unshift({ x: current.x, y: current.y });</p>
+<p>            current = current.parent;</p>
+<p>        }</p>
+        
+<p>        // Reconstruct backward path</p>
+<p>        current = this.meetingPoint.direction === 'backward' </p>
+<p>            ? this.meetingPoint.node </p>
+<p>            : this.meetingPoint.oppositeNode;</p>
+        
+<p>        while (current && current.parent) { // Skip the meeting point to avoid duplication</p>
+<p>            current = current.parent;</p>
+<p>            backwardPath.push({ x: current.x, y: current.y });</p>
+<p>        }</p>
+        
+<p>        return forwardPath.concat(backwardPath);</p>
+<p>    }</p>
+    
+<p>    getNeighbors(x, y) {</p>
+<p>        const neighbors = [];</p>
+<p>        const directions = [</p>
+<p>            { dx: 0, dy: -1 }, { dx: 1, dy: 0 },</p>
+<p>            { dx: 0, dy: 1 }, { dx: -1, dy: 0 },</p>
+<p>            { dx: 1, dy: -1 }, { dx: 1, dy: 1 },</p>
+<p>            { dx: -1, dy: 1 }, { dx: -1, dy: -1 }</p>
+<p>        ];</p>
+        
+<p>        for (const dir of directions) {</p>
+<p>            const newX = x + dir.dx;</p>
+<p>            const newY = y + dir.dy;</p>
+            
+<p>            if (newX >= 0 && newX < GRID_WIDTH &&</p>
+<p>                newY >= 0 && newY < GRID_HEIGHT &&</p>
+<p>                !grid[newY][newX].isObstacle) {</p>
+                
+<p>                neighbors.push({ x: newX, y: newY });</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        return neighbors;</p>
+<p>    }</p>
+    
+<p>    getMovementCost(from, to) {</p>
+<p>        const dx = Math.abs(to.x - from.x);</p>
+<p>        const dy = Math.abs(to.y - from.y);</p>
+        
+<p>        return (dx === 1 && dy === 1) ? Math.sqrt(2) : 1;</p>
+<p>    }</p>
+    
+<p>    findNodeInOpenSet(openSet, x, y) {</p>
+<p>        // This is a simplified implementation</p>
+<p>        // In practice, you'd need to search through the heap</p>
+<p>        return null;</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
+
+<h2>Dynamic A* (D*)</h2>
+
+<p>### Concept for Dynamic Environments</p>
+<p>```javascript</p>
+<p>class DynamicAStar {</p>
+<p>    constructor() {</p>
+<p>        this.graph = new Map();</p>
+<p>        this.rhs = new Map(); // Right-hand side values</p>
+<p>        this.g = new Map();   // g-values</p>
+<p>        this.openSet = new PriorityQueue();</p>
+<p>        this.km = 0; // Key modifier</p>
+<p>        this.lastStart = null;</p>
+<p>    }</p>
+    
+<p>    initialize(startX, startY, goalX, goalY) {</p>
+<p>        this.start = { x: startX, y: startY };</p>
+<p>        this.goal = { x: goalX, y: goalY };</p>
+<p>        this.lastStart = { ...this.start };</p>
+        
+<p>        // Initialize all nodes</p>
+<p>        for (let y = 0; y < GRID_HEIGHT; y++) {</p>
+<p>            for (let x = 0; x < GRID_WIDTH; x++) {</p>
+<p>                const nodeKey = `${x}_${y}`;</p>
+<p>                this.rhs.set(nodeKey, Infinity);</p>
+<p>                this.g.set(nodeKey, Infinity);</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        // Goal node</p>
+<p>        const goalKey = `${goalX}_${goalY}`;</p>
+<p>        this.rhs.set(goalKey, 0);</p>
+<p>        this.openSet.insert(this.goal, this.calculateKey(this.goal));</p>
+<p>    }</p>
+    
+<p>    calculateKey(node) {</p>
+<p>        const nodeKey = `${node.x}_${node.y}`;</p>
+<p>        const gVal = this.g.get(nodeKey);</p>
+<p>        const rhsVal = this.rhs.get(nodeKey);</p>
+        
+<p>        const minVal = Math.min(gVal, rhsVal);</p>
+        
+<p>        return [</p>
+<p>            minVal + this.heuristic(this.start, node) + this.km,</p>
+<p>            minVal</p>
+<p>        ];</p>
+<p>    }</p>
+    
+<p>    heuristic(node1, node2) {</p>
+<p>        return Math.abs(node1.x - node2.x) + Math.abs(node1.y - node2.y);</p>
+<p>    }</p>
+    
+<p>    updateVertex(node) {</p>
+<p>        const nodeKey = `${node.x}_${node.y}`;</p>
+        
+<p>        if (!this.isGoal(node)) {</p>
+<p>            let minRhs = Infinity;</p>
+<p>            const successors = this.getSuccessors(node);</p>
+            
+<p>            for (const successor of successors) {</p>
+<p>                const successorKey = `${successor.x}_${successor.y}`;</p>
+<p>                const cost = this.getEdgeCost(node, successor);</p>
+<p>                const successorG = this.g.get(successorKey);</p>
+                
+<p>                minRhs = Math.min(minRhs, cost + successorG);</p>
+<p>            }</p>
+            
+<p>            this.rhs.set(nodeKey, minRhs);</p>
+<p>        }</p>
+        
+<p>        // Remove from open set if present</p>
+<p>        this.openSet.remove(node);</p>
+        
+<p>        // Add to open set if locally inconsistent</p>
+<p>        if (this.g.get(nodeKey) !== this.rhs.get(nodeKey)) {</p>
+<p>            this.openSet.insert(node, this.calculateKey(node));</p>
+<p>        }</p>
+<p>    }</p>
+    
+<p>    computeShortestPath() {</p>
+<p>        while (!this.openSet.isEmpty() && </p>
+<p>               (this.compareKeys(this.openSet.topKey(), this.calculateKey(this.start)) || </p>
+<p>                this.rhs.get(`${this.start.x}_${this.start.y}`) !== this.g.get(`${this.start.x}_${this.start.y}`))) {</p>
+            
+<p>            const current = this.openSet.pop();</p>
+<p>            const currentKey = `${current.x}_${current.y}`;</p>
+            
+<p>            if (this.g.get(currentKey) > this.rhs.get(currentKey)) {</p>
+<p>                // Overconsistent</p>
+<p>                this.g.set(currentKey, this.rhs.get(currentKey));</p>
+                
+<p>                const predecessors = this.getPredecessors(current);</p>
+<p>                for (const pred of predecessors) {</p>
+<p>                    this.updateVertex(pred);</p>
+<p>                }</p>
+<p>            } else {</p>
+<p>                // Underconsistent</p>
+<p>                this.g.set(currentKey, Infinity);</p>
+                
+<p>                const predecessors = this.getPredecessors(current);</p>
+<p>                for (const pred of predecessors) {</p>
+<p>                    this.updateVertex(pred);</p>
+<p>                }</p>
+<p>                this.updateVertex(current);</p>
+<p>            }</p>
+<p>        }</p>
+<p>    }</p>
+    
+<p>    replan() {</p>
+<p>        this.km += this.heuristic(this.lastStart, this.start);</p>
+<p>        this.lastStart = { ...this.start };</p>
+<p>        this.computeShortestPath();</p>
+<p>    }</p>
+    
+<p>    updateEdgeCosts(changedEdges) {</p>
+<p>        for (const edge of changedEdges) {</p>
+<p>            const { from, to, newCost } = edge;</p>
+            
+<p>            // Update edge cost in graph</p>
+<p>            this.setEdgeCost(from, to, newCost);</p>
+            
+<p>            // Update affected vertices</p>
+<p>            this.updateVertex(from);</p>
+<p>            if (from.x !== to.x || from.y !== to.y) {</p>
+<p>                this.updateVertex(to);</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        this.replan();</p>
+<p>    }</p>
+    
+<p>    getPath() {</p>
+<p>        const path = [];</p>
+<p>        let current = { ...this.start };</p>
+        
+<p>        while (!this.isGoal(current)) {</p>
+<p>            path.push({ ...current });</p>
+            
+<p>            let nextNode = null;</p>
+<p>            let minCost = Infinity;</p>
+            
+<p>            const successors = this.getSuccessors(current);</p>
+<p>            for (const successor of successors) {</p>
+<p>                const successorKey = `${successor.x}_${successor.y}`;</p>
+<p>                const cost = this.getEdgeCost(current, successor) + this.g.get(successorKey);</p>
+                
+<p>                if (cost < minCost) {</p>
+<p>                    minCost = cost;</p>
+<p>                    nextNode = successor;</p>
+<p>                }</p>
+<p>            }</p>
+            
+<p>            if (!nextNode) break;</p>
+<p>            current = nextNode;</p>
+<p>        }</p>
+        
+<p>        path.push({ ...this.goal });</p>
+<p>        return path;</p>
+<p>    }</p>
+    
+<p>    // Helper methods</p>
+<p>    isGoal(node) {</p>
+<p>        return node.x === this.goal.x && node.y === this.goal.y;</p>
+<p>    }</p>
+    
+<p>    compareKeys(key1, key2) {</p>
+<p>        return key1[0] < key2[0] || (key1[0] === key2[0] && key1[1] < key2[1]);</p>
+<p>    }</p>
+    
+<p>    getSuccessors(node) {</p>
+<p>        return this.getNeighbors(node.x, node.y);</p>
+<p>    }</p>
+    
+<p>    getPredecessors(node) {</p>
+<p>        return this.getNeighbors(node.x, node.y);</p>
+<p>    }</p>
+    
+<p>    getNeighbors(x, y) {</p>
+<p>        const neighbors = [];</p>
+<p>        const directions = [</p>
+<p>            { dx: 0, dy: -1 }, { dx: 1, dy: 0 },</p>
+<p>            { dx: 0, dy: 1 }, { dx: -1, dy: 0 }</p>
+<p>        ];</p>
+        
+<p>        for (const dir of directions) {</p>
+<p>            const newX = x + dir.dx;</p>
+<p>            const newY = y + dir.dy;</p>
+            
+<p>            if (newX >= 0 && newX < GRID_WIDTH &&</p>
+<p>                newY >= 0 && newY < GRID_HEIGHT) {</p>
+<p>                neighbors.push({ x: newX, y: newY });</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        return neighbors;</p>
+<p>    }</p>
+    
+<p>    getEdgeCost(from, to) {</p>
+<p>        if (grid[to.y][to.x].isObstacle) {</p>
+<p>            return Infinity;</p>
+<p>        }</p>
+<p>        return 1; // Uniform cost</p>
+<p>    }</p>
+    
+<p>    setEdgeCost(from, to, cost) {</p>
+<p>        // Implementation depends on how you store edge costs</p>
+<p>        // This is a simplified version</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
 
-findPath(startX, startY, goalX, goalY) {
-    this.initializeSearch(startX, startY, goalX, goalY);
-
-    while (!this.forwardSearch.openSet.isEmpty() &amp;&amp; !this.backwardSearch.openSet.isEmpty()) {
-        // Expand from the search with smaller f-cost
-        const forwardTop = this.forwardSearch.openSet.peek();
-        const backwardTop = this.backwardSearch.openSet.peek();
-
-        if (forwardTop.fCost &lt;= backwardTop.fCost) {
-            if (this.expandNode(this.forwardSearch, this.backwardSearch, 'forward', goalX, goalY)) {
-                break;
-            }
-        } else {
-            if (this.expandNode(this.backwardSearch, this.forwardSearch, 'backward', startX, startY)) {
-                break;
-            }
-        }
-
-        // Check termination condition
-        if (this.shouldTerminate()) {
-            break;
-        }
-    }
-
-    return this.reconstructBidirectionalPath();
-}
-
-initializeSearch(startX, startY, goalX, goalY) {
-    // Initialize forward search
-    const startNode = {
-        x: startX,
-        y: startY,
-        gCost: 0,
-        hCost: manhattanDistance({ x: startX, y: startY }, { x: goalX, y: goalY }),
-        parent: null
-    };
-    startNode.fCost = startNode.gCost + startNode.hCost;
-
-    this.forwardSearch.openSet.insert(startNode);
-    this.forwardSearch.gCosts.set(`${startX}_${startY}`, 0);
-
-    // Initialize backward search
-    const goalNode = {
-        x: goalX,
-        y: goalY,
-        gCost: 0,
-        hCost: manhattanDistance({ x: goalX, y: goalY }, { x: startX, y: startY }),
-        parent: null
-    };
-    goalNode.fCost = goalNode.gCost + goalNode.hCost;
-
-    this.backwardSearch.openSet.insert(goalNode);
-    this.backwardSearch.gCosts.set(`${goalX}_${goalY}`, 0);
-}
-
-expandNode(currentSearch, oppositeSearch, direction, targetX, targetY) {
-    const currentNode = currentSearch.openSet.extractMin();
-    const nodeKey = `${currentNode.x}_${currentNode.y}`;
-
-    currentSearch.closedSet.set(nodeKey, currentNode);
-
-    // Check if this node was reached by the opposite search
-    if (oppositeSearch.closedSet.has(nodeKey) || oppositeSearch.gCosts.has(nodeKey)) {
-        const pathCost = this.calculateMeetingCost(currentNode, oppositeSearch, nodeKey);
-
-        if (pathCost &lt; this.bestPathCost) {
-            this.bestPathCost = pathCost;
-            this.meetingPoint = {
-                node: currentNode,
-                direction: direction,
-                oppositeNode: oppositeSearch.closedSet.get(nodeKey) || 
-                             this.findNodeInOpenSet(oppositeSearch.openSet, currentNode.x, currentNode.y)
-            };
-        }
-
-        return true; // Found meeting point
-    }
-
-    // Expand neighbors
-    const neighbors = this.getNeighbors(currentNode.x, currentNode.y);
-
-    for (const neighbor of neighbors) {
-        const neighborKey = `${neighbor.x}_${neighbor.y}`;
-
-        if (currentSearch.closedSet.has(neighborKey)) continue;
-
-        const tentativeGCost = currentNode.gCost + this.getMovementCost(currentNode, neighbor);
-        const existingGCost = currentSearch.gCosts.get(neighborKey);
-
-        if (existingGCost === undefined || tentativeGCost &lt; existingGCost) {
-            const neighborNode = {
-                x: neighbor.x,
-                y: neighbor.y,
-                gCost: tentativeGCost,
-                hCost: direction === 'forward' 
-                    ? manhattanDistance(neighbor, { x: targetX, y: targetY })
-                    : manhattanDistance(neighbor, { x: targetX, y: targetY }),
-                parent: currentNode
-            };
-            neighborNode.fCost = neighborNode.gCost + neighborNode.hCost;
-
-            currentSearch.openSet.insert(neighborNode);
-            currentSearch.gCosts.set(neighborKey, tentativeGCost);
-        }
-    }
-
-    return false;
-}
-
-calculateMeetingCost(currentNode, oppositeSearch, nodeKey) {
-    const oppositeGCost = oppositeSearch.gCosts.get(nodeKey) || 
-                         oppositeSearch.closedSet.get(nodeKey)?.gCost || 0;
-
-    return currentNode.gCost + oppositeGCost;
-}
-
-shouldTerminate() {
-    // Terminate if the minimum f-cost in both open sets exceeds the best path cost
-    const forwardMinF = this.forwardSearch.openSet.isEmpty() ? Infinity : this.forwardSearch.openSet.peek().fCost;
-    const backwardMinF = this.backwardSearch.openSet.isEmpty() ? Infinity : this.backwardSearch.openSet.peek().fCost;
-
-    return Math.min(forwardMinF, backwardMinF) &gt;= this.bestPathCost;
-}
-
-reconstructBidirectionalPath() {
-    if (!this.meetingPoint) {
-        return null;
-    }
-
-    const forwardPath = [];
-    const backwardPath = [];
-
-    // Reconstruct forward path
-    let current = this.meetingPoint.direction === 'forward' 
-        ? this.meetingPoint.node 
-        : this.meetingPoint.oppositeNode;
-
-    while (current) {
-        forwardPath.unshift({ x: current.x, y: current.y });
-        current = current.parent;
-    }
-
-    // Reconstruct backward path
-    current = this.meetingPoint.direction === 'backward' 
-        ? this.meetingPoint.node 
-        : this.meetingPoint.oppositeNode;
-
-    while (current &amp;&amp; current.parent) { // Skip the meeting point to avoid duplication
-        current = current.parent;
-        backwardPath.push({ x: current.x, y: current.y });
-    }
-
-    return forwardPath.concat(backwardPath);
-}
-
-getNeighbors(x, y) {
-    const neighbors = [];
-    const directions = [
-        { dx: 0, dy: -1 }, { dx: 1, dy: 0 },
-        { dx: 0, dy: 1 }, { dx: -1, dy: 0 },
-        { dx: 1, dy: -1 }, { dx: 1, dy: 1 },
-        { dx: -1, dy: 1 }, { dx: -1, dy: -1 }
-    ];
-
-    for (const dir of directions) {
-        const newX = x + dir.dx;
-        const newY = y + dir.dy;
-
-        if (newX &gt;= 0 &amp;&amp; newX &lt; GRID_WIDTH &amp;&amp;
-            newY &gt;= 0 &amp;&amp; newY &lt; GRID_HEIGHT &amp;&amp;
-            !grid[newY][newX].isObstacle) {
-
-            neighbors.push({ x: newX, y: newY });
-        }
-    }
-
-    return neighbors;
-}
-
-getMovementCost(from, to) {
-    const dx = Math.abs(to.x - from.x);
-    const dy = Math.abs(to.y - from.y);
-
-    return (dx === 1 &amp;&amp; dy === 1) ? Math.sqrt(2) : 1;
-}
-
-findNodeInOpenSet(openSet, x, y) {
-    // This is a simplified implementation
-    // In practice, you'd need to search through the heap
-    return null;
-}
-</code></pre>
-<p>}
-```</p>
-<h2>Dynamic A<em> (D</em>)</h2>
-<h3>Concept for Dynamic Environments</h3>
-<p>```javascript
-class DynamicAStar {
-    constructor() {
-        this.graph = new Map();
-        this.rhs = new Map(); // Right-hand side values
-        this.g = new Map();   // g-values
-        this.openSet = new PriorityQueue();
-        this.km = 0; // Key modifier
-        this.lastStart = null;
-    }</p>
-<pre><code>initialize(startX, startY, goalX, goalY) {
-    this.start = { x: startX, y: startY };
-    this.goal = { x: goalX, y: goalY };
-    this.lastStart = { ...this.start };
-
-    // Initialize all nodes
-    for (let y = 0; y &lt; GRID_HEIGHT; y++) {
-        for (let x = 0; x &lt; GRID_WIDTH; x++) {
-            const nodeKey = `${x}_${y}`;
-            this.rhs.set(nodeKey, Infinity);
-            this.g.set(nodeKey, Infinity);
-        }
-    }
-
-    // Goal node
-    const goalKey = `${goalX}_${goalY}`;
-    this.rhs.set(goalKey, 0);
-    this.openSet.insert(this.goal, this.calculateKey(this.goal));
-}
-
-calculateKey(node) {
-    const nodeKey = `${node.x}_${node.y}`;
-    const gVal = this.g.get(nodeKey);
-    const rhsVal = this.rhs.get(nodeKey);
-
-    const minVal = Math.min(gVal, rhsVal);
-
-    return [
-        minVal + this.heuristic(this.start, node) + this.km,
-        minVal
-    ];
-}
-
-heuristic(node1, node2) {
-    return Math.abs(node1.x - node2.x) + Math.abs(node1.y - node2.y);
-}
-
-updateVertex(node) {
-    const nodeKey = `${node.x}_${node.y}`;
-
-    if (!this.isGoal(node)) {
-        let minRhs = Infinity;
-        const successors = this.getSuccessors(node);
-
-        for (const successor of successors) {
-            const successorKey = `${successor.x}_${successor.y}`;
-            const cost = this.getEdgeCost(node, successor);
-            const successorG = this.g.get(successorKey);
-
-            minRhs = Math.min(minRhs, cost + successorG);
-        }
-
-        this.rhs.set(nodeKey, minRhs);
-    }
-
-    // Remove from open set if present
-    this.openSet.remove(node);
-
-    // Add to open set if locally inconsistent
-    if (this.g.get(nodeKey) !== this.rhs.get(nodeKey)) {
-        this.openSet.insert(node, this.calculateKey(node));
-    }
-}
-
-computeShortestPath() {
-    while (!this.openSet.isEmpty() &amp;&amp; 
-           (this.compareKeys(this.openSet.topKey(), this.calculateKey(this.start)) || 
-            this.rhs.get(`${this.start.x}_${this.start.y}`) !== this.g.get(`${this.start.x}_${this.start.y}`))) {
-
-        const current = this.openSet.pop();
-        const currentKey = `${current.x}_${current.y}`;
-
-        if (this.g.get(currentKey) &gt; this.rhs.get(currentKey)) {
-            // Overconsistent
-            this.g.set(currentKey, this.rhs.get(currentKey));
-
-            const predecessors = this.getPredecessors(current);
-            for (const pred of predecessors) {
-                this.updateVertex(pred);
-            }
-        } else {
-            // Underconsistent
-            this.g.set(currentKey, Infinity);
-
-            const predecessors = this.getPredecessors(current);
-            for (const pred of predecessors) {
-                this.updateVertex(pred);
-            }
-            this.updateVertex(current);
-        }
-    }
-}
-
-replan() {
-    this.km += this.heuristic(this.lastStart, this.start);
-    this.lastStart = { ...this.start };
-    this.computeShortestPath();
-}
-
-updateEdgeCosts(changedEdges) {
-    for (const edge of changedEdges) {
-        const { from, to, newCost } = edge;
-
-        // Update edge cost in graph
-        this.setEdgeCost(from, to, newCost);
-
-        // Update affected vertices
-        this.updateVertex(from);
-        if (from.x !== to.x || from.y !== to.y) {
-            this.updateVertex(to);
-        }
-    }
-
-    this.replan();
-}
-
-getPath() {
-    const path = [];
-    let current = { ...this.start };
-
-    while (!this.isGoal(current)) {
-        path.push({ ...current });
-
-        let nextNode = null;
-        let minCost = Infinity;
-
-        const successors = this.getSuccessors(current);
-        for (const successor of successors) {
-            const successorKey = `${successor.x}_${successor.y}`;
-            const cost = this.getEdgeCost(current, successor) + this.g.get(successorKey);
-
-            if (cost &lt; minCost) {
-                minCost = cost;
-                nextNode = successor;
-            }
-        }
-
-        if (!nextNode) break;
-        current = nextNode;
-    }
-
-    path.push({ ...this.goal });
-    return path;
-}
-
-// Helper methods
-isGoal(node) {
-    return node.x === this.goal.x &amp;&amp; node.y === this.goal.y;
-}
-
-compareKeys(key1, key2) {
-    return key1[0] &lt; key2[0] || (key1[0] === key2[0] &amp;&amp; key1[1] &lt; key2[1]);
-}
-
-getSuccessors(node) {
-    return this.getNeighbors(node.x, node.y);
-}
-
-getPredecessors(node) {
-    return this.getNeighbors(node.x, node.y);
-}
-
-getNeighbors(x, y) {
-    const neighbors = [];
-    const directions = [
-        { dx: 0, dy: -1 }, { dx: 1, dy: 0 },
-        { dx: 0, dy: 1 }, { dx: -1, dy: 0 }
-    ];
-
-    for (const dir of directions) {
-        const newX = x + dir.dx;
-        const newY = y + dir.dy;
-
-        if (newX &gt;= 0 &amp;&amp; newX &lt; GRID_WIDTH &amp;&amp;
-            newY &gt;= 0 &amp;&amp; newY &lt; GRID_HEIGHT) {
-            neighbors.push({ x: newX, y: newY });
-        }
-    }
-
-    return neighbors;
-}
-
-getEdgeCost(from, to) {
-    if (grid[to.y][to.x].isObstacle) {
-        return Infinity;
-    }
-    return 1; // Uniform cost
-}
-
-setEdgeCost(from, to, cost) {
-    // Implementation depends on how you store edge costs
-    // This is a simplified version
-}
-</code></pre>
-<p>}
-```</p>
 <h2>Multi-Agent Pathfinding</h2>
-<h3>Conflict-Based Search (CBS)</h3>
-<p>```javascript
-class ConflictBasedSearch {
-    constructor() {
-        this.openSet = new PriorityQueue();
-        this.agents = [];
-    }</p>
-<pre><code>findPaths(agents) {
-    this.agents = agents;
 
-    // Create root node with individual optimal paths
-    const rootNode = {
-        constraints: [],
-        solution: {},
-        cost: 0
-    };
+<p>### Conflict-Based Search (CBS)</p>
+<p>```javascript</p>
+<p>class ConflictBasedSearch {</p>
+<p>    constructor() {</p>
+<p>        this.openSet = new PriorityQueue();</p>
+<p>        this.agents = [];</p>
+<p>    }</p>
+    
+<p>    findPaths(agents) {</p>
+<p>        this.agents = agents;</p>
+        
+<p>        // Create root node with individual optimal paths</p>
+<p>        const rootNode = {</p>
+<p>            constraints: [],</p>
+<p>            solution: {},</p>
+<p>            cost: 0</p>
+<p>        };</p>
+        
+<p>        // Find individual paths for each agent</p>
+<p>        for (const agent of agents) {</p>
+<p>            const path = this.findIndividualPath(agent, []);</p>
+<p>            if (!path) {</p>
+<p>                return null; // No solution exists</p>
+<p>            }</p>
+<p>            rootNode.solution[agent.id] = path;</p>
+<p>            rootNode.cost += path.length;</p>
+<p>        }</p>
+        
+<p>        // Check for conflicts</p>
+<p>        const conflicts = this.findConflicts(rootNode.solution);</p>
+<p>        if (conflicts.length === 0) {</p>
+<p>            return rootNode.solution;</p>
+<p>        }</p>
+        
+<p>        rootNode.conflicts = conflicts;</p>
+<p>        this.openSet.insert(rootNode, rootNode.cost);</p>
+        
+<p>        while (!this.openSet.isEmpty()) {</p>
+<p>            const currentNode = this.openSet.pop();</p>
+            
+<p>            // Pick the first conflict</p>
+<p>            const conflict = currentNode.conflicts[0];</p>
+            
+<p>            // Create two child nodes with constraints</p>
+<p>            const childNodes = this.createChildNodes(currentNode, conflict);</p>
+            
+<p>            for (const childNode of childNodes) {</p>
+<p>                // Replan for the constrained agent</p>
+<p>                const constrainedAgent = childNode.newConstraint.agent;</p>
+<p>                const newPath = this.findIndividualPath(</p>
+<p>                    this.agents.find(a => a.id === constrainedAgent),</p>
+<p>                    childNode.constraints</p>
+<p>                );</p>
+                
+<p>                if (!newPath) {</p>
+<p>                    continue; // This branch is infeasible</p>
+<p>                }</p>
+                
+<p>                childNode.solution[constrainedAgent] = newPath;</p>
+<p>                childNode.cost = this.calculateSolutionCost(childNode.solution);</p>
+                
+<p>                // Check for conflicts</p>
+<p>                const newConflicts = this.findConflicts(childNode.solution);</p>
+                
+<p>                if (newConflicts.length === 0) {</p>
+<p>                    return childNode.solution; // Solution found!</p>
+<p>                }</p>
+                
+<p>                childNode.conflicts = newConflicts;</p>
+<p>                this.openSet.insert(childNode, childNode.cost);</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        return null; // No solution found</p>
+<p>    }</p>
+    
+<p>    findIndividualPath(agent, constraints) {</p>
+<p>        // Use A* with constraints</p>
+<p>        const openSet = new MinHeap();</p>
+<p>        const closedSet = new Set();</p>
+        
+<p>        const startNode = {</p>
+<p>            x: agent.start.x,</p>
+<p>            y: agent.start.y,</p>
+<p>            time: 0,</p>
+<p>            gCost: 0,</p>
+<p>            hCost: manhattanDistance(agent.start, agent.goal),</p>
+<p>            parent: null</p>
+<p>        };</p>
+<p>        startNode.fCost = startNode.gCost + startNode.hCost;</p>
+        
+<p>        openSet.insert(startNode);</p>
+        
+<p>        while (!openSet.isEmpty()) {</p>
+<p>            const currentNode = openSet.extractMin();</p>
+<p>            const nodeKey = `${currentNode.x}_${currentNode.y}_${currentNode.time}`;</p>
+            
+<p>            if (closedSet.has(nodeKey)) continue;</p>
+<p>            closedSet.add(nodeKey);</p>
+            
+<p>            if (currentNode.x === agent.goal.x && currentNode.y === agent.goal.y) {</p>
+<p>                return this.reconstructTimedPath(currentNode);</p>
+<p>            }</p>
+            
+<p>            // Generate successors (including wait action)</p>
+<p>            const successors = this.getTimedSuccessors(currentNode, agent.id, constraints);</p>
+            
+<p>            for (const successor of successors) {</p>
+<p>                const successorKey = `${successor.x}_${successor.y}_${successor.time}`;</p>
+<p>                if (closedSet.has(successorKey)) continue;</p>
+                
+<p>                openSet.insert(successor);</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        return null;</p>
+<p>    }</p>
+    
+<p>    getTimedSuccessors(node, agentId, constraints) {</p>
+<p>        const successors = [];</p>
+<p>        const nextTime = node.time + 1;</p>
+        
+<p>        // Movement actions</p>
+<p>        const directions = [</p>
+<p>            { dx: 0, dy: -1 }, { dx: 1, dy: 0 },</p>
+<p>            { dx: 0, dy: 1 }, { dx: -1, dy: 0 }</p>
+<p>        ];</p>
+        
+<p>        for (const dir of directions) {</p>
+<p>            const newX = node.x + dir.dx;</p>
+<p>            const newY = node.y + dir.dy;</p>
+            
+<p>            if (this.isValidMove(newX, newY, nextTime, agentId, constraints)) {</p>
+<p>                const successor = {</p>
+<p>                    x: newX,</p>
+<p>                    y: newY,</p>
+<p>                    time: nextTime,</p>
+<p>                    gCost: node.gCost + 1,</p>
+<p>                    hCost: manhattanDistance({ x: newX, y: newY }, this.agents.find(a => a.id === agentId).goal),</p>
+<p>                    parent: node</p>
+<p>                };</p>
+<p>                successor.fCost = successor.gCost + successor.hCost;</p>
+<p>                successors.push(successor);</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        // Wait action</p>
+<p>        if (this.isValidMove(node.x, node.y, nextTime, agentId, constraints)) {</p>
+<p>            const waitSuccessor = {</p>
+<p>                x: node.x,</p>
+<p>                y: node.y,</p>
+<p>                time: nextTime,</p>
+<p>                gCost: node.gCost + 1,</p>
+<p>                hCost: node.hCost,</p>
+<p>                parent: node</p>
+<p>            };</p>
+<p>            waitSuccessor.fCost = waitSuccessor.gCost + waitSuccessor.hCost;</p>
+<p>            successors.push(waitSuccessor);</p>
+<p>        }</p>
+        
+<p>        return successors;</p>
+<p>    }</p>
+    
+<p>    isValidMove(x, y, time, agentId, constraints) {</p>
+<p>        // Check grid bounds and obstacles</p>
+<p>        if (x < 0 || x >= GRID_WIDTH || y < 0 || y >= GRID_HEIGHT || </p>
+<p>            grid[y][x].isObstacle) {</p>
+<p>            return false;</p>
+<p>        }</p>
+        
+<p>        // Check constraints</p>
+<p>        for (const constraint of constraints) {</p>
+<p>            if (constraint.agent === agentId &&</p>
+<p>                constraint.x === x &&</p>
+<p>                constraint.y === y &&</p>
+<p>                constraint.time === time) {</p>
+<p>                return false;</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        return true;</p>
+<p>    }</p>
+    
+<p>    findConflicts(solution) {</p>
+<p>        const conflicts = [];</p>
+<p>        const agents = Object.keys(solution);</p>
+        
+<p>        for (let i = 0; i < agents.length; i++) {</p>
+<p>            for (let j = i + 1; j < agents.length; j++) {</p>
+<p>                const agentA = agents[i];</p>
+<p>                const agentB = agents[j];</p>
+<p>                const pathA = solution[agentA];</p>
+<p>                const pathB = solution[agentB];</p>
+                
+<p>                // Check for vertex conflicts</p>
+<p>                const maxTime = Math.max(pathA.length, pathB.length);</p>
+<p>                for (let t = 0; t < maxTime; t++) {</p>
+<p>                    const posA = t < pathA.length ? pathA[t] : pathA[pathA.length - 1];</p>
+<p>                    const posB = t < pathB.length ? pathB[t] : pathB[pathB.length - 1];</p>
+                    
+<p>                    if (posA.x === posB.x && posA.y === posB.y) {</p>
+<p>                        conflicts.push({</p>
+<p>                            type: 'vertex',</p>
+<p>                            agentA: agentA,</p>
+<p>                            agentB: agentB,</p>
+<p>                            x: posA.x,</p>
+<p>                            y: posA.y,</p>
+<p>                            time: t</p>
+<p>                        });</p>
+<p>                    }</p>
+<p>                }</p>
+                
+<p>                // Check for edge conflicts</p>
+<p>                for (let t = 0; t < Math.min(pathA.length - 1, pathB.length - 1); t++) {</p>
+<p>                    const posA1 = pathA[t];</p>
+<p>                    const posA2 = pathA[t + 1];</p>
+<p>                    const posB1 = pathB[t];</p>
+<p>                    const posB2 = pathB[t + 1];</p>
+                    
+<p>                    if (posA1.x === posB2.x && posA1.y === posB2.y &&</p>
+<p>                        posA2.x === posB1.x && posA2.y === posB1.y) {</p>
+<p>                        conflicts.push({</p>
+<p>                            type: 'edge',</p>
+<p>                            agentA: agentA,</p>
+<p>                            agentB: agentB,</p>
+<p>                            time: t</p>
+<p>                        });</p>
+<p>                    }</p>
+<p>                }</p>
+<p>            }</p>
+<p>        }</p>
+        
+<p>        return conflicts;</p>
+<p>    }</p>
+    
+<p>    createChildNodes(parentNode, conflict) {</p>
+<p>        const childNodes = [];</p>
+        
+<p>        // Create constraint for agent A</p>
+<p>        const constraintA = {</p>
+<p>            agent: conflict.agentA,</p>
+<p>            x: conflict.x,</p>
+<p>            y: conflict.y,</p>
+<p>            time: conflict.time</p>
+<p>        };</p>
+        
+<p>        const childA = {</p>
+<p>            constraints: [...parentNode.constraints, constraintA],</p>
+<p>            solution: { ...parentNode.solution },</p>
+<p>            newConstraint: constraintA</p>
+<p>        };</p>
+        
+<p>        // Create constraint for agent B</p>
+<p>        const constraintB = {</p>
+<p>            agent: conflict.agentB,</p>
+<p>            x: conflict.x,</p>
+<p>            y: conflict.y,</p>
+<p>            time: conflict.time</p>
+<p>        };</p>
+        
+<p>        const childB = {</p>
+<p>            constraints: [...parentNode.constraints, constraintB],</p>
+<p>            solution: { ...parentNode.solution },</p>
+<p>            newConstraint: constraintB</p>
+<p>        };</p>
+        
+<p>        return [childA, childB];</p>
+<p>    }</p>
+    
+<p>    calculateSolutionCost(solution) {</p>
+<p>        let totalCost = 0;</p>
+<p>        for (const path of Object.values(solution)) {</p>
+<p>            totalCost += path.length;</p>
+<p>        }</p>
+<p>        return totalCost;</p>
+<p>    }</p>
+    
+<p>    reconstructTimedPath(node) {</p>
+<p>        const path = [];</p>
+<p>        let current = node;</p>
+        
+<p>        while (current) {</p>
+<p>            path.unshift({ x: current.x, y: current.y, time: current.time });</p>
+<p>            current = current.parent;</p>
+<p>        }</p>
+        
+<p>        return path;</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
 
-    // Find individual paths for each agent
-    for (const agent of agents) {
-        const path = this.findIndividualPath(agent, []);
-        if (!path) {
-            return null; // No solution exists
-        }
-        rootNode.solution[agent.id] = path;
-        rootNode.cost += path.length;
-    }
+<p>---</p>
+<b>Previous:</b> <a href="13-performance.md">Performance Analysis</a>
+<b>Next:</b> <a href="15-research.md">Research Frontiers</a>
 
-    // Check for conflicts
-    const conflicts = this.findConflicts(rootNode.solution);
-    if (conflicts.length === 0) {
-        return rootNode.solution;
-    }
-
-    rootNode.conflicts = conflicts;
-    this.openSet.insert(rootNode, rootNode.cost);
-
-    while (!this.openSet.isEmpty()) {
-        const currentNode = this.openSet.pop();
-
-        // Pick the first conflict
-        const conflict = currentNode.conflicts[0];
-
-        // Create two child nodes with constraints
-        const childNodes = this.createChildNodes(currentNode, conflict);
-
-        for (const childNode of childNodes) {
-            // Replan for the constrained agent
-            const constrainedAgent = childNode.newConstraint.agent;
-            const newPath = this.findIndividualPath(
-                this.agents.find(a =&gt; a.id === constrainedAgent),
-                childNode.constraints
-            );
-
-            if (!newPath) {
-                continue; // This branch is infeasible
-            }
-
-            childNode.solution[constrainedAgent] = newPath;
-            childNode.cost = this.calculateSolutionCost(childNode.solution);
-
-            // Check for conflicts
-            const newConflicts = this.findConflicts(childNode.solution);
-
-            if (newConflicts.length === 0) {
-                return childNode.solution; // Solution found!
-            }
-
-            childNode.conflicts = newConflicts;
-            this.openSet.insert(childNode, childNode.cost);
-        }
-    }
-
-    return null; // No solution found
-}
-
-findIndividualPath(agent, constraints) {
-    // Use A* with constraints
-    const openSet = new MinHeap();
-    const closedSet = new Set();
-
-    const startNode = {
-        x: agent.start.x,
-        y: agent.start.y,
-        time: 0,
-        gCost: 0,
-        hCost: manhattanDistance(agent.start, agent.goal),
-        parent: null
-    };
-    startNode.fCost = startNode.gCost + startNode.hCost;
-
-    openSet.insert(startNode);
-
-    while (!openSet.isEmpty()) {
-        const currentNode = openSet.extractMin();
-        const nodeKey = `${currentNode.x}_${currentNode.y}_${currentNode.time}`;
-
-        if (closedSet.has(nodeKey)) continue;
-        closedSet.add(nodeKey);
-
-        if (currentNode.x === agent.goal.x &amp;&amp; currentNode.y === agent.goal.y) {
-            return this.reconstructTimedPath(currentNode);
-        }
-
-        // Generate successors (including wait action)
-        const successors = this.getTimedSuccessors(currentNode, agent.id, constraints);
-
-        for (const successor of successors) {
-            const successorKey = `${successor.x}_${successor.y}_${successor.time}`;
-            if (closedSet.has(successorKey)) continue;
-
-            openSet.insert(successor);
-        }
-    }
-
-    return null;
-}
-
-getTimedSuccessors(node, agentId, constraints) {
-    const successors = [];
-    const nextTime = node.time + 1;
-
-    // Movement actions
-    const directions = [
-        { dx: 0, dy: -1 }, { dx: 1, dy: 0 },
-        { dx: 0, dy: 1 }, { dx: -1, dy: 0 }
-    ];
-
-    for (const dir of directions) {
-        const newX = node.x + dir.dx;
-        const newY = node.y + dir.dy;
-
-        if (this.isValidMove(newX, newY, nextTime, agentId, constraints)) {
-            const successor = {
-                x: newX,
-                y: newY,
-                time: nextTime,
-                gCost: node.gCost + 1,
-                hCost: manhattanDistance({ x: newX, y: newY }, this.agents.find(a =&gt; a.id === agentId).goal),
-                parent: node
-            };
-            successor.fCost = successor.gCost + successor.hCost;
-            successors.push(successor);
-        }
-    }
-
-    // Wait action
-    if (this.isValidMove(node.x, node.y, nextTime, agentId, constraints)) {
-        const waitSuccessor = {
-            x: node.x,
-            y: node.y,
-            time: nextTime,
-            gCost: node.gCost + 1,
-            hCost: node.hCost,
-            parent: node
-        };
-        waitSuccessor.fCost = waitSuccessor.gCost + waitSuccessor.hCost;
-        successors.push(waitSuccessor);
-    }
-
-    return successors;
-}
-
-isValidMove(x, y, time, agentId, constraints) {
-    // Check grid bounds and obstacles
-    if (x &lt; 0 || x &gt;= GRID_WIDTH || y &lt; 0 || y &gt;= GRID_HEIGHT || 
-        grid[y][x].isObstacle) {
-        return false;
-    }
-
-    // Check constraints
-    for (const constraint of constraints) {
-        if (constraint.agent === agentId &amp;&amp;
-            constraint.x === x &amp;&amp;
-            constraint.y === y &amp;&amp;
-            constraint.time === time) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-findConflicts(solution) {
-    const conflicts = [];
-    const agents = Object.keys(solution);
-
-    for (let i = 0; i &lt; agents.length; i++) {
-        for (let j = i + 1; j &lt; agents.length; j++) {
-            const agentA = agents[i];
-            const agentB = agents[j];
-            const pathA = solution[agentA];
-            const pathB = solution[agentB];
-
-            // Check for vertex conflicts
-            const maxTime = Math.max(pathA.length, pathB.length);
-            for (let t = 0; t &lt; maxTime; t++) {
-                const posA = t &lt; pathA.length ? pathA[t] : pathA[pathA.length - 1];
-                const posB = t &lt; pathB.length ? pathB[t] : pathB[pathB.length - 1];
-
-                if (posA.x === posB.x &amp;&amp; posA.y === posB.y) {
-                    conflicts.push({
-                        type: 'vertex',
-                        agentA: agentA,
-                        agentB: agentB,
-                        x: posA.x,
-                        y: posA.y,
-                        time: t
-                    });
-                }
-            }
-
-            // Check for edge conflicts
-            for (let t = 0; t &lt; Math.min(pathA.length - 1, pathB.length - 1); t++) {
-                const posA1 = pathA[t];
-                const posA2 = pathA[t + 1];
-                const posB1 = pathB[t];
-                const posB2 = pathB[t + 1];
-
-                if (posA1.x === posB2.x &amp;&amp; posA1.y === posB2.y &amp;&amp;
-                    posA2.x === posB1.x &amp;&amp; posA2.y === posB1.y) {
-                    conflicts.push({
-                        type: 'edge',
-                        agentA: agentA,
-                        agentB: agentB,
-                        time: t
-                    });
-                }
-            }
-        }
-    }
-
-    return conflicts;
-}
-
-createChildNodes(parentNode, conflict) {
-    const childNodes = [];
-
-    // Create constraint for agent A
-    const constraintA = {
-        agent: conflict.agentA,
-        x: conflict.x,
-        y: conflict.y,
-        time: conflict.time
-    };
-
-    const childA = {
-        constraints: [...parentNode.constraints, constraintA],
-        solution: { ...parentNode.solution },
-        newConstraint: constraintA
-    };
-
-    // Create constraint for agent B
-    const constraintB = {
-        agent: conflict.agentB,
-        x: conflict.x,
-        y: conflict.y,
-        time: conflict.time
-    };
-
-    const childB = {
-        constraints: [...parentNode.constraints, constraintB],
-        solution: { ...parentNode.solution },
-        newConstraint: constraintB
-    };
-
-    return [childA, childB];
-}
-
-calculateSolutionCost(solution) {
-    let totalCost = 0;
-    for (const path of Object.values(solution)) {
-        totalCost += path.length;
-    }
-    return totalCost;
-}
-
-reconstructTimedPath(node) {
-    const path = [];
-    let current = node;
-
-    while (current) {
-        path.unshift({ x: current.x, y: current.y, time: current.time });
-        current = current.parent;
-    }
-
-    return path;
-}
-</code></pre>
-<p>}
-```</p>
-<hr />
-<p><strong>Previous:</strong> <a href="13-performance.md">Performance Analysis</a>
-<strong>Next:</strong> <a href="15-research.md">Research Frontiers</a></p>
-<p><strong>Interactive:</strong> <a href="demo.html">Try advanced algorithms</a></p>
+<b>Interactive:</b> <a href="demo.html">Try advanced algorithms</a>
     </div>
 </body>
 </html>
