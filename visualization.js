@@ -99,6 +99,10 @@ class AStarVisualizer {
 
         // Config events
         document.getElementById('demoSelect').addEventListener('change', (e) => this.handleDemoModeChange(e.target.value));
+        document.getElementById('heuristicSelect').addEventListener('change', () => this.updateHeuristicDescription());
+        
+        // Initial call to set description
+        this.updateHeuristicDescription();
         
         // Keyboard events
         document.addEventListener('keydown', (e) => {
@@ -432,6 +436,18 @@ class AStarVisualizer {
         } else {
             this.resetGrid();
         }
+    }
+
+    updateHeuristicDescription() {
+        const type = document.getElementById('heuristicSelect').value;
+        const descriptions = {
+            manhattan: "This heuristic calculates the distance as the sum of absolute differences of coordinates, which is perfect for 4-directional grid movement. It essentially represents the distance traveled if you were limited to moving only along grid axes like city streets.",
+            euclidean: "This metric computes the straight-line 'as-the-crow-flies' distance between the start and goal nodes. While mathematically precise, it can be less effective on strict grid-based maps compared to Manhattan distance.",
+            diagonal: "This heuristic calculates distance by taking the maximum of absolute coordinate differences, treating diagonal and cardinal moves with equal cost. It is optimally suited for environments where moving diagonally is as cheap as moving horizontally or vertically.",
+            octile: "This heuristic is designed for 8-directional movement where diagonal moves have a cost of approximately 1.414, reflecting the geometric reality of square grids. It provides a more accurate cost estimate than Chebyshev distance for grids with weighted diagonal traversal.",
+            dijkstra: "This method essentially operates as a blind search, exploring all directions equally because it uses a heuristic cost of zero. It guarantees the absolute shortest path but explores significantly more nodes than informed heuristics because it lacks goal-directed guidance."
+        };
+        document.getElementById('heuristicDescription').textContent = descriptions[type];
     }
     
     draw() {
