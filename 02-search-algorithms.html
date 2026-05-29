@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="shared.css">
+    <title>02 Search Algorithms</title>
+</head>
+<body>
+    <nav class="nav-bar">
+        <span>Mastering A*</span>
+        <div>
+            <a href="index.html">Home</a>
+            <a href="demo.html">Visualizer</a>
+        </div>
+    </nav>
+    <div class="container">
+        <h1>Search Algorithms Comparison</h1>
+<h2>Uninformed vs Informed Search</h2>
+<h3>Uninformed Search (Blind Search)</h3>
+<p>Algorithms that explore without knowledge of the goal location.</p>
+<h4>Breadth-First Search (BFS)</h4>
+<p><code>Exploration Pattern:
+┌─┬─┬─┬─┬─┐
+│1│2│3│4│5│
+├─┼─┼─┼─┼─┤
+│2│3│4│5│6│
+├─┼─┼─┼─┼─┤
+│3│4│5│6│7│
+└─┴─┴─┴─┴─┘</code>
+- <strong>Guarantees</strong>: Shortest path
+- <strong>Time</strong>: O(b^d)
+- <strong>Space</strong>: O(b^d)
+- <strong>Problem</strong>: Explores everywhere equally</p>
+<h4>Depth-First Search (DFS)</h4>
+<p><code>Exploration Pattern:
+┌─┬─┬─┬─┬─┐
+│1│ │ │ │ │
+├─┼─┼─┼─┼─┤
+│2│ │ │ │ │
+├─┼─┼─┼─┼─┤
+│3│4│5│6│7│
+└─┴─┴─┴─┴─┘</code>
+- <strong>Guarantees</strong>: None
+- <strong>Time</strong>: O(b^m)
+- <strong>Space</strong>: O(bm)
+- <strong>Problem</strong>: May find suboptimal paths</p>
+<h3>Informed Search (Heuristic Search)</h3>
+<p>Algorithms that use domain knowledge to guide exploration.</p>
+<h4>Greedy Best-First Search</h4>
+<p><code>Exploration Pattern (toward goal):
+┌─┬─┬─┬─┬─┐
+│ │ │ │ │G│
+├─┼─┼─┼─┼─┤
+│ │ │ │4│3│
+├─┼─┼─┼─┼─┤
+│S│1│2│ │ │
+└─┴─┴─┴─┴─┘</code>
+- <strong>Guarantees</strong>: None
+- <strong>Time</strong>: O(b^m)
+- <strong>Space</strong>: O(b^m)
+- <strong>Problem</strong>: Can get trapped by local optima</p>
+<h4>Dijkstra's Algorithm</h4>
+<p><code>Exploration Pattern (uniform cost):
+┌─┬─┬─┬─┬─┐
+│4│3│4│5│6│
+├─┼─┼─┼─┼─┤
+│3│2│3│4│5│
+├─┼─┼─┼─┼─┤
+│2│1│2│3│4│
+├─┼─┼─┼─┼─┤
+│1│S│1│2│3│
+└─┴─┴─┴─┴─┘</code>
+- <strong>Guarantees</strong>: Optimal path
+- <strong>Time</strong>: O((V + E) log V)
+- <strong>Space</strong>: O(V)
+- <strong>Problem</strong>: Explores in all directions equally</p>
+<h2>A* Algorithm: The Best of Both Worlds</h2>
+<h3>Formula: f(n) = g(n) + h(n)</h3>
+<ul>
+<li><strong>g(n)</strong>: Actual cost from start</li>
+<li><strong>h(n)</strong>: Heuristic estimate to goal</li>
+<li><strong>f(n)</strong>: Total estimated cost</li>
+</ul>
+<p><code>A* Exploration Pattern:
+┌─┬─┬─┬─┬─┐
+│ │ │ │ │G│
+├─┼─┼─┼─┼─┤
+│ │ │3│2│1│
+├─┼─┼─┼─┼─┤
+│ │4│3│2│ │
+├─┼─┼─┼─┼─┤
+│S│1│2│ │ │
+└─┴─┴─┴─┴─┘</code></p>
+<h3>Why A* is Optimal</h3>
+<ol>
+<li><strong>Admissible Heuristic</strong>: Never overestimates</li>
+<li><strong>Consistent</strong>: Satisfies triangle inequality</li>
+<li><strong>Complete</strong>: Always finds solution if exists</li>
+<li><strong>Optimal</strong>: Finds shortest path</li>
+</ol>
+<h2>Performance Comparison</h2>
+<p>| Algorithm | Optimal | Complete | Time | Space |
+|-----------|---------|----------|------|-------|
+| BFS | ✓ | ✓ | O(b^d) | O(b^d) |
+| DFS | ✗ | ✗ | O(b^m) | O(bm) |
+| Greedy | ✗ | ✗ | O(b^m) | O(b^m) |
+| Dijkstra | ✓ | ✓ | O((V+E)logV) | O(V) |
+| A* | ✓ | ✓ | O(b^d) | O(b^d) |</p>
+<p><strong>Key Advantage</strong>: A* typically explores fewer nodes than other optimal algorithms.</p>
+<hr />
+<p><strong>Previous:</strong> <a href="01-graph-theory-basics.md">Graph Theory Basics</a>
+<strong>Next:</strong> <a href="03-heuristic-mathematics.md">Heuristic Mathematics</a></p>
+<p><strong>Interactive:</strong> <a href="demo.html">Compare algorithms</a></p>
+    </div>
+</body>
+</html>

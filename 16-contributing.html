@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="shared.css">
+    <title>16 Contributing</title>
+</head>
+<body>
+    <nav class="nav-bar">
+        <span>Mastering A*</span>
+        <div>
+            <a href="index.html">Home</a>
+            <a href="demo.html">Visualizer</a>
+        </div>
+    </nav>
+    <div class="container">
+        <h1>Contributing Guide</h1>
+<h2>Welcome Contributors!</h2>
+<p>Thank you for your interest in contributing to the A* Algorithm Educational Repository! This guide will help you understand how to contribute effectively to this learning-focused project.</p>
+<h2>Table of Contents</h2>
+<ol>
+<li><a href="#getting-started">Getting Started</a></li>
+<li><a href="#types-of-contributions">Types of Contributions</a></li>
+<li><a href="#development-setup">Development Setup</a></li>
+<li><a href="#code-standards">Code Standards</a></li>
+<li><a href="#documentation-guidelines">Documentation Guidelines</a></li>
+<li><a href="#testing-requirements">Testing Requirements</a></li>
+<li><a href="#submission-process">Submission Process</a></li>
+<li><a href="#review-process">Review Process</a></li>
+<li><a href="#community-guidelines">Community Guidelines</a></li>
+<li><a href="#recognition">Recognition</a></li>
+</ol>
+<h2>Getting Started</h2>
+<h3>Prerequisites</h3>
+<ul>
+<li>Basic understanding of JavaScript and HTML</li>
+<li>Familiarity with pathfinding algorithms (A* knowledge preferred)</li>
+<li>Git and GitHub experience</li>
+<li>Modern web browser for testing</li>
+</ul>
+<h3>First Steps</h3>
+<ol>
+<li>
+<p><strong>Fork the Repository</strong>
+   <code>bash
+   git clone https://github.com/yourusername/astar-algorithm.git
+   cd astar-algorithm</code></p>
+</li>
+<li>
+<p><strong>Explore the Codebase</strong></p>
+</li>
+<li>Read through the <a href="README.md">README</a> for project overview</li>
+<li>Review the <a href="11-code-walkthrough.md">Code Walkthrough</a></li>
+<li>
+<p>Test the <a href="demo.html">Interactive Demo</a></p>
+</li>
+<li>
+<p><strong>Set Up Development Environment</strong>
+   <code>bash
+   # No build process required - pure HTML/JS/CSS
+   # Simply open demo.html in your browser</code></p>
+</li>
+</ol>
+<h2>Types of Contributions</h2>
+<h3>🐛 Bug Fixes</h3>
+<ul>
+<li>Algorithm implementation errors</li>
+<li>Visualization bugs</li>
+<li>Performance issues</li>
+<li>Browser compatibility problems</li>
+</ul>
+<h3>✨ Feature Enhancements</h3>
+<ul>
+<li>New pathfinding algorithms</li>
+<li>Additional visualization options</li>
+<li>Performance optimizations</li>
+<li>UI/UX improvements</li>
+</ul>
+<h3>📚 Documentation</h3>
+<ul>
+<li>Tutorial improvements</li>
+<li>Code comments</li>
+<li>Example additions</li>
+<li>Translation to other languages</li>
+</ul>
+<h3>🧪 Testing</h3>
+<ul>
+<li>Unit test additions</li>
+<li>Performance benchmarks</li>
+<li>Edge case testing</li>
+<li>Cross-browser testing</li>
+</ul>
+<h3>🔬 Research</h3>
+<ul>
+<li>Algorithm analysis</li>
+<li>Performance studies</li>
+<li>New heuristic functions</li>
+<li>Academic paper implementations</li>
+</ul>
+<h2>Development Setup</h2>
+<h3>Local Development</h3>
+<p>```javascript
+// Development utilities for contributors
+class DevelopmentUtils {
+    constructor() {
+        this.debugMode = false;
+        this.performanceMetrics = new Map();
+        this.testResults = [];
+    }</p>
+<pre><code>enableDebugMode() {
+    this.debugMode = true;
+    console.log('Debug mode enabled');
+
+    // Add debug visualization
+    this.addDebugControls();
+    this.enablePerformanceMonitoring();
+}
+
+addDebugControls() {
+    const debugPanel = document.createElement('div');
+    debugPanel.id = 'debug-panel';
+    debugPanel.style.cssText = `
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 10px;
+        border-radius: 5px;
+        font-family: monospace;
+        font-size: 12px;
+        z-index: 1000;
+        max-width: 300px;
+    `;
+
+    debugPanel.innerHTML = `
+        &lt;h4&gt;Debug Panel&lt;/h4&gt;
+        &lt;div id="debug-info"&gt;&lt;/div&gt;
+        &lt;button onclick="devUtils.runTests()"&gt;Run Tests&lt;/button&gt;
+        &lt;button onclick="devUtils.benchmarkPerformance()"&gt;Benchmark&lt;/button&gt;
+        &lt;button onclick="devUtils.exportMetrics()"&gt;Export Metrics&lt;/button&gt;
+    `;
+
+    document.body.appendChild(debugPanel);
+}
+
+enablePerformanceMonitoring() {
+    // Override pathfinding functions to add timing
+    const originalFindPath = window.findPath;
+
+    window.findPath = (...args) =&gt; {
+        const startTime = performance.now();
+        const result = originalFindPath.apply(this, args);
+        const endTime = performance.now();
+
+        this.recordMetric('pathfinding_time', endTime - startTime);
+        this.updateDebugInfo();
+
+        return result;
+    };
+}
+
+recordMetric(name, value) {
+    if (!this.performanceMetrics.has(name)) {
+        this.performanceMetrics.set(name, []);
+    }
+    this.performanceMetrics.get(name).push(value);
+}
+
+updateDebugInfo() {
+    const debugInfo = document.getElementById('debug-info');
+    if (!debugInfo) return;
+
+    let info = '';
+    for (const [metric, values] of this.performanceMetrics) {
+        const avg = values.reduce((a, b) =&gt; a + b, 0) / values.length;
+        const min = Math.min(...values);
+        const max = Math.max(...values);
+
+        info += `&lt;div&gt;${metric}:&lt;/div&gt;`;
+        info += `&lt;div&gt;  Avg: ${avg.toFixed(2)}ms&lt;/div&gt;`;
+        info += `&lt;div&gt;  Min: ${min.toFixed(2)}ms&lt;/div&gt;`;
+        info += `&lt;div&gt;  Max: ${max.toFixed(2)}ms&lt;/div&gt;`;
+        info += `&lt;div&gt;  Samples: ${values.length}&lt;/div&gt;&lt;br&gt;`;
+    }
+
+    debugInfo.innerHTML = info;
+}
+
+runTests() {
+    console.log('Running development tests...');
+
+    const tests = [
+        this.testBasicPathfinding,
+        this.testHeuristicFunctions,
+        this.testEdgeCases,
+        this.testPerformance
+    ];
+
+    this.testResults = [];
+
+    for (const test of tests) {
+        try {
+            const result = test.call(this);
+            this.testResults.push({ test: test.name, result: 'PASS', details: result });
+            console.log(`✅ ${test.name}: PASS`);
+        } catch (error) {
+            this.testResults.push({ test: test.name, result: 'FAIL', error: error.message });
+            console.error(`❌ ${test.name}: FAIL - ${error.message}`);
+        }
+    }
+
+    this.displayTestResults();
+}
+
+testBasicPathfinding() {
+    // Clear grid
+    initializeGrid();
+
+    // Test simple path
+    const path = findPath(0, 0, 5, 5);
+
+    if (!path || path.length === 0) {
+        throw new Error('No path found for simple case');
+    }
+
+    if (path[0].x !== 0 || path[0].y !== 0) {
+        throw new Error('Path does not start at correct position');
+    }
+
+    if (path[path.length - 1].x !== 5 || path[path.length - 1].y !== 5) {
+        throw new Error('Path does not end at correct position');
+    }
+
+    return { pathLength: path.length };
+}
+
+testHeuristicFunctions() {
+    const start = { x: 0, y: 0 };
+    const goal = { x: 3, y: 4 };
+
+    const manhattan = manhattanDistance(start, goal);
+    const euclidean = euclideanDistance(start, goal);
+
+    if (manhattan !== 7) {
+        throw new Error(`Manhattan distance incorrect: expected 7, got ${manhattan}`);
+    }
+
+    if (Math.abs(euclidean - 5) &gt; 0.01) {
+        throw new Error(`Euclidean distance incorrect: expected ~5, got ${euclidean}`);
+    }
+
+    return { manhattan, euclidean };
+}
+
+testEdgeCases() {
+    // Test same start and goal
+    initializeGrid();
+    let path = findPath(5, 5, 5, 5);
+
+    if (!path || path.length !== 1) {
+        throw new Error('Same start/goal should return single-node path');
+    }
+
+    // Test impossible path
+    initializeGrid();
+    // Create wall around goal
+    for (let x = 4; x &lt;= 6; x++) {
+        for (let y = 4; y &lt;= 6; y++) {
+            if (x !== 5 || y !== 5) {
+                grid[y][x].isObstacle = true;
+            }
+        }
+    }
+
+    path = findPath(0, 0, 5, 5);
+
+    if (path !== null) {
+        throw new Error('Should return null for impossible path');
+    }
+
+    return { edgeCasesPassed: 2 };
+}
+
+testPerformance() {
+    initializeGrid();
+
+    const startTime = performance.now();
+    const iterations = 100;
+
+    for (let i = 0; i &lt; iterations; i++) {
+        const startX = Math.floor(Math.random() * GRID_WIDTH);
+        const startY = Math.floor(Math.random() * GRID_HEIGHT);
+        const goalX = Math.floor(Math.random() * GRID_WIDTH);
+        const goalY = Math.floor(Math.random() * GRID_HEIGHT);
+
+        findPath(startX, startY, goalX, goalY);
+    }
+
+    const endTime = performance.now();
+    const avgTime = (endTime - startTime) / iterations;
+
+    if (avgTime &gt; 100) { // 100ms threshold
+        throw new Error(`Performance too slow: ${avgTime.toFixed(2)}ms average`);
+    }
+
+    return { averageTime: avgTime, iterations };
+}
+
+displayTestResults() {
+    const resultsWindow = window.open('', '_blank', 'width=600,height=400');
+
+    let html = `
+        &lt;html&gt;
+        &lt;head&gt;&lt;title&gt;Test Results&lt;/title&gt;&lt;/head&gt;
+        &lt;body style="font-family: monospace; padding: 20px;"&gt;
+        &lt;h2&gt;Development Test Results&lt;/h2&gt;
+    `;
+
+    for (const result of this.testResults) {
+        const status = result.result === 'PASS' ? '✅' : '❌';
+        html += `&lt;div style="margin: 10px 0;"&gt;`;
+        html += `&lt;strong&gt;${status} ${result.test}&lt;/strong&gt;&lt;br&gt;`;
+
+        if (result.result === 'PASS') {
+            html += `&lt;pre style="margin-left: 20px; color: green;"&gt;${JSON.stringify(result.details, null, 2)}&lt;/pre&gt;`;
+        } else {
+            html += `&lt;pre style="margin-left: 20px; color: red;"&gt;${result.error}&lt;/pre&gt;`;
+        }
+
+        html += `&lt;/div&gt;`;
+    }
+
+    html += `&lt;/body&gt;&lt;/html&gt;`;
+    resultsWindow.document.write(html);
+}
+
+benchmarkPerformance() {
+    console.log('Running performance benchmark...');
+
+    const scenarios = [
+        { name: 'Small Grid (10x10)', width: 10, height: 10, obstacles: 0.1 },
+        { name: 'Medium Grid (25x25)', width: 25, height: 25, obstacles: 0.2 },
+        { name: 'Large Grid (50x50)', width: 50, height: 50, obstacles: 0.3 },
+        { name: 'Dense Obstacles', width: 20, height: 20, obstacles: 0.4 }
+    ];
+
+    const results = [];
+
+    for (const scenario of scenarios) {
+        const result = this.benchmarkScenario(scenario);
+        results.push({ scenario: scenario.name, ...result });
+        console.log(`${scenario.name}: ${result.averageTime.toFixed(2)}ms average`);
+    }
+
+    this.displayBenchmarkResults(results);
+}
+
+benchmarkScenario(scenario) {
+    // Temporarily modify grid size
+    const originalWidth = GRID_WIDTH;
+    const originalHeight = GRID_HEIGHT;
+    const originalGrid = grid;
+
+    // Create test grid
+    const testGrid = [];
+    for (let y = 0; y &lt; scenario.height; y++) {
+        testGrid[y] = [];
+        for (let x = 0; x &lt; scenario.width; x++) {
+            testGrid[y][x] = {
+                isObstacle: Math.random() &lt; scenario.obstacles
+            };
+        }
+    }
+
+    // Override globals
+    window.GRID_WIDTH = scenario.width;
+    window.GRID_HEIGHT = scenario.height;
+    window.grid = testGrid;
+
+    const times = [];
+    const iterations = 50;
+
+    for (let i = 0; i &lt; iterations; i++) {
+        let startX, startY, goalX, goalY;
+
+        // Find valid start position
+        do {
+            startX = Math.floor(Math.random() * scenario.width);
+            startY = Math.floor(Math.random() * scenario.height);
+        } while (testGrid[startY][startX].isObstacle);
+
+        // Find valid goal position
+        do {
+            goalX = Math.floor(Math.random() * scenario.width);
+            goalY = Math.floor(Math.random() * scenario.height);
+        } while (testGrid[goalY][goalX].isObstacle);
+
+        const startTime = performance.now();
+        findPath(startX, startY, goalX, goalY);
+        const endTime = performance.now();
+
+        times.push(endTime - startTime);
+    }
+
+    // Restore original grid
+    window.GRID_WIDTH = originalWidth;
+    window.GRID_HEIGHT = originalHeight;
+    window.grid = originalGrid;
+
+    return {
+        averageTime: times.reduce((a, b) =&gt; a + b, 0) / times.length,
+        minTime: Math.min(...times),
+        maxTime: Math.max(...times),
+        iterations
+    };
+}
+
+displayBenchmarkResults(results) {
+    const resultsWindow = window.open('', '_blank', 'width=800,height=600');
+
+    let html = `
+        &lt;html&gt;
+        &lt;head&gt;
+            &lt;title&gt;Performance Benchmark Results&lt;/title&gt;
+            &lt;style&gt;
+                body { font-family: Arial, sans-serif; padding: 20px; }
+                table { border-collapse: collapse; width: 100%; }
+                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                th { background-color: #f2f2f2; }
+                .metric { font-family: monospace; }
+            &lt;/style&gt;
+        &lt;/head&gt;
+        &lt;body&gt;
+            &lt;h2&gt;Performance Benchmark Results&lt;/h2&gt;
+            &lt;table&gt;
+                &lt;tr&gt;
+                    &lt;th&gt;Scenario&lt;/th&gt;
+                    &lt;th&gt;Average Time (ms)&lt;/th&gt;
+                    &lt;th&gt;Min Time (ms)&lt;/th&gt;
+                    &lt;th&gt;Max Time (ms)&lt;/th&gt;
+                    &lt;th&gt;Iterations&lt;/th&gt;
+                &lt;/tr&gt;
+    `;
+
+    for (const result of results) {
+        html += `
+            &lt;tr&gt;
+                &lt;td&gt;${result.scenario}&lt;/td&gt;
+                &lt;td class="metric"&gt;${result.averageTime.toFixed(2)}&lt;/td&gt;
+                &lt;td class="metric"&gt;${result.minTime.toFixed(2)}&lt;/td&gt;
+                &lt;td class="metric"&gt;${result.maxTime.toFixed(2)}&lt;/td&gt;
+                &lt;td class="metric"&gt;${result.iterations}&lt;/td&gt;
+            &lt;/tr&gt;
+        `;
+    }
+
+    html += `
+            &lt;/table&gt;
+            &lt;h3&gt;Performance Analysis&lt;/h3&gt;
+            &lt;ul&gt;
+    `;
+
+    // Add analysis
+    const fastestScenario = results.reduce((min, current) =&gt; 
+        current.averageTime &lt; min.averageTime ? current : min
+    );
+
+    const slowestScenario = results.reduce((max, current) =&gt; 
+        current.averageTime &gt; max.averageTime ? current : max
+    );
+
+    html += `
+                &lt;li&gt;&lt;strong&gt;Fastest:&lt;/strong&gt; ${fastestScenario.scenario} (${fastestScenario.averageTime.toFixed(2)}ms)&lt;/li&gt;
+                &lt;li&gt;&lt;strong&gt;Slowest:&lt;/strong&gt; ${slowestScenario.scenario} (${slowestScenario.averageTime.toFixed(2)}ms)&lt;/li&gt;
+                &lt;li&gt;&lt;strong&gt;Performance Ratio:&lt;/strong&gt; ${(slowestScenario.averageTime / fastestScenario.averageTime).toFixed(2)}x&lt;/li&gt;
+            &lt;/ul&gt;
+        &lt;/body&gt;
+        &lt;/html&gt;
+    `;
+
+    resultsWindow.document.write(html);
+}
+
+exportMetrics() {
+    const data = {
+        timestamp: new Date().toISOString(),
+        performanceMetrics: Object.fromEntries(this.performanceMetrics),
+        testResults: this.testResults,
+        browserInfo: {
+            userAgent: navigator.userAgent,
+            platform: navigator.platform,
+            language: navigator.language
+        }
+    };
+
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `astar-metrics-${Date.now()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    URL.revokeObjectURL(url);
+
+    console.log('Metrics exported successfully');
+}
+</code></pre>
+<p>}</p>
+<p>// Initialize development utilities
+const devUtils = new DevelopmentUtils();</p>
+<p>// Auto-enable debug mode in development
+if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    devUtils.enableDebugMode();
+}
+```</p>
+<h3>Code Quality Tools</h3>
+<p>```javascript
+// Code quality checker for contributors
+class CodeQualityChecker {
+    constructor() {
+        this.rules = {
+            maxFunctionLength: 50,
+            maxLineLength: 100,
+            requireComments: true,
+            noConsoleLog: false, // Allow for educational purposes
+            requireJSDoc: true
+        };
+    }</p>
+<pre><code>checkCode(code) {
+    const issues = [];
+    const lines = code.split('\n');
+
+    // Check line length
+    lines.forEach((line, index) =&gt; {
+        if (line.length &gt; this.rules.maxLineLength) {
+            issues.push({
+                type: 'line-length',
+                line: index + 1,
+                message: `Line exceeds ${this.rules.maxLineLength} characters`
+            });
+        }
+    });
+
+    // Check function length
+    const functions = this.extractFunctions(code);
+    functions.forEach(func =&gt; {
+        if (func.lineCount &gt; this.rules.maxFunctionLength) {
+            issues.push({
+                type: 'function-length',
+                function: func.name,
+                message: `Function '${func.name}' has ${func.lineCount} lines (max: ${this.rules.maxFunctionLength})`
+            });
+        }
+    });
+
+    // Check for JSDoc comments
+    if (this.rules.requireJSDoc) {
+        functions.forEach(func =&gt; {
+            if (!func.hasJSDoc) {
+                issues.push({
+                    type: 'missing-jsdoc',
+                    function: func.name,
+                    message: `Function '${func.name}' missing JSDoc comment`
+                });
+            }
+        });
+    }
+
+    return issues;
+}
+
+extractFunctions(code) {
+    const functions = [];
+    const lines = code.split('\n');
+    let currentFunction = null;
+    let braceCount = 0;
+
+    for (let i = 0; i &lt; lines.length; i++) {
+        const line = lines[i].trim();
+
+        // Detect function start
+        const functionMatch = line.match(/function\s+(\w+)\s*\(|class\s+(\w+)|const\s+(\w+)\s*=.*=&gt;|let\s+(\w+)\s*=.*=&gt;|var\s+(\w+)\s*=.*=&gt;/);
+
+        if (functionMatch &amp;&amp; !currentFunction) {
+            const name = functionMatch[1] || functionMatch[2] || functionMatch[3] || functionMatch[4] || functionMatch[5];
+            currentFunction = {
+                name,
+                startLine: i + 1,
+                lineCount: 0,
+                hasJSDoc: i &gt; 0 &amp;&amp; lines[i - 1].trim().includes('*/')
+            };
+        }
+
+        if (currentFunction) {
+            currentFunction.lineCount++;
+
+            // Count braces to detect function end
+            braceCount += (line.match(/\{/g) || []).length;
+            braceCount -= (line.match(/\}/g) || []).length;
+
+            if (braceCount === 0 &amp;&amp; line.includes('}')) {
+                functions.push(currentFunction);
+                currentFunction = null;
+            }
+        }
+    }
+
+    return functions;
+}
+
+generateReport(issues) {
+    if (issues.length === 0) {
+        return '✅ No code quality issues found!';
+    }
+
+    let report = `❌ Found ${issues.length} code quality issues:\n\n`;
+
+    const groupedIssues = {};
+    issues.forEach(issue =&gt; {
+        if (!groupedIssues[issue.type]) {
+            groupedIssues[issue.type] = [];
+        }
+        groupedIssues[issue.type].push(issue);
+    });
+
+    for (const [type, typeIssues] of Object.entries(groupedIssues)) {
+        report += `**${type.toUpperCase()}:**\n`;
+        typeIssues.forEach(issue =&gt; {
+            report += `  - ${issue.message}\n`;
+        });
+        report += '\n';
+    }
+
+    return report;
+}
+</code></pre>
+<p>}
+```</p>
+<h2>Code Standards</h2>
+<h3>JavaScript Style Guide</h3>
+<p>```javascript
+/*<em>
+ * Example of properly formatted function
+ * @param {number} startX - Starting X coordinate
+ * @param {number} startY - Starting Y coordinate
+ * @param {number} goalX - Goal X coordinate
+ * @param {number} goalY - Goal Y coordinate
+ * @returns {Array|null} Path array or null if no path found
+ </em>/
+function findPath(startX, startY, goalX, goalY) {
+    // Validate input parameters
+    if (!isValidCoordinate(startX, startY) || !isValidCoordinate(goalX, goalY)) {
+        console.warn('Invalid coordinates provided to findPath');
+        return null;
+    }</p>
+<pre><code>// Initialize data structures
+const openSet = new MinHeap();
+const closedSet = new Set();
+
+// Create start node
+const startNode = createNode(startX, startY, 0, 
+    manhattanDistance({ x: startX, y: startY }, { x: goalX, y: goalY }));
+
+openSet.insert(startNode);
+
+// Main pathfinding loop
+while (!openSet.isEmpty()) {
+    const currentNode = openSet.extractMin();
+
+    // Check if goal reached
+    if (currentNode.x === goalX &amp;&amp; currentNode.y === goalY) {
+        return reconstructPath(currentNode);
+    }
+
+    // Process neighbors
+    processNeighbors(currentNode, goalX, goalY, openSet, closedSet);
+}
+
+return null; // No path found
+</code></pre>
+<p>}
+```</p>
+<h3>Naming Conventions</h3>
+<ul>
+<li><strong>Functions</strong>: camelCase (<code>findPath</code>, <code>calculateHeuristic</code>)</li>
+<li><strong>Variables</strong>: camelCase (<code>startNode</code>, <code>currentDistance</code>)</li>
+<li><strong>Constants</strong>: UPPER_SNAKE_CASE (<code>GRID_WIDTH</code>, <code>MAX_ITERATIONS</code>)</li>
+<li><strong>Classes</strong>: PascalCase (<code>MinHeap</code>, <code>PathfindingVisualizer</code>)</li>
+<li><strong>Files</strong>: kebab-case (<code>path-reconstruction.js</code>, <code>heuristic-functions.js</code>)</li>
+</ul>
+<h3>Comment Standards</h3>
+<p>```javascript
+/*<em>
+ * JSDoc for all public functions
+ * @param {type} paramName - Description
+ * @returns {type} Description
+ </em>/</p>
+<p>// Single-line comments for implementation details</p>
+<p>/<em> 
+ * Multi-line comments for complex algorithms
+ * or important explanations
+ </em>/
+```</p>
+<h2>Documentation Guidelines</h2>
+<h3>Markdown Structure</h3>
+<p>```markdown</p>
+<h1>Title</h1>
+<h2>Overview</h2>
+<p>Brief description of the topic</p>
+<h2>Key Concepts</h2>
+<h3>Concept 1</h3>
+<p>Detailed explanation with examples</p>
+<h3>Concept 2</h3>
+<p>Detailed explanation with examples</p>
+<h2>Implementation</h2>
+<p><code>javascript
+// Code examples with comments</code></p>
+<h2>Exercises</h2>
+<ol>
+<li>Practice exercise 1</li>
+<li>Practice exercise 2</li>
+</ol>
+<h2>Further Reading</h2>
+<ul>
+<li><a href="url">Link 1</a></li>
+<li><a href="url">Link 2</a></li>
+</ul>
+<hr />
+<p><strong>Previous:</strong> <a href="link">Previous Topic</a>
+<strong>Next:</strong> <a href="link">Next Topic</a>
+<strong>Interactive:</strong> <a href="demo.html">Demo</a>
+```</p>
+<h3>Writing Style</h3>
+<ul>
+<li><strong>Clear and Concise</strong>: Use simple language</li>
+<li><strong>Educational Focus</strong>: Explain the "why" not just the "how"</li>
+<li><strong>Progressive Complexity</strong>: Start simple, build up</li>
+<li><strong>Interactive Elements</strong>: Include exercises and examples</li>
+<li><strong>Cross-References</strong>: Link related concepts</li>
+</ul>
+<h2>Testing Requirements</h2>
+<h3>Unit Tests</h3>
+<p>All new functions must include unit tests:</p>
+<p>```javascript
+// test-heuristics.js
+function testManhattanDistance() {
+    const start = { x: 0, y: 0 };
+    const goal = { x: 3, y: 4 };
+    const expected = 7;
+    const actual = manhattanDistance(start, goal);</p>
+<pre><code>assert(actual === expected, 
+    `Manhattan distance test failed: expected ${expected}, got ${actual}`);
+</code></pre>
+<p>}
+```</p>
+<h3>Integration Tests</h3>
+<p>Test complete pathfinding scenarios:</p>
+<p>```javascript
+function testCompletePathfinding() {
+    // Setup test grid
+    initializeTestGrid();</p>
+<pre><code>// Test various scenarios
+const scenarios = [
+    { start: [0, 0], goal: [5, 5], expectPath: true },
+    { start: [0, 0], goal: [0, 0], expectPath: true },
+    // Add blocked path scenario
+];
+
+scenarios.forEach(scenario =&gt; {
+    const path = findPath(...scenario.start, ...scenario.goal);
+    const hasPath = path !== null;
+
+    assert(hasPath === scenario.expectPath,
+        `Pathfinding test failed for scenario: ${JSON.stringify(scenario)}`);
+});
+</code></pre>
+<p>}
+```</p>
+<h3>Performance Tests</h3>
+<p>```javascript
+function benchmarkPathfinding() {
+    const iterations = 1000;
+    const startTime = performance.now();</p>
+<pre><code>for (let i = 0; i &lt; iterations; i++) {
+    findPath(0, 0, GRID_WIDTH - 1, GRID_HEIGHT - 1);
+}
+
+const endTime = performance.now();
+const averageTime = (endTime - startTime) / iterations;
+
+console.log(`Average pathfinding time: ${averageTime.toFixed(2)}ms`);
+
+// Assert performance threshold
+assert(averageTime &lt; 10, 
+    `Performance regression: ${averageTime}ms &gt; 10ms threshold`);
+</code></pre>
+<p>}
+```</p>
+<h2>Submission Process</h2>
+<h3>1. Create Feature Branch</h3>
+<p>```bash
+git checkout -b feature/your-feature-name</p>
+<h1>or</h1>
+<p>git checkout -b fix/bug-description</p>
+<h1>or</h1>
+<p>git checkout -b docs/documentation-update
+```</p>
+<h3>2. Make Changes</h3>
+<ul>
+<li>Follow code standards</li>
+<li>Add tests for new functionality</li>
+<li>Update documentation</li>
+<li>Test thoroughly</li>
+</ul>
+<h3>3. Commit Guidelines</h3>
+<p>```bash</p>
+<h1>Use conventional commit format</h1>
+<p>git commit -m "feat: add bidirectional A* algorithm"
+git commit -m "fix: correct heuristic calculation bug"
+git commit -m "docs: improve pathfinding tutorial"
+git commit -m "test: add edge case tests for grid boundaries"
+git commit -m "perf: optimize neighbor generation"
+```</p>
+<h3>4. Pre-submission Checklist</h3>
+<ul>
+<li>[ ] Code follows style guidelines</li>
+<li>[ ] All tests pass</li>
+<li>[ ] Documentation updated</li>
+<li>[ ] Performance impact assessed</li>
+<li>[ ] Browser compatibility tested</li>
+<li>[ ] No console errors</li>
+<li>[ ] Educational value maintained</li>
+</ul>
+<h3>5. Create Pull Request</h3>
+<p><strong>Template:</strong></p>
+<p>```markdown</p>
+<h2>Description</h2>
+<p>Brief description of changes</p>
+<h2>Type of Change</h2>
+<ul>
+<li>[ ] Bug fix</li>
+<li>[ ] New feature</li>
+<li>[ ] Documentation update</li>
+<li>[ ] Performance improvement</li>
+<li>[ ] Code refactoring</li>
+</ul>
+<h2>Testing</h2>
+<ul>
+<li>[ ] Unit tests added/updated</li>
+<li>[ ] Integration tests pass</li>
+<li>[ ] Manual testing completed</li>
+<li>[ ] Performance benchmarks run</li>
+</ul>
+<h2>Educational Impact</h2>
+<ul>
+<li>[ ] Maintains learning progression</li>
+<li>[ ] Adds educational value</li>
+<li>[ ] Includes clear explanations</li>
+<li>[ ] Provides practical examples</li>
+</ul>
+<h2>Screenshots (if applicable)</h2>
+<p>[Add screenshots of UI changes]</p>
+<h2>Additional Notes</h2>
+<p>[Any additional information for reviewers]
+```</p>
+<h2>Review Process</h2>
+<h3>Review Criteria</h3>
+<ol>
+<li><strong>Code Quality</strong></li>
+<li>Follows style guidelines</li>
+<li>Well-commented and documented</li>
+<li>Efficient implementation</li>
+<li>
+<p>Error handling</p>
+</li>
+<li>
+<p><strong>Educational Value</strong></p>
+</li>
+<li>Clear explanations</li>
+<li>Progressive difficulty</li>
+<li>Practical examples</li>
+<li>
+<p>Interactive elements</p>
+</li>
+<li>
+<p><strong>Testing</strong></p>
+</li>
+<li>Adequate test coverage</li>
+<li>Edge cases considered</li>
+<li>
+<p>Performance impact</p>
+</li>
+<li>
+<p><strong>Documentation</strong></p>
+</li>
+<li>Clear and accurate</li>
+<li>Proper formatting</li>
+<li>Cross-references</li>
+<li>Examples included</li>
+</ol>
+<h3>Review Timeline</h3>
+<ul>
+<li><strong>Initial Review</strong>: Within 48 hours</li>
+<li><strong>Feedback Response</strong>: Within 24 hours</li>
+<li><strong>Final Approval</strong>: Within 72 hours</li>
+</ul>
+<h2>Community Guidelines</h2>
+<h3>Code of Conduct</h3>
+<ul>
+<li><strong>Be Respectful</strong>: Treat all contributors with respect</li>
+<li><strong>Be Constructive</strong>: Provide helpful feedback</li>
+<li><strong>Be Patient</strong>: Remember this is an educational project</li>
+<li><strong>Be Inclusive</strong>: Welcome contributors of all skill levels</li>
+</ul>
+<h3>Communication Channels</h3>
+<ul>
+<li><strong>Issues</strong>: Bug reports and feature requests</li>
+<li><strong>Discussions</strong>: General questions and ideas</li>
+<li><strong>Pull Requests</strong>: Code review and collaboration</li>
+</ul>
+<h3>Getting Help</h3>
+<ol>
+<li><strong>Check Documentation</strong>: Review existing guides</li>
+<li><strong>Search Issues</strong>: Look for similar problems</li>
+<li><strong>Ask Questions</strong>: Create a discussion thread</li>
+<li><strong>Join Community</strong>: Participate in project discussions</li>
+</ol>
+<h2>Recognition</h2>
+<h3>Contributor Acknowledgment</h3>
+<p>All contributors will be:</p>
+<ul>
+<li>Listed in the project README</li>
+<li>Credited in release notes</li>
+<li>Mentioned in documentation they helped create</li>
+<li>Invited to join the core contributor team (for significant contributions)</li>
+</ul>
+<h3>Contribution Types</h3>
+<ul>
+<li>🐛 <strong>Bug Fixes</strong>: Fixing issues and improving stability</li>
+<li>✨ <strong>Features</strong>: Adding new functionality</li>
+<li>📚 <strong>Documentation</strong>: Improving learning materials</li>
+<li>🧪 <strong>Testing</strong>: Adding tests and quality assurance</li>
+<li>🎨 <strong>Design</strong>: UI/UX improvements</li>
+<li>🔬 <strong>Research</strong>: Algorithm analysis and optimization</li>
+<li>🌍 <strong>Translation</strong>: Making content accessible in other languages</li>
+</ul>
+<h3>Badges and Recognition</h3>
+<p>Contributors earn badges for different types of contributions:</p>
+<ul>
+<li><strong>First Contribution</strong> 🎉</li>
+<li><strong>Bug Hunter</strong> 🐛</li>
+<li><strong>Feature Creator</strong> ✨</li>
+<li><strong>Documentation Master</strong> 📚</li>
+<li><strong>Test Champion</strong> 🧪</li>
+<li><strong>Performance Optimizer</strong> ⚡</li>
+<li><strong>Community Helper</strong> 🤝</li>
+</ul>
+<hr />
+<h2>Quick Start for Contributors</h2>
+<p>```bash</p>
+<h1>1. Fork and clone</h1>
+<p>git clone https://github.com/yourusername/astar-algorithm.git
+cd astar-algorithm</p>
+<h1>2. Create feature branch</h1>
+<p>git checkout -b feature/my-contribution</p>
+<h1>3. Make changes and test</h1>
+<h1>Open demo.html in browser</h1>
+<h1>Run development tests</h1>
+<h1>4. Commit and push</h1>
+<p>git add .
+git commit -m "feat: add my awesome contribution"
+git push origin feature/my-contribution</p>
+<h1>5. Create pull request</h1>
+<h1>Go to GitHub and create PR</h1>
+<p>```</p>
+<p><strong>Thank you for contributing to A* Algorithm education! 🌟</strong></p>
+<hr />
+<p><strong>Previous:</strong> <a href="15-research.md">Research Frontiers</a>
+<strong>Next:</strong> <a href="17-glossary.md">Glossary</a></p>
+<p><strong>Interactive:</strong> <a href="demo.html">Test your contributions</a></p>
+    </div>
+</body>
+</html>

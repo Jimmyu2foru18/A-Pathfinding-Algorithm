@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="shared.css">
+    <title>17 Glossary</title>
+</head>
+<body>
+    <nav class="nav-bar">
+        <span>Mastering A*</span>
+        <div>
+            <a href="index.html">Home</a>
+            <a href="demo.html">Visualizer</a>
+        </div>
+    </nav>
+    <div class="container">
+        <h1>Glossary</h1>
+<h2>A</h2>
+<p><strong>A* Algorithm</strong>
+A graph traversal and pathfinding algorithm that finds the shortest path between nodes by using a heuristic to guide its search. It combines the benefits of Dijkstra's algorithm (guaranteed shortest path) with the efficiency of greedy best-first search.</p>
+<p><strong>Admissible Heuristic</strong>
+A heuristic function that never overestimates the actual cost to reach the goal. This property ensures that A<em> will always find the optimal path. Mathematically: h(n) ≤ h</em>(n) where h*(n) is the true cost from node n to the goal.</p>
+<p><strong>Algorithm Complexity</strong>
+A measure of how the algorithm's performance (time and space requirements) scales with input size. Expressed using Big O notation (e.g., O(n log n)).</p>
+<p><strong>Asymptotic Behavior</strong>
+How an algorithm's performance characteristics change as the input size approaches infinity. Important for understanding scalability.</p>
+<h2>B</h2>
+<p><strong>Backtracking</strong>
+The process of reconstructing the optimal path by following parent pointers from the goal node back to the start node.</p>
+<p><strong>Best-First Search</strong>
+A search algorithm that explores nodes in order of their estimated promise, using a heuristic function to determine which node to examine next.</p>
+<p><strong>Bidirectional Search</strong>
+A pathfinding technique that simultaneously searches from both the start and goal nodes, potentially reducing the search space significantly.</p>
+<p><strong>Branching Factor</strong>
+The average number of successor nodes for each node in the search tree. In grid-based pathfinding, this is typically 4 (cardinal directions) or 8 (including diagonals).</p>
+<h2>C</h2>
+<p><strong>Closed Set</strong>
+A data structure (typically a hash set) that stores nodes that have already been evaluated by the A* algorithm. Prevents re-evaluation of nodes.</p>
+<p><strong>Consistent Heuristic (Monotonic)</strong>
+A heuristic that satisfies the triangle inequality: h(n) ≤ c(n,n') + h(n') for every node n and successor n'. Ensures optimal pathfinding with A*.</p>
+<p><strong>Cost Function</strong>
+A function that assigns a numerical cost to moving from one node to another. In simple grids, this is often uniform (cost = 1), but can vary based on terrain type.</p>
+<p><strong>Chebyshev Distance</strong>
+A distance metric that measures the maximum difference between coordinates. Formula: max(|x₁-x₂|, |y₁-y₂|). Useful for 8-directional movement.</p>
+<h2>D</h2>
+<p><strong>Dijkstra's Algorithm</strong>
+A graph search algorithm that finds the shortest path between nodes by exploring all nodes in order of their distance from the start. Guarantees optimal paths but can be slower than A*.</p>
+<p><strong>Dynamic Programming</strong>
+A method for solving complex problems by breaking them down into simpler subproblems and storing the results to avoid redundant calculations.</p>
+<p><strong>Diagonal Movement</strong>
+Movement that allows transitions between diagonally adjacent cells in a grid, typically with a cost of √2 ≈ 1.414 compared to 1.0 for cardinal directions.</p>
+<h2>E</h2>
+<p><strong>Euclidean Distance</strong>
+The straight-line distance between two points. Formula: √[(x₁-x₂)² + (y₁-y₂)²]. Often used as a heuristic for pathfinding.</p>
+<p><strong>Exploration</strong>
+The process of examining nodes during the search. A* explores nodes in order of their f-cost (f = g + h).</p>
+<p><strong>Edge</strong>
+A connection between two nodes in a graph, representing a possible move or transition. In grid pathfinding, edges connect adjacent cells.</p>
+<h2>F</h2>
+<p><strong>F-Cost (F-Score)</strong>
+The total estimated cost of a path through a node, calculated as f(n) = g(n) + h(n), where g(n) is the actual cost from start to n, and h(n) is the heuristic estimate from n to goal.</p>
+<p><strong>Frontier</strong>
+Another term for the open set - the collection of nodes that have been discovered but not yet evaluated.</p>
+<p><strong>Fringe</strong>
+Synonymous with frontier or open set in pathfinding terminology.</p>
+<h2>G</h2>
+<p><strong>G-Cost (G-Score)</strong>
+The actual cost of the path from the start node to the current node. This represents the "distance traveled so far."</p>
+<p><strong>Graph</strong>
+A mathematical structure consisting of nodes (vertices) connected by edges. Pathfinding algorithms operate on graphs.</p>
+<p><strong>Grid-Based Pathfinding</strong>
+Pathfinding performed on a regular grid where each cell can be either passable or blocked (obstacle).</p>
+<p><strong>Greedy Best-First Search</strong>
+A search algorithm that always chooses the node that appears closest to the goal according to the heuristic function, without considering the cost to reach that node.</p>
+<h2>H</h2>
+<p><strong>H-Cost (H-Score)</strong>
+The heuristic estimate of the cost from the current node to the goal node. This is the "estimated distance remaining."</p>
+<p><strong>Heuristic Function</strong>
+A function that estimates the cost from a given node to the goal. Good heuristics are admissible and help guide the search efficiently.</p>
+<p><strong>Heap</strong>
+A tree-based data structure that satisfies the heap property. Min-heaps are commonly used to implement priority queues in A*.</p>
+<p><strong>Hierarchical Pathfinding</strong>
+A technique that uses multiple levels of abstraction to find paths more efficiently in large environments.</p>
+<h2>I</h2>
+<p><strong>Inadmissible Heuristic</strong>
+A heuristic that may overestimate the actual cost to the goal. While this can make A* faster, it may not find the optimal path.</p>
+<p><strong>Informed Search</strong>
+Search algorithms that use domain-specific knowledge (heuristics) to guide the search process more efficiently than uninformed search.</p>
+<p><strong>Iterative Deepening</strong>
+A search strategy that combines the space efficiency of depth-first search with the optimality of breadth-first search.</p>
+<h2>J</h2>
+<p><strong>Jump Point Search (JPS)</strong>
+An optimization technique for A* on uniform-cost grids that reduces the number of nodes explored by "jumping" over certain nodes.</p>
+<h2>L</h2>
+<p><strong>Landmark</strong>
+A pre-computed reference point used in some pathfinding optimizations to improve heuristic estimates.</p>
+<p><strong>Lexicographic Ordering</strong>
+A method for breaking ties when multiple nodes have the same f-cost, often by comparing g-costs or coordinates.</p>
+<h2>M</h2>
+<p><strong>Manhattan Distance</strong>
+The distance between two points measured along axes at right angles. Formula: |x₁-x₂| + |y₁-y₂|. Also called taxicab distance.</p>
+<p><strong>Min-Heap</strong>
+A binary heap where the parent node is always smaller than its children. Used to efficiently retrieve the node with minimum f-cost in A*.</p>
+<p><strong>Monotonic Heuristic</strong>
+See Consistent Heuristic. A property ensuring that the heuristic estimate decreases appropriately as you move closer to the goal.</p>
+<h2>N</h2>
+<p><strong>Node</strong>
+A point in the search space, representing a position or state. In grid pathfinding, each cell is a node.</p>
+<p><strong>Neighbor</strong>
+A node that can be reached directly from the current node in a single step.</p>
+<p><strong>Non-Admissible Heuristic</strong>
+A heuristic that may overestimate the true cost, potentially leading to suboptimal paths but faster search.</p>
+<h2>O</h2>
+<p><strong>Obstacle</strong>
+A blocked cell or impassable area in the pathfinding environment.</p>
+<p><strong>Open Set</strong>
+A priority queue containing nodes that have been discovered but not yet evaluated. Nodes are ordered by their f-cost.</p>
+<p><strong>Optimal Path</strong>
+The shortest possible path between two points, considering the cost function and constraints of the environment.</p>
+<p><strong>Octile Distance</strong>
+A distance metric for 8-directional movement that accounts for the different costs of diagonal vs. cardinal moves.</p>
+<h2>P</h2>
+<p><strong>Parent Pointer</strong>
+A reference stored in each node pointing to the node from which it was reached, used for path reconstruction.</p>
+<p><strong>Path</strong>
+A sequence of connected nodes from a start point to a goal point.</p>
+<p><strong>Path Reconstruction</strong>
+The process of building the final path by following parent pointers from the goal back to the start.</p>
+<p><strong>Priority Queue</strong>
+A data structure where elements are served in order of their priority rather than their insertion order. Essential for A* implementation.</p>
+<h2>Q</h2>
+<p><strong>Queue</strong>
+A first-in-first-out (FIFO) data structure. Used in breadth-first search but not directly in A*.</p>
+<h2>R</h2>
+<p><strong>Relaxation</strong>
+The process of updating a node's g-cost and parent when a better path to that node is found.</p>
+<p><strong>Real-Time Search</strong>
+Pathfinding algorithms designed to work within strict time constraints, often used in video games.</p>
+<h2>S</h2>
+<p><strong>Search Space</strong>
+The set of all possible states or positions that can be explored during pathfinding.</p>
+<p><strong>Stack</strong>
+A last-in-first-out (LIFO) data structure used in depth-first search algorithms.</p>
+<p><strong>State Space</strong>
+The set of all possible configurations or states in a problem domain.</p>
+<p><strong>Suboptimal</strong>
+A solution that is not the best possible, but may be acceptable for practical purposes.</p>
+<h2>T</h2>
+<p><strong>Tie-Breaking</strong>
+Methods for choosing between nodes with equal f-costs, such as preferring nodes with higher g-costs or using coordinate-based ordering.</p>
+<p><strong>Time Complexity</strong>
+A measure of how the algorithm's execution time scales with input size.</p>
+<p><strong>Traversal</strong>
+The process of visiting nodes in a graph or tree structure.</p>
+<h2>U</h2>
+<p><strong>Uninformed Search</strong>
+Search algorithms that don't use domain-specific knowledge, such as breadth-first search or depth-first search.</p>
+<p><strong>Uniform Cost Search</strong>
+A search algorithm that explores nodes in order of their path cost from the start node.</p>
+<h2>V</h2>
+<p><strong>Vertex</strong>
+Another term for a node in graph theory.</p>
+<p><strong>Visited Set</strong>
+Synonymous with closed set - nodes that have been fully processed.</p>
+<h2>W</h2>
+<p><strong>Weighted A</strong><em>
+A variant of A</em> that uses a weighted heuristic (h' = w × h where w &gt; 1) to trade optimality for speed.</p>
+<p><strong>Waypoint</strong>
+An intermediate target point in a path, often used in hierarchical pathfinding.</p>
+<hr />
+<h2>Mathematical Notation</h2>
+<p><strong>f(n) = g(n) + h(n)</strong>
+The fundamental equation of A*, where:
+- f(n) = estimated total cost of path through node n
+- g(n) = actual cost from start to node n<br />
+- h(n) = heuristic estimate from node n to goal</p>
+<p><strong>O(b^d)</strong>
+Time complexity notation where b is branching factor and d is depth of solution.</p>
+<p><strong>h(n) ≤ h*(n)</strong>
+Admissibility condition where h*(n) is the true optimal cost from n to goal.</p>
+<p><strong>h(n) ≤ c(n,n') + h(n')</strong>
+Consistency condition for heuristic functions.</p>
+<hr />
+<h2>Algorithm Variants</h2>
+<p><strong>A<em> Variants:<strong>
+- </strong>Weighted A</em></strong>: Uses w×h(n) for faster but potentially suboptimal results
+- <strong>Bidirectional A</strong><em>: Searches from both start and goal simultaneously
+- </em><em>Hierarchical A</em><strong>: Uses multiple abstraction levels
+- </strong>Real-Time A<strong><em>: Designed for time-constrained environments
+- </em>*Incremental A</strong>*: Handles dynamic environments efficiently</p>
+<p><strong>Related Algorithms:</strong>
+- <strong>Dijkstra's</strong>: A<em> with h(n) = 0
+- </em><em>Greedy Best-First</em><em>: Uses only h(n), ignoring g(n)
+- </em><em>Jump Point Search</em><em>: Grid optimization for A</em>
+- <strong>D<em> (Dynamic A<em>)</em><em>: Handles changing environments
+- </em>*Theta</em></strong>: Any-angle pathfinding variant</p>
+<hr />
+<h2>Data Structures</h2>
+<p><strong>Priority Queue Implementations:</strong>
+- <strong>Binary Heap</strong>: O(log n) insert/extract
+- <strong>Fibonacci Heap</strong>: O(1) amortized insert, O(log n) extract
+- <strong>Pairing Heap</strong>: Good practical performance</p>
+<p><strong>Set Implementations:</strong>
+- <strong>Hash Set</strong>: O(1) average insert/lookup
+- <strong>Tree Set</strong>: O(log n) insert/lookup, ordered
+- <strong>Bit Set</strong>: Memory-efficient for dense coordinate spaces</p>
+<hr />
+<h2>Performance Metrics</h2>
+<p><strong>Time Complexity:</strong>
+- <strong>Best Case</strong>: O(d) where d is depth of solution
+- <strong>Average Case</strong>: O(b^d) where b is effective branching factor
+- <strong>Worst Case</strong>: O(b^d) for complete search</p>
+<p><strong>Space Complexity:</strong>
+- <strong>Memory Usage</strong>: O(b^d) for storing open and closed sets
+- <strong>Path Storage</strong>: O(d) for storing the solution path</p>
+<p><strong>Quality Metrics:</strong>
+- <strong>Optimality</strong>: Whether the algorithm finds the shortest path
+- <strong>Completeness</strong>: Whether the algorithm always finds a solution if one exists
+- <strong>Admissibility</strong>: Whether the heuristic never overestimates</p>
+<hr />
+<h2>Common Pitfalls</h2>
+<p><strong>Implementation Issues:</strong>
+- <strong>Inconsistent Heuristic</strong>: Can lead to suboptimal paths
+- <strong>Incorrect Tie-Breaking</strong>: May cause unnecessary exploration
+- <strong>Memory Leaks</strong>: Improper cleanup of data structures
+- <strong>Floating Point Errors</strong>: Precision issues with diagonal movement</p>
+<p><strong>Design Issues:</strong>
+- <strong>Poor Heuristic Choice</strong>: Inefficient search or suboptimal paths
+- <strong>Inadequate Data Structures</strong>: Performance bottlenecks
+- <strong>Missing Edge Cases</strong>: Crashes or incorrect behavior</p>
+<hr />
+<h2>Practical Applications</h2>
+<p><strong>Video Games:</strong>
+- <strong>NPC Movement</strong>: Character pathfinding
+- <strong>RTS Unit Control</strong>: Multiple unit coordination
+- <strong>Level Design</strong>: Ensuring connectivity</p>
+<p><strong>Robotics:</strong>
+- <strong>Navigation</strong>: Mobile robot path planning
+- <strong>Manipulation</strong>: Robot arm motion planning
+- <strong>Swarm Robotics</strong>: Multi-agent coordination</p>
+<p><strong>Transportation:</strong>
+- <strong>GPS Navigation</strong>: Route planning
+- <strong>Traffic Management</strong>: Optimal flow control
+- <strong>Logistics</strong>: Delivery route optimization</p>
+<p><strong>Network Routing:</strong>
+- <strong>Internet Protocols</strong>: Packet routing
+- <strong>Telecommunications</strong>: Call routing
+- <strong>Social Networks</strong>: Connection finding</p>
+<hr />
+<p><strong>Previous:</strong> <a href="16-contributing.md">Contributing Guide</a>
+<strong>Next:</strong> <a href="18-references.md">References</a></p>
+<p><strong>Interactive:</strong> <a href="demo.html">Explore concepts in practice</a></p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="shared.css">
+    <title>06 Path Reconstruction</title>
+</head>
+<body>
+    <nav class="nav-bar">
+        <span>Mastering A*</span>
+        <div>
+            <a href="index.html">Home</a>
+            <a href="demo.html">Visualizer</a>
+        </div>
+    </nav>
+    <div class="container">
+        <h1>Path Reconstruction</h1>
+<h2>The Final Step: Building the Path</h2>
+<p>Once A* finds the goal, we need to reconstruct the actual path by following parent pointers backward from goal to start.</p>
+<h2>Basic Reconstruction Algorithm</h2>
+<p>```javascript
+function reconstructPath(goalNode) {
+    const path = [];
+    let current = goalNode;</p>
+<pre><code>while (current !== null) {
+    path.push(current);
+    current = current.parent;
+}
+
+return path.reverse();  // Start to goal order
+</code></pre>
+<p>}
+```</p>
+<h2>Visual Example</h2>
+<h3>Parent Pointer Chain</h3>
+<p><code>Grid with parent pointers:
+┌─┬─┬─┬─┬─┐
+│ │ │ │G│ │  G ← (3,1) ← (2,1) ← (1,1) ← S
+├─┼─┼─┼─┼─┤  ↑    ↑      ↑      ↑      ↑
+│ │ │█│↑│ │  Goal (3,1) (2,1) (1,1)  Start
+├─┼─┼─┼─┼─┤
+│ │←│←│↑│ │  Arrows show parent direction
+├─┼─┼─┼─┼─┤
+│ │S│ │ │ │  S = Start (1,3)
+└─┴─┴─┴─┴─┘</code></p>
+<h3>Reconstruction Steps</h3>
+<p>```
+Step 1: current = Goal(3,0), path = [(3,0)]
+Step 2: current = (3,1), path = [(3,0), (3,1)]
+Step 3: current = (2,1), path = [(3,0), (3,1), (2,1)]
+Step 4: current = (1,1), path = [(3,0), (3,1), (2,1), (1,1)]
+Step 5: current = Start(1,3), path = [(3,0), (3,1), (2,1), (1,1), (1,3)]
+Step 6: current = null, STOP</p>
+<p>Reverse: [(1,3), (1,1), (2,1), (3,1), (3,0)]
+Final path: Start → (1,1) → (2,1) → (3,1) → Goal
+```</p>
+<h2>Advanced Reconstruction Techniques</h2>
+<h3>1. Coordinate-Only Storage</h3>
+<p>```javascript
+// Instead of storing full parent objects
+class Node {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.parentX = -1;
+        this.parentY = -1;
+    }</p>
+<pre><code>setParent(parent) {
+    this.parentX = parent.x;
+    this.parentY = parent.y;
+}
+</code></pre>
+<p>}</p>
+<p>function reconstructPath(goalNode, nodeGrid) {
+    const path = [];
+    let x = goalNode.x;
+    let y = goalNode.y;</p>
+<pre><code>while (x !== -1 &amp;&amp; y !== -1) {
+    path.push({x, y});
+    const node = nodeGrid[y][x];
+    x = node.parentX;
+    y = node.parentY;
+}
+
+return path.reverse();
+</code></pre>
+<p>}
+```</p>
+<h3>2. Direction-Based Storage</h3>
+<p>```javascript
+// Store movement direction instead of coordinates
+const DIRECTIONS = {
+    NONE: 0,
+    UP: 1,
+    DOWN: 2,
+    LEFT: 3,
+    RIGHT: 4,
+    UP_LEFT: 5,
+    UP_RIGHT: 6,
+    DOWN_LEFT: 7,
+    DOWN_RIGHT: 8
+};</p>
+<p>class Node {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.parentDirection = DIRECTIONS.NONE;
+    }
+}</p>
+<p>function getParentCoords(node) {
+    const dx = [0, 0, 0, -1, 1, -1, 1, -1, 1];
+    const dy = [0, -1, 1, 0, 0, -1, -1, 1, 1];</p>
+<pre><code>const dir = node.parentDirection;
+return {
+    x: node.x + dx[dir],
+    y: node.y + dy[dir]
+};
+</code></pre>
+<p>}
+```</p>
+<h3>3. Compressed Path Storage</h3>
+<p>```javascript
+// Store only direction changes (for long straight paths)
+function compressPath(path) {
+    if (path.length &lt; 3) return path;</p>
+<pre><code>const compressed = [path[0]];
+
+for (let i = 1; i &lt; path.length - 1; i++) {
+    const prev = path[i - 1];
+    const curr = path[i];
+    const next = path[i + 1];
+
+    // Check if direction changes
+    const dir1 = getDirection(prev, curr);
+    const dir2 = getDirection(curr, next);
+
+    if (dir1 !== dir2) {
+        compressed.push(curr);
+    }
+}
+
+compressed.push(path[path.length - 1]);
+return compressed;
+</code></pre>
+<p>}</p>
+<p>function getDirection(from, to) {
+    const dx = to.x - from.x;
+    const dy = to.y - from.y;
+    return <code>${dx},${dy}</code>;
+}
+```</p>
+<h2>Path Smoothing</h2>
+<h3>Line-of-Sight Optimization</h3>
+<p>```javascript
+function smoothPath(path, grid) {
+    if (path.length &lt; 3) return path;</p>
+<pre><code>const smoothed = [path[0]];
+let current = 0;
+
+while (current &lt; path.length - 1) {
+    let farthest = current + 1;
+
+    // Find farthest visible point
+    for (let i = current + 2; i &lt; path.length; i++) {
+        if (hasLineOfSight(path[current], path[i], grid)) {
+            farthest = i;
+        } else {
+            break;
+        }
+    }
+
+    smoothed.push(path[farthest]);
+    current = farthest;
+}
+
+return smoothed;
+</code></pre>
+<p>}</p>
+<p>function hasLineOfSight(start, end, grid) {
+    // Bresenham's line algorithm
+    const dx = Math.abs(end.x - start.x);
+    const dy = Math.abs(end.y - start.y);
+    const sx = start.x &lt; end.x ? 1 : -1;
+    const sy = start.y &lt; end.y ? 1 : -1;
+    let err = dx - dy;</p>
+<pre><code>let x = start.x;
+let y = start.y;
+
+while (true) {
+    if (grid[y][x].isObstacle) return false;
+
+    if (x === end.x &amp;&amp; y === end.y) break;
+
+    const e2 = 2 * err;
+    if (e2 &gt; -dy) {
+        err -= dy;
+        x += sx;
+    }
+    if (e2 &lt; dx) {
+        err += dx;
+        y += sy;
+    }
+}
+
+return true;
+</code></pre>
+<p>}
+```</p>
+<h2>Path Validation</h2>
+<h3>Verify Path Integrity</h3>
+<p>```javascript
+function validatePath(path, grid) {
+    const errors = [];</p>
+<pre><code>// Check path continuity
+for (let i = 1; i &lt; path.length; i++) {
+    const prev = path[i - 1];
+    const curr = path[i];
+
+    const dx = Math.abs(curr.x - prev.x);
+    const dy = Math.abs(curr.y - prev.y);
+
+    // Check if move is valid (adjacent cells)
+    if (dx &gt; 1 || dy &gt; 1 || (dx === 0 &amp;&amp; dy === 0)) {
+        errors.push(`Invalid move from (${prev.x},${prev.y}) to (${curr.x},${curr.y})`);
+    }
+
+    // Check if cell is passable
+    if (grid[curr.y][curr.x].isObstacle) {
+        errors.push(`Path goes through obstacle at (${curr.x},${curr.y})`);
+    }
+}
+
+return {
+    isValid: errors.length === 0,
+    errors: errors
+};
+</code></pre>
+<p>}
+```</p>
+<h2>Path Metrics</h2>
+<h3>Calculate Path Statistics</h3>
+<p>```javascript
+function analyzePathMetrics(path) {
+    let totalDistance = 0;
+    let straightMoves = 0;
+    let diagonalMoves = 0;
+    let directionChanges = 0;</p>
+<pre><code>for (let i = 1; i &lt; path.length; i++) {
+    const prev = path[i - 1];
+    const curr = path[i];
+
+    const dx = Math.abs(curr.x - prev.x);
+    const dy = Math.abs(curr.y - prev.y);
+
+    // Calculate distance
+    if (dx === 1 &amp;&amp; dy === 1) {
+        totalDistance += Math.sqrt(2);  // Diagonal
+        diagonalMoves++;
+    } else {
+        totalDistance += 1;  // Cardinal
+        straightMoves++;
+    }
+
+    // Count direction changes
+    if (i &gt; 1) {
+        const prevPrev = path[i - 2];
+        const dir1 = getDirection(prevPrev, prev);
+        const dir2 = getDirection(prev, curr);
+        if (dir1 !== dir2) {
+            directionChanges++;
+        }
+    }
+}
+
+return {
+    totalDistance: totalDistance.toFixed(2),
+    pathLength: path.length,
+    straightMoves,
+    diagonalMoves,
+    directionChanges,
+    efficiency: (totalDistance / (path.length - 1)).toFixed(2)
+};
+</code></pre>
+<p>}
+```</p>
+<h2>Memory-Efficient Reconstruction</h2>
+<h3>Iterative (Stack-Free) Approach</h3>
+<p>```javascript
+function reconstructPathIterative(goalNode) {
+    // Count path length first
+    let length = 0;
+    let current = goalNode;
+    while (current !== null) {
+        length++;
+        current = current.parent;
+    }</p>
+<pre><code>// Pre-allocate array
+const path = new Array(length);
+
+// Fill array backwards
+current = goalNode;
+for (let i = length - 1; i &gt;= 0; i--) {
+    path[i] = {x: current.x, y: current.y};
+    current = current.parent;
+}
+
+return path;
+</code></pre>
+<p>}
+```</p>
+<h2>Debugging Path Issues</h2>
+<h3>Common Problems</h3>
+<ol>
+<li><strong>Infinite Loop</strong>: Circular parent references</li>
+<li><strong>Broken Chain</strong>: Missing parent pointer</li>
+<li><strong>Wrong Direction</strong>: Parent points to child</li>
+<li><strong>Memory Leak</strong>: Keeping full node references</li>
+</ol>
+<h3>Debug Visualization</h3>
+<p>```javascript
+function debugPath(goalNode) {
+    const visited = new Set();
+    let current = goalNode;
+    let steps = 0;</p>
+<pre><code>console.log('Path reconstruction debug:');
+
+while (current !== null &amp;&amp; steps &lt; 1000) {
+    const key = `${current.x},${current.y}`;
+
+    if (visited.has(key)) {
+        console.error('Circular reference detected at:', key);
+        break;
+    }
+
+    visited.add(key);
+    console.log(`Step ${steps}: (${current.x}, ${current.y})`);
+
+    current = current.parent;
+    steps++;
+}
+
+if (steps &gt;= 1000) {
+    console.error('Path too long, possible infinite loop');
+}
+</code></pre>
+<p>}
+```</p>
+<hr />
+<p><strong>Previous:</strong> <a href="05-set-management.md">Open/Closed Set Management</a>
+<strong>Next:</strong> <a href="07-complete-implementation.md">Complete Implementation</a></p>
+<p><strong>Interactive:</strong> <a href="demo.html">Trace path reconstruction</a></p>
+    </div>
+</body>
+</html>

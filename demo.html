@@ -33,7 +33,108 @@
         </div>
         
         <div class="controls-panel">
-            <!-- ... (Controls, Legend, Stats, etc.) ... -->
+            <div class="instructions">
+                <h4>🎯 How to Use</h4>
+                <ul>
+                    <li><strong>Left Click:</strong> Set start/end points or add obstacles</li>
+                    <li><strong>Right Click:</strong> Remove obstacles</li>
+                    <li><strong>Drag:</strong> Paint multiple obstacles</li>
+                    <li><strong>Space:</strong> Start/pause algorithm</li>
+                    <li><strong>R:</strong> Reset grid</li>
+                </ul>
+            </div>
+            
+            <div class="control-section">
+                <h3>🎮 Controls</h3>
+                <div class="button-group">
+                    <button id="startBtn" class="btn btn-primary">Start A* Search</button>
+                    <button id="pauseBtn" class="btn btn-secondary" disabled>Pause</button>
+                    <button id="resetBtn" class="btn btn-danger">Reset Grid</button>
+                    <button id="clearPathBtn" class="btn btn-secondary">Clear Path Only</button>
+                    <button id="generateMazeBtn" class="btn btn-secondary">Generate Maze</button>
+                </div>
+                
+                <div class="speed-control">
+                    <label for="speedSlider">Animation Speed:</label>
+                    <input type="range" id="speedSlider" min="1" max="100" value="50">
+                    <span id="speedValue">50ms</span>
+                </div>
+                
+                <div class="heuristic-selector">
+                    <label for="heuristicSelect">Heuristic Function:</label>
+                    <select id="heuristicSelect">
+                        <option value="manhattan">Manhattan Distance</option>
+                        <option value="euclidean">Euclidean Distance</option>
+                        <option value="diagonal">Diagonal Distance</option>
+                        <option value="dijkstra">Dijkstra (h=0)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="control-section">
+                <h3>🎨 Legend</h3>
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #2ecc71;"></div>
+                        <span>Start</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #e74c3c;"></div>
+                        <span>End</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #34495e;"></div>
+                        <span>Obstacle</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #3498db;"></div>
+                        <span>Open Set</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #9b59b6;"></div>
+                        <span>Closed Set</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #f1c40f;"></div>
+                        <span>Path</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="control-section">
+                <h3>📊 Statistics</h3>
+                <div class="stats">
+                    <div class="stat-item">
+                        <span>Nodes Explored:</span>
+                        <span id="nodesExplored">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>Path Length:</span>
+                        <span id="pathLength">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>Execution Time:</span>
+                        <span id="executionTime">0ms</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>Algorithm Status:</span>
+                        <span id="algorithmStatus">Ready</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="algorithm-info">
+                <h4>💡 Algorithm Insight</h4>
+                <p id="algorithmDescription">
+                    A* uses f(n) = g(n) + h(n) where g(n) is the actual cost from start to n, 
+                    and h(n) is the heuristic estimate from n to goal. Click Start to begin!
+                </p>
+            </div>
+            
+            <div class="step-info">
+                <h4>🔍 Current Step</h4>
+                <p id="stepDescription">Click on the grid to set start and end points, then click Start to begin the A* search.</p>
+            </div>
         </div>
     </div>
     

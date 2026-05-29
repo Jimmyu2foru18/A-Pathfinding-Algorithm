@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="shared.css">
+    <title>03 Heuristic Mathematics</title>
+</head>
+<body>
+    <nav class="nav-bar">
+        <span>Mastering A*</span>
+        <div>
+            <a href="index.html">Home</a>
+            <a href="demo.html">Visualizer</a>
+        </div>
+    </nav>
+    <div class="container">
+        <h1>Heuristic Mathematics</h1>
+<h2>What is a Heuristic?</h2>
+<p>A heuristic is an <strong>educated guess</strong> about the cost to reach the goal from any given node.</p>
+<h3>Key Properties</h3>
+<ol>
+<li><strong>Admissible</strong>: h(n) ≤ h*(n) (never overestimate)</li>
+<li><strong>Consistent</strong>: h(n) ≤ c(n,n') + h(n') (triangle inequality)</li>
+<li><strong>Fast to compute</strong>: O(1) time complexity</li>
+</ol>
+<h2>Common Heuristics</h2>
+<h3>1. Manhattan Distance (L1 Norm)</h3>
+<p><strong>Formula</strong>: <code>h(n) = |x₁ - x₂| + |y₁ - y₂|</code></p>
+<p>```
+Example: From (1,1) to (4,3)
+h = |4-1| + |3-1| = 3 + 2 = 5</p>
+<p>┌─┬─┬─┬─┬─┐
+│ │ │ │G│ │  G = Goal (4,3)
+├─┼─┼─┼─┼─┤
+│ │ │2│1│ │  Numbers = Manhattan distance
+├─┼─┼─┼─┼─┤
+│ │S│3│2│1│  S = Start (1,1)
+├─┼─┼─┼─┼─┤
+│ │4│3│2│1│
+└─┴─┴─┴─┴─┘
+```</p>
+<p><strong>Best for</strong>: 4-directional movement (no diagonal)</p>
+<h3>2. Euclidean Distance (L2 Norm)</h3>
+<p><strong>Formula</strong>: <code>h(n) = √[(x₁ - x₂)² + (y₁ - y₂)²]</code></p>
+<p>```
+Example: From (1,1) to (4,3)
+h = √[(4-1)² + (3-1)²] = √[9 + 4] = √13 ≈ 3.6</p>
+<p>┌─┬─┬─┬─┬─┐
+│ │ │ │G│ │  G = Goal (4,3)
+├─┼─┼─┼─┼─┤
+│ │ │2.2│1│ │  Numbers = Euclidean distance
+├─┼─┼─┼─┼─┤
+│ │S│2.8│2│1│  S = Start (1,1)
+├─┼─┼─┼─┼─┤
+│ │3.6│3.2│2.2│1│
+└─┴─┴─┴─┴─┘
+```</p>
+<p><strong>Best for</strong>: Any-direction movement</p>
+<h3>3. Chebyshev Distance (L∞ Norm)</h3>
+<p><strong>Formula</strong>: <code>h(n) = max(|x₁ - x₂|, |y₁ - y₂|)</code></p>
+<p>```
+Example: From (1,1) to (4,3)
+h = max(|4-1|, |3-1|) = max(3, 2) = 3</p>
+<p>┌─┬─┬─┬─┬─┐
+│ │ │ │G│ │  G = Goal (4,3)
+├─┼─┼─┼─┼─┤
+│ │ │2│1│ │  Numbers = Chebyshev distance
+├─┼─┼─┼─┼─┤
+│ │S│2│2│1│  S = Start (1,1)
+├─┼─┼─┼─┼─┤
+│ │3│3│2│1│
+└─┴─┴─┴─┴─┘
+```</p>
+<p><strong>Best for</strong>: 8-directional movement (with diagonal)</p>
+<h2>Heuristic Impact on Performance</h2>
+<h3>Perfect Heuristic (h = h*)</h3>
+<p><code>Nodes explored: Minimal (only optimal path)
+┌─┬─┬─┬─┬─┐
+│ │ │ │G│ │
+├─┼─┼─┼─┼─┤
+│ │ │ │*│ │
+├─┼─┼─┼─┼─┤
+│ │S│*│*│ │
+└─┴─┴─┴─┴─┘</code></p>
+<h3>Good Heuristic (h &lt; h*, close)</h3>
+<p><code>Nodes explored: Few
+┌─┬─┬─┬─┬─┐
+│ │ │*│G│ │
+├─┼─┼─┼─┼─┤
+│ │*│*│*│ │
+├─┼─┼─┼─┼─┤
+│ │S│*│*│ │
+└─┴─┴─┴─┴─┘</code></p>
+<h3>Poor Heuristic (h &lt;&lt; h*)</h3>
+<p><code>Nodes explored: Many (like Dijkstra)
+┌─┬─┬─┬─┬─┐
+│*│*│*│G│ │
+├─┼─┼─┼─┼─┤
+│*│*│*│*│ │
+├─┼─┼─┼─┼─┤
+│*│S│*│*│ │
+└─┴─┴─┴─┴─┘</code></p>
+<h3>Inadmissible Heuristic (h &gt; h*)</h3>
+<p><code>Result: Suboptimal path found
+┌─┬─┬─┬─┬─┐
+│ │ │ │G│ │
+├─┼─┼─┼─┼─┤
+│ │ │ │X│ │  X = Suboptimal path
+├─┼─┼─┼─┼─┤
+│ │S│X│X│X│
+└─┴─┴─┴─┴─┘</code></p>
+<h2>Choosing the Right Heuristic</h2>
+<p>| Movement Type | Best Heuristic | Reason |
+|---------------|----------------|--------|
+| 4-directional | Manhattan | Matches actual movement |
+| 8-directional | Chebyshev | Accounts for diagonal |
+| Any direction | Euclidean | True geometric distance |
+| Weighted edges | Custom | Domain-specific |</p>
+<h2>Mathematical Proof: Admissibility</h2>
+<p>For A* to be optimal, the heuristic must be admissible:</p>
+<p><strong>Theorem</strong>: If h(n) ≤ h<em>(n) for all n, then A</em> finds optimal solution.</p>
+<p><strong>Proof Sketch</strong>:
+1. Suppose A<em> returns suboptimal path with cost C
+2. Optimal path has cost C</em> &lt; C
+3. Some node n on optimal path must be in open set
+4. f(n) = g(n) + h(n) ≤ g(n) + h<em>(n) = C</em>
+5. Since f(n) ≤ C* &lt; C, node n would be expanded before suboptimal goal
+6. Contradiction! ∎</p>
+<h2>Implementation Tips</h2>
+<p>```javascript
+// Manhattan distance for grid
+function manhattanDistance(a, b) {
+    return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+}</p>
+<p>// Euclidean distance
+function euclideanDistance(a, b) {
+    const dx = a.x - b.x;
+    const dy = a.y - b.y;
+    return Math.sqrt(dx * dx + dy * dy);
+}</p>
+<p>// Chebyshev distance
+function chebyshevDistance(a, b) {
+    return Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y));
+}
+```</p>
+<hr />
+<p><strong>Previous:</strong> <a href="02-search-algorithms.md">Search Algorithms Comparison</a>
+<strong>Next:</strong> <a href="04-node-evaluation.md">Node Evaluation Process</a></p>
+<p><strong>Interactive:</strong> <a href="demo.html">Test different heuristics</a></p>
+    </div>
+</body>
+</html>

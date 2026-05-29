@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="shared.css">
+    <title>10 Demo Guide</title>
+</head>
+<body>
+    <nav class="nav-bar">
+        <span>Mastering A*</span>
+        <div>
+            <a href="index.html">Home</a>
+            <a href="demo.html">Visualizer</a>
+        </div>
+    </nav>
+    <div class="container">
+        <h1>Interactive Demo Guide</h1>
+<h2>Getting Started</h2>
+<h3>Opening the Demo</h3>
+<ol>
+<li>Open <code>demo.html</code> in your web browser</li>
+<li>You'll see a grid-based visualization interface</li>
+<li>The demo starts with a pre-configured maze</li>
+</ol>
+<h3>Interface Overview</h3>
+<p><code>┌─────────────────────────────────────┐
+│  A* Pathfinding Visualizer         │
+├─────────────────────────────────────┤
+│ [Start Search] [Reset] [Clear Path] │
+├─────────────────────────────────────┤
+│ Speed: [Slow] [Medium] [Fast]       │
+├─────────────────────────────────────┤
+│ Heuristic: [Manhattan] [Euclidean]  │
+├─────────────────────────────────────┤
+│                                     │
+│        GRID VISUALIZATION           │
+│                                     │
+└─────────────────────────────────────┘</code></p>
+<h2>Grid Elements</h2>
+<h3>Cell Types</h3>
+<ul>
+<li><strong>🟢 Green</strong>: Start position</li>
+<li><strong>🔴 Red</strong>: Goal position  </li>
+<li><strong>⬛ Black</strong>: Obstacles/walls</li>
+<li><strong>⬜ White</strong>: Empty walkable cells</li>
+<li><strong>🟡 Yellow</strong>: Open set (being considered)</li>
+<li><strong>🟠 Orange</strong>: Closed set (already evaluated)</li>
+<li><strong>🔵 Blue</strong>: Final path</li>
+</ul>
+<h3>Interactive Controls</h3>
+<ul>
+<li><strong>Left Click</strong>: Place/remove obstacles</li>
+<li><strong>Right Click</strong>: Set start position (green)</li>
+<li><strong>Ctrl + Click</strong>: Set goal position (red)</li>
+<li><strong>Drag</strong>: Paint multiple obstacles</li>
+</ul>
+<h2>Step-by-Step Tutorial</h2>
+<h3>Tutorial 1: Basic Pathfinding</h3>
+<ol>
+<li><strong>Reset the grid</strong> using the Reset button</li>
+<li><strong>Set start point</strong>: Right-click on any cell</li>
+<li><strong>Set goal point</strong>: Ctrl+Click on another cell</li>
+<li><strong>Add some obstacles</strong>: Left-click to create walls</li>
+<li><strong>Start the search</strong>: Click "Start Search"</li>
+<li><strong>Observe</strong>: Watch how the algorithm explores</li>
+</ol>
+<h3>Tutorial 2: Understanding the Search Process</h3>
+<ol>
+<li>Set speed to "Slow" for detailed observation</li>
+<li>Start the search and watch:</li>
+<li>Yellow cells appear (open set)</li>
+<li>Orange cells appear (closed set)</li>
+<li>The algorithm expands outward from start</li>
+<li>Blue path appears when goal is reached</li>
+</ol>
+<h3>Tutorial 3: Heuristic Comparison</h3>
+<ol>
+<li><strong>Test Manhattan Distance</strong>:</li>
+<li>Set heuristic to "Manhattan"</li>
+<li>Create a simple maze</li>
+<li>Run the algorithm</li>
+<li>
+<p>Note the exploration pattern</p>
+</li>
+<li>
+<p><strong>Test Euclidean Distance</strong>:</p>
+</li>
+<li>Reset and use same maze</li>
+<li>Set heuristic to "Euclidean"</li>
+<li>Run the algorithm</li>
+<li>Compare exploration patterns</li>
+</ol>
+<h3>Tutorial 4: Complex Scenarios</h3>
+<h4>Scenario A: No Solution</h4>
+<ol>
+<li>Create walls that completely surround the goal</li>
+<li>Run the algorithm</li>
+<li>Observe: Algorithm explores all reachable cells</li>
+<li>Result: No path found (algorithm terminates)</li>
+</ol>
+<h4>Scenario B: Multiple Paths</h4>
+<ol>
+<li>Create a maze with multiple routes to goal</li>
+<li>Run the algorithm</li>
+<li>Observe: A* finds the optimal path</li>
+<li>Note: Other paths are not fully explored</li>
+</ol>
+<h4>Scenario C: Narrow Passages</h4>
+<ol>
+<li>Create a maze with narrow corridors</li>
+<li>Run the algorithm</li>
+<li>Observe: How A* navigates tight spaces</li>
+<li>Note: Efficiency in constrained environments</li>
+</ol>
+<h2>Advanced Experiments</h2>
+<h3>Experiment 1: Heuristic Impact</h3>
+<p>```javascript
+// Try these scenarios in the demo:</p>
+<p>// Scenario 1: Open field (no obstacles)
+// - Manhattan vs Euclidean should show similar performance
+// - Both should explore minimal cells</p>
+<p>// Scenario 2: Complex maze
+// - Manhattan might explore more cells
+// - Euclidean might be more direct</p>
+<p>// Scenario 3: Diagonal movement
+// - Euclidean should perform better
+// - Manhattan might take longer paths
+```</p>
+<h3>Experiment 2: Obstacle Density</h3>
+<ol>
+<li><strong>Low Density (10% obstacles)</strong>:</li>
+<li>Fast pathfinding</li>
+<li>Direct routes</li>
+<li>
+<p>Minimal exploration</p>
+</li>
+<li>
+<p><strong>Medium Density (30% obstacles)</strong>:</p>
+</li>
+<li>Moderate exploration</li>
+<li>Some detours required</li>
+<li>
+<p>Good balance</p>
+</li>
+<li>
+<p><strong>High Density (60% obstacles)</strong>:</p>
+</li>
+<li>Extensive exploration</li>
+<li>Complex paths</li>
+<li>Longer computation time</li>
+</ol>
+<h3>Experiment 3: Grid Size Impact</h3>
+<ol>
+<li><strong>Small Grid (20x20)</strong>:</li>
+<li>Fast visualization</li>
+<li>Easy to follow</li>
+<li>
+<p>Good for learning</p>
+</li>
+<li>
+<p><strong>Large Grid (50x50)</strong>:</p>
+</li>
+<li>More realistic scenarios</li>
+<li>Performance testing</li>
+<li>Complex path planning</li>
+</ol>
+<h2>Understanding the Visualization</h2>
+<h3>Color Progression</h3>
+<p><code>Start → Open Set → Closed Set → Path
+ 🟢   →    🟡    →     🟠     → 🔵</code></p>
+<h3>Algorithm States</h3>
+<ol>
+<li><strong>Initialization</strong>: Start and goal are set</li>
+<li><strong>Exploration</strong>: Yellow and orange cells appear</li>
+<li><strong>Path Found</strong>: Blue path is drawn</li>
+<li><strong>Complete</strong>: Algorithm terminates</li>
+</ol>
+<h3>Performance Indicators</h3>
+<ul>
+<li><strong>Cells Explored</strong>: Count of orange cells</li>
+<li><strong>Path Length</strong>: Number of blue cells</li>
+<li><strong>Execution Time</strong>: Displayed in console</li>
+<li><strong>Optimality</strong>: Shortest possible path</li>
+</ul>
+<h2>Common Observations</h2>
+<h3>Expected Behaviors</h3>
+<ul>
+<li>A* explores fewer cells than Dijkstra's algorithm</li>
+<li>Heuristic guides search toward goal</li>
+<li>Optimal path is always found (if one exists)</li>
+<li>Algorithm terminates when no path exists</li>
+</ul>
+<h3>Interesting Patterns</h3>
+<ul>
+<li><strong>Wavefront</strong>: Exploration spreads like a wave</li>
+<li><strong>Directional Bias</strong>: Search favors goal direction</li>
+<li><strong>Obstacle Avoidance</strong>: Smart navigation around barriers</li>
+<li><strong>Tie Breaking</strong>: Consistent behavior with equal f-costs</li>
+</ul>
+<h2>Debugging and Analysis</h2>
+<h3>Console Information</h3>
+<p>Open browser developer tools to see:
+<code>javascript
+// Example console output:
+"A* Search Started"
+"Exploring node: (5, 3) with f-cost: 12"
+"Path found! Length: 23 cells"
+"Nodes explored: 156"
+"Execution time: 45ms"</code></p>
+<h3>Performance Metrics</h3>
+<ul>
+<li><strong>Nodes Explored</strong>: Lower is better</li>
+<li><strong>Path Length</strong>: Should be optimal</li>
+<li><strong>Execution Time</strong>: Depends on complexity</li>
+<li><strong>Memory Usage</strong>: Tracked in advanced mode</li>
+</ul>
+<h3>Troubleshooting</h3>
+<h4>Problem: No Path Found</h4>
+<ul>
+<li><strong>Check</strong>: Start and goal are accessible</li>
+<li><strong>Verify</strong>: No walls blocking all routes</li>
+<li><strong>Solution</strong>: Clear some obstacles</li>
+</ul>
+<h4>Problem: Slow Performance</h4>
+<ul>
+<li><strong>Cause</strong>: Large grid or complex maze</li>
+<li><strong>Solution</strong>: Reduce grid size or obstacles</li>
+<li><strong>Alternative</strong>: Use faster speed setting</li>
+</ul>
+<h4>Problem: Unexpected Path</h4>
+<ul>
+<li><strong>Check</strong>: Heuristic function selection</li>
+<li><strong>Verify</strong>: Diagonal movement settings</li>
+<li><strong>Note</strong>: A* finds optimal path, not necessarily intuitive</li>
+</ul>
+<h2>Educational Exercises</h2>
+<h3>Exercise 1: Heuristic Analysis</h3>
+<ol>
+<li>Create identical mazes</li>
+<li>Test with different heuristics</li>
+<li>Count explored cells for each</li>
+<li>Analyze performance differences</li>
+</ol>
+<h3>Exercise 2: Maze Design</h3>
+<ol>
+<li>Design mazes that favor different heuristics</li>
+<li>Create scenarios where Manhattan is better</li>
+<li>Create scenarios where Euclidean is better</li>
+<li>Document your findings</li>
+</ol>
+<h3>Exercise 3: Performance Testing</h3>
+<ol>
+<li>Measure execution time for different grid sizes</li>
+<li>Test with varying obstacle densities</li>
+<li>Compare different heuristic functions</li>
+<li>Create performance charts</li>
+</ol>
+<h3>Exercise 4: Algorithm Comparison</h3>
+<ol>
+<li>Implement BFS in the demo</li>
+<li>Compare exploration patterns</li>
+<li>Analyze optimality guarantees</li>
+<li>Document trade-offs</li>
+</ol>
+<h2>Advanced Features</h2>
+<h3>Custom Scenarios</h3>
+<p>```javascript
+// You can modify visualization.js to add:</p>
+<p>// 1. Different movement patterns
+const MOVEMENT_PATTERNS = {
+    CARDINAL: [[0,1], [1,0], [0,-1], [-1,0]],
+    DIAGONAL: [[0,1], [1,0], [0,-1], [-1,0], [1,1], [1,-1], [-1,1], [-1,-1]],
+    KNIGHT: [[2,1], [2,-1], [-2,1], [-2,-1], [1,2], [1,-2], [-1,2], [-1,-2]]
+};</p>
+<p>// 2. Different cost functions
+function getMovementCost(from, to) {
+    const dx = Math.abs(to.x - from.x);
+    const dy = Math.abs(to.y - from.y);</p>
+<pre><code>if (dx === 1 &amp;&amp; dy === 1) return 1.414; // Diagonal
+return 1; // Cardinal
+</code></pre>
+<p>}</p>
+<p>// 3. Dynamic obstacles
+function addDynamicObstacles() {
+    setInterval(() =&gt; {
+        // Randomly add/remove obstacles
+        const x = Math.floor(Math.random() * GRID_WIDTH);
+        const y = Math.floor(Math.random() * GRID_HEIGHT);
+        toggleObstacle(x, y);
+    }, 1000);
+}
+```</p>
+<h3>Data Export</h3>
+<p><code>``javascript
+// Export pathfinding results
+function exportResults() {
+    const results = {
+        gridSize:</code>${GRID_WIDTH}x${GRID_HEIGHT}`,
+        pathLength: finalPath.length,
+        nodesExplored: closedSet.size,
+        executionTime: searchTime,
+        heuristic: currentHeuristic,
+        obstacles: obstaclePositions
+    };</p>
+<pre><code>const dataStr = JSON.stringify(results, null, 2);
+const dataBlob = new Blob([dataStr], {type: 'application/json'});
+
+const link = document.createElement('a');
+link.href = URL.createObjectURL(dataBlob);
+link.download = 'pathfinding-results.json';
+link.click();
+</code></pre>
+<p>}
+```</p>
+<h2>Tips for Learning</h2>
+<h3>Best Practices</h3>
+<ol>
+<li><strong>Start Simple</strong>: Begin with small grids and few obstacles</li>
+<li><strong>Observe Carefully</strong>: Watch the exploration pattern</li>
+<li><strong>Experiment</strong>: Try different configurations</li>
+<li><strong>Compare</strong>: Test multiple scenarios</li>
+<li><strong>Document</strong>: Keep notes on observations</li>
+</ol>
+<h3>Common Mistakes</h3>
+<ol>
+<li><strong>Ignoring Heuristic</strong>: Not understanding its impact</li>
+<li><strong>Complex Mazes</strong>: Starting with overly difficult scenarios</li>
+<li><strong>Speed Too Fast</strong>: Missing important details</li>
+<li><strong>No Comparison</strong>: Not testing alternatives</li>
+<li><strong>Passive Watching</strong>: Not actively experimenting</li>
+</ol>
+<h3>Learning Progression</h3>
+<ol>
+<li><strong>Beginner</strong>: Understand basic pathfinding</li>
+<li><strong>Intermediate</strong>: Grasp heuristic functions</li>
+<li><strong>Advanced</strong>: Optimize for specific scenarios</li>
+<li><strong>Expert</strong>: Implement variations and improvements</li>
+</ol>
+<hr />
+<p><strong>Previous:</strong> <a href="09-optimizations.md">Optimization Techniques</a>
+<strong>Next:</strong> <a href="11-code-walkthrough.md">Code Walkthrough</a></p>
+<p><strong>Interactive:</strong> <a href="demo.html">Start exploring</a></p>
+    </div>
+</body>
+</html>

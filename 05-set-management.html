@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="shared.css">
+    <title>05 Set Management</title>
+</head>
+<body>
+    <nav class="nav-bar">
+        <span>Mastering A*</span>
+        <div>
+            <a href="index.html">Home</a>
+            <a href="demo.html">Visualizer</a>
+        </div>
+    </nav>
+    <div class="container">
+        <h1>Open/Closed Set Management</h1>
+<h2>The Two Essential Data Structures</h2>
+<h3>Open Set (Frontier)</h3>
+<p><strong>Purpose</strong>: Nodes discovered but not yet explored
+<strong>Operations</strong>: Add, Remove minimum f-cost, Check membership
+<strong>Implementation</strong>: Priority Queue (Min-Heap)</p>
+<h3>Closed Set (Explored)</h3>
+<p><strong>Purpose</strong>: Nodes already explored
+<strong>Operations</strong>: Add, Check membership
+<strong>Implementation</strong>: Hash Set</p>
+<h2>Visual Representation</h2>
+<p><code>Search Progress:
+┌─┬─┬─┬─┬─┐
+│ │ │ │G│ │  Legend:
+├─┼─┼─┼─┼─┤  S = Start
+│ │O│█│C│ │  G = Goal
+├─┼─┼─┼─┼─┤  O = Open Set
+│O│C│C│O│ │  C = Closed Set
+├─┼─┼─┼─┼─┤  █ = Obstacle
+│ │S│O│ │ │  (blank) = Unexplored
+└─┴─┴─┴─┴─┘</code></p>
+<h2>Algorithm Flow</h2>
+<h3>Step-by-Step Process</h3>
+<ol>
+<li>
+<p><strong>Initialize</strong>
+   <code>openSet = {start}
+   closedSet = {}
+   start.gCost = 0</code></p>
+</li>
+<li>
+<p><strong>Main Loop</strong>
+   ```
+   while openSet is not empty:
+       current = node in openSet with lowest f-cost
+       remove current from openSet
+       add current to closedSet</p>
+<p>if current == goal:
+       return reconstructPath(current)</p>
+<p>for each neighbor of current:
+       if neighbor in closedSet:
+           continue  // Skip already explored</p>
+<pre><code>   if neighbor not in openSet:
+       add neighbor to openSet
+
+   tentativeG = current.gCost + distance(current, neighbor)
+   if tentativeG &gt;= neighbor.gCost:
+       continue  // Not a better path
+
+   neighbor.parent = current
+   neighbor.gCost = tentativeG
+   neighbor.hCost = heuristic(neighbor, goal)
+</code></pre>
+<p>```</p>
+</li>
+</ol>
+<h2>Data Structure Analysis</h2>
+<h3>Priority Queue Implementation</h3>
+<h4>Option 1: Binary Heap</h4>
+<p>```javascript
+class MinHeap {
+    constructor() {
+        this.heap = [];
+    }</p>
+<pre><code>insert(node) {
+    this.heap.push(node);
+    this.bubbleUp(this.heap.length - 1);
+}
+
+extractMin() {
+    if (this.heap.length === 0) return null;
+    if (this.heap.length === 1) return this.heap.pop();
+
+    const min = this.heap[0];
+    this.heap[0] = this.heap.pop();
+    this.bubbleDown(0);
+    return min;
+}
+
+bubbleUp(index) {
+    while (index &gt; 0) {
+        const parentIndex = Math.floor((index - 1) / 2);
+        if (this.heap[parentIndex].fCost &lt;= this.heap[index].fCost) break;
+
+        [this.heap[parentIndex], this.heap[index]] = 
+        [this.heap[index], this.heap[parentIndex]];
+        index = parentIndex;
+    }
+}
+
+bubbleDown(index) {
+    while (true) {
+        let minIndex = index;
+        const leftChild = 2 * index + 1;
+        const rightChild = 2 * index + 2;
+
+        if (leftChild &lt; this.heap.length &amp;&amp; 
+            this.heap[leftChild].fCost &lt; this.heap[minIndex].fCost) {
+            minIndex = leftChild;
+        }
+
+        if (rightChild &lt; this.heap.length &amp;&amp; 
+            this.heap[rightChild].fCost &lt; this.heap[minIndex].fCost) {
+            minIndex = rightChild;
+        }
+
+        if (minIndex === index) break;
+
+        [this.heap[index], this.heap[minIndex]] = 
+        [this.heap[minIndex], this.heap[index]];
+        index = minIndex;
+    }
+}
+</code></pre>
+<p>}
+```</p>
+<p><strong>Time Complexity</strong>:
+- Insert: O(log n)
+- Extract Min: O(log n)
+- Peek: O(1)</p>
+<h4>Option 2: Simple Array (for small grids)</h4>
+<p>```javascript
+class SimpleOpenSet {
+    constructor() {
+        this.nodes = [];
+    }</p>
+<pre><code>add(node) {
+    if (!this.contains(node)) {
+        this.nodes.push(node);
+    }
+}
+
+getLowestFCost() {
+    return this.nodes.reduce((best, node) =&gt; 
+        node.fCost &lt; best.fCost ? node : best
+    );
+}
+
+remove(node) {
+    const index = this.nodes.indexOf(node);
+    if (index &gt; -1) {
+        this.nodes.splice(index, 1);
+    }
+}
+
+contains(node) {
+    return this.nodes.includes(node);
+}
+
+isEmpty() {
+    return this.nodes.length === 0;
+}
+</code></pre>
+<p>}
+```</p>
+<p><strong>Time Complexity</strong>:
+- Insert: O(1)
+- Extract Min: O(n)
+- Contains: O(n)</p>
+<h3>Hash Set for Closed Set</h3>
+<p>```javascript
+class ClosedSet {
+    constructor() {
+        this.set = new Set();
+    }</p>
+<pre><code>add(node) {
+    this.set.add(this.getKey(node));
+}
+
+contains(node) {
+    return this.set.has(this.getKey(node));
+}
+
+getKey(node) {
+    return `${node.x},${node.y}`;
+}
+</code></pre>
+<p>}
+```</p>
+<p><strong>Time Complexity</strong>:
+- Insert: O(1)
+- Contains: O(1)</p>
+<h2>Performance Comparison</h2>
+<p>| Grid Size | Simple Array | Binary Heap | Fibonacci Heap |
+|-----------|--------------|-------------|----------------|
+| 10×10 | Fast | Overkill | Overkill |
+| 100×100 | Slow | Good | Good |
+| 1000×1000 | Very Slow | Good | Better |</p>
+<h2>Memory Optimization</h2>
+<h3>Node Pooling</h3>
+<p>```javascript
+class NodePool {
+    constructor() {
+        this.pool = [];
+        this.used = new Set();
+    }</p>
+<pre><code>getNode(x, y) {
+    const key = `${x},${y}`;
+    if (this.used.has(key)) {
+        return this.used.get(key);
+    }
+
+    let node = this.pool.pop() || new Node();
+    node.reset(x, y);
+    this.used.set(key, node);
+    return node;
+}
+
+releaseAll() {
+    for (let node of this.used.values()) {
+        this.pool.push(node);
+    }
+    this.used.clear();
+}
+</code></pre>
+<p>}
+```</p>
+<h3>Coordinate Hashing</h3>
+<p>```javascript
+// Instead of storing full node objects
+function coordToIndex(x, y, width) {
+    return y * width + x;
+}</p>
+<p>function indexToCoord(index, width) {
+    return {
+        x: index % width,
+        y: Math.floor(index / width)
+    };
+}
+```</p>
+<h2>Common Pitfalls</h2>
+<h3>1. Duplicate Nodes in Open Set</h3>
+<p>```javascript
+// WRONG: Adding without checking
+openSet.add(neighbor);</p>
+<p>// CORRECT: Check and update if better
+if (!openSet.contains(neighbor)) {
+    openSet.add(neighbor);
+} else if (tentativeG &lt; neighbor.gCost) {
+    neighbor.updateCosts(current, goal);
+    // Note: Some implementations need to re-heapify here
+}
+```</p>
+<h3>2. Not Updating Priority Queue</h3>
+<p>```javascript
+// PROBLEM: Heap doesn't know about cost changes
+neighbor.gCost = newGCost;
+// Heap order is now invalid!</p>
+<p>// SOLUTION: Remove and re-add, or use decrease-key operation
+openSet.remove(neighbor);
+neighbor.gCost = newGCost;
+openSet.add(neighbor);
+```</p>
+<h3>3. Memory Leaks</h3>
+<p>```javascript
+// WRONG: Keeping references
+node.parent = parentNode;  // Creates reference chain</p>
+<p>// BETTER: Store coordinates only
+node.parentX = parentNode.x;
+node.parentY = parentNode.y;
+```</p>
+<h2>Visualization States</h2>
+<p><code>Iteration 1:           Iteration 2:           Iteration 3:
+┌─┬─┬─┬─┐             ┌─┬─┬─┬─┐             ┌─┬─┬─┬─┐
+│ │ │ │G│             │ │O│ │G│             │ │C│O│G│
+├─┼─┼─┼─┤             ├─┼─┼─┼─┤             ├─┼─┼─┼─┤
+│ │O│ │ │             │O│C│O│ │             │O│C│C│O│
+├─┼─┼─┼─┤             ├─┼─┼─┼─┤             ├─┼─┼─┼─┤
+│S│ │ │ │             │C│ │ │ │             │C│ │ │ │
+└─┴─┴─┴─┘             └─┴─┴─┴─┘             └─┴─┴─┴─┘
+Open: {(0,1)}          Open: {(1,1),(0,0)}   Open: {(1,1),(0,0),(2,0)}
+Closed: {(0,2)}        Closed: {(0,2),(1,2)} Closed: {(0,2),(1,2),(2,1)}</code></p>
+<hr />
+<p><strong>Previous:</strong> <a href="04-node-evaluation.md">Node Evaluation Process</a>
+<strong>Next:</strong> <a href="06-path-reconstruction.md">Path Reconstruction</a></p>
+<p><strong>Interactive:</strong> <a href="demo.html">Visualize set operations</a></p>
+    </div>
+</body>
+</html>
