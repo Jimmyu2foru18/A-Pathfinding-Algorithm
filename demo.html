@@ -41,31 +41,35 @@
         
         <div class="controls-panel">
             <div class="control-section">
-                <h3>Controls</h3>
-                <button id="startBtn" class="btn btn-primary">Start A* Search</button>
-                <button id="pauseBtn" class="btn btn-secondary" disabled>Pause</button>
-                <button id="resetBtn" class="btn btn-danger">Reset Grid</button>
-                <button id="clearPathBtn" class="btn btn-secondary">Clear Path Only</button>
-                <button id="generateMazeBtn" class="btn btn-secondary">Generate Maze</button>
-                
-                <label>Heuristic:</label>
-                <select id="heuristicSelect" style="width: 100%;">
+                <h3>Algorithm Controls</h3>
+                <button id="startBtn" class="btn btn-primary">Start Algorithm</button>
+                <button id="pauseBtn" class="btn btn-danger" disabled>Stop / Pause</button>
+                <button id="resetBtn" class="btn btn-secondary">Reset Grid</button>
+                <button id="generateMazeBtn" class="btn btn-secondary">Generate Random Maze</button>
+            </div>
+            
+            <div class="control-section">
+                <h3>Configuration</h3>
+                <label for="heuristicSelect">Heuristic:</label>
+                <select id="heuristicSelect" style="width: 100%; margin-bottom: 10px; padding: 5px;">
                     <option value="manhattan">Manhattan</option>
                     <option value="euclidean">Euclidean</option>
                     <option value="diagonal">Diagonal</option>
-                    <option value="dijkstra">Dijkstra</option>
+                    <option value="dijkstra">Dijkstra (No Heuristic)</option>
+                </select>
+                
+                <label for="demoSelect">Demo Mode:</label>
+                <select id="demoSelect" style="width: 100%; padding: 5px;">
+                    <option value="manual">Manual (Set Start/End)</option>
+                    <option value="maze">Run on Generated Maze</option>
                 </select>
             </div>
             
             <div class="stats">
                 <h4>Statistics</h4>
+                <div class="stat-item"><span>Status:</span><span id="algorithmStatus">Ready</span></div>
                 <div class="stat-item"><span>Nodes Explored:</span><span id="nodesExplored">0</span></div>
                 <div class="stat-item"><span>Path Length:</span><span id="pathLength">0</span></div>
-                <div class="stat-item"><span>Status:</span><span id="algorithmStatus">Ready</span></div>
-            </div>
-            
-            <div class="legend">
-                <!-- Legend items... -->
             </div>
         </div>
     </div>
